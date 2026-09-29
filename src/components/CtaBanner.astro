@@ -11,12 +11,14 @@ interface Props {
   title: string;
   lede?: string;
   image?: ImageMetadata;
-  primary?: { label: string; href: string };
-  secondary?: { label: string; href: string; icon?: IconName };
+  primary?: { label: string; href: string; icon?: IconName };
   id?: string;
 }
 
-const { eyebrow, title, lede, image, primary, secondary, id } = Astro.props;
+const { eyebrow, title, lede, image, primary, id } = Astro.props;
+
+/* Only send the reader away in a new tab when the link actually leaves the site. */
+const external = primary?.href.startsWith('http') ?? false;
 ---
 <section class="sv-cta sv-root sv-night" id={id}>
   {image && (
@@ -38,10 +40,9 @@ const { eyebrow, title, lede, image, primary, secondary, id } = Astro.props;
       {lede}
     </SectionHeading>
     <div class="sv-cta-actions">
-      {primary && <Button variant="primary" arrow href={primary.href}>{primary.label}</Button>}
-      {secondary && (
-        <Button variant="outline-night" icon={secondary.icon ?? 'chat'} href={secondary.href} target="_blank">
-          {secondary.label}
+      {primary && (
+        <Button variant="primary" size="lg" icon={primary.icon} arrow={!primary.icon} href={primary.href} target={external ? '_blank' : undefined}>
+          {primary.label}
         </Button>
       )}
     </div>
