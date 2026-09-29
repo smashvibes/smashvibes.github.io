@@ -6,10 +6,12 @@ import sitemap from '@astrojs/sitemap';
 // If this ever moves to a project repo, add `base: '/<repo>'` and the asset paths
 // in src/data/site.ts must switch to `import.meta.env.BASE_URL` prefixes.
 //
-// `site` is not optional here — the sitemap and every canonical/OG URL are built
-// from it.
+// `site` MUST be the live custom domain (public/CNAME), not the github.io address:
+// every canonical link, sitemap entry, Open Graph URL and JSON-LD @id is built from it,
+// and pointing it at the wrong host silently splits the site across two origins for
+// search engines.
 export default defineConfig({
-  site: 'https://smashvibes.github.io',
+  site: 'https://www.smashvibes.sg',
   integrations: [sitemap()],
   build: { inlineStylesheets: 'always' },
   image: {

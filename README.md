@@ -1,5 +1,7 @@
 # smashvibes.github.io
 
+Published at **https://www.smashvibes.sg** (custom domain, see `public/CNAME`).
+
 The Smash Vibes one-pager — a static site built with [Astro](https://astro.build) and
 deployed to GitHub Pages. **The build ships zero JavaScript**: every component renders
 to HTML at build time, and the mobile menu is a CSS-only disclosure.
@@ -108,7 +110,7 @@ no JavaScript at all.
 ### After the first deploy
 
 1. Verify the property in Google Search Console.
-2. Submit `https://smashvibes.github.io/sitemap-index.xml`.
+2. Submit `https://www.smashvibes.sg/sitemap-index.xml`.
 3. Run the Rich Results test on the live URL.
 4. Consider a Google Business Profile — this is a local, place-based activity, and that
    is where most of the local search value sits.

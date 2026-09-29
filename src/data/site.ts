@@ -40,7 +40,7 @@ export const site = {
   /** 157 characters. Keep under 160 so it is not truncated in results. */
   description:
     'Join friendly, level-matched badminton games in Singapore every Monday and Wednesday, 12-2PM at SBH Premier Courts, Geylang. $10 per game, all levels welcome.',
-  url: 'https://smashvibes.github.io',
+  url: 'https://www.smashvibes.sg',
   locale: 'en_SG',
   /** Absolute path (served from public/) — social crawlers need a stable, un-hashed URL. */
   ogImage: '/images/og-cover.jpg',
