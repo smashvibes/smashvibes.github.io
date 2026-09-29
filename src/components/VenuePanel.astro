@@ -1,5 +1,6 @@
 ---
 /** Venue card: court photograph beside the address and check list, held in the grid. */
+import { Image } from 'astro:assets';
 import CheckList from './CheckList.astro';
 import Icon from './Icon.astro';
 import { venue } from '../data/site';
@@ -8,7 +9,16 @@ import { venue } from '../data/site';
   <div class="sv-container">
     <div class="sv-venue-card">
       <figure class="sv-venue-media">
-        <img src={venue.image} alt={venue.imageAlt} loading="lazy" decoding="async" width="1034" height="476" />
+        <Image
+          src={venue.image}
+          alt={venue.imageAlt}
+          widths={[480, 720, 1034]}
+          sizes="(max-width: 1080px) 100vw, 660px"
+          format="webp"
+          quality={78}
+          loading="lazy"
+          decoding="async"
+        />
       </figure>
 
       <div class="sv-venue-body">

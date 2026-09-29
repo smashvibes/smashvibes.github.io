@@ -11,29 +11,85 @@ import FaqList from '../components/FaqList.astro';
 import CtaBanner from '../components/CtaBanner.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import {
-  closing, features, highlights, JOIN_URL, nav, schedule, site, WHATSAPP_GROUP,
+  closing, contacts, faq, features, featuresIntro, highlights, JOIN_URL, nav, schedule,
+  site, venue,
+  WHATSAPP_CHAT, WHATSAPP_GROUP, WHATSAPP_NUMBER,
 } from '../data/site';
 
-/* LocalBusiness/SportsActivityLocation markup: the weekly game is the thing people
-   search for, so day, time, venue and price are all exposed to search engines. */
+/**
+ * Structured data as a single @graph so the entities cross-reference each other.
+ *
+ * - SportsActivityLocation is the one that matters: day, time, venue, geo and price are
+ *   exactly what someone searching "badminton Singapore Monday" is asking for.
+ * - FAQPage makes the ten questions eligible for FAQ rich results, and is generated from
+ *   the same data the page renders, so the two cannot disagree — which is the condition
+ *   Google requires for the markup to be valid.
+ */
+const stripTags = (html: string) => html.replace(/<[^>]+>/g, '');
+
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'SportsActivityLocation',
-  name: site.name,
-  description: site.description,
-  url: site.url,
-  sport: 'Badminton',
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: '1 Lorong 23 Geylang',
-    addressLocality: 'Singapore',
-    postalCode: '388352',
-    addressCountry: 'SG',
-  },
-  openingHoursSpecification: [
-    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Wednesday'], opens: '12:00', closes: '14:00' },
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${site.url}/#website`,
+      url: `${site.url}/`,
+      name: site.name,
+      description: site.description,
+      inLanguage: 'en-SG',
+      publisher: { '@id': `${site.url}/#organization` },
+    },
+    {
+      '@type': ['SportsActivityLocation', 'SportsClub'],
+      '@id': `${site.url}/#organization`,
+      name: site.name,
+      alternateName: 'Smash Vibes Badminton Singapore',
+      description: site.description,
+      url: `${site.url}/`,
+      slogan: 'Play • Connect • Good Vibes',
+      sport: 'Badminton',
+      image: new URL(site.ogImage, site.url).href,
+      logo: new URL('/icon-512.png', site.url).href,
+      telephone: `+65${WHATSAPP_NUMBER.replace(/\s/g, '')}`,
+      areaServed: { '@type': 'Country', name: 'Singapore' },
+      address: {
+        '@type': 'PostalAddress',
+        name: venue.building,
+        streetAddress: '1 Lorong 23 Geylang',
+        addressLocality: 'Singapore',
+        postalCode: '388352',
+        addressCountry: 'SG',
+      },
+      geo: { '@type': 'GeoCoordinates', latitude: 1.3157, longitude: 103.8846 },
+      openingHoursSpecification: [
+        {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: ['Monday', 'Wednesday'],
+          opens: '12:00',
+          closes: '14:00',
+        },
+      ],
+      priceRange: '$',
+      makesOffer: {
+        '@type': 'Offer',
+        name: 'Badminton session',
+        price: '10',
+        priceCurrency: 'SGD',
+        description: 'Per game, pay as you play. All levels welcome.',
+        availability: 'https://schema.org/InStock',
+      },
+      sameAs: [WHATSAPP_CHAT, ...contacts.telegram.map((t) => t.href)],
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': `${site.url}/#faq`,
+      mainEntity: faq.items.map((item) => ({
+        '@type': 'Question',
+        name: item.q,
+        acceptedAnswer: { '@type': 'Answer', text: stripTags(item.a) },
+      })),
+    },
   ],
-  offers: { '@type': 'Offer', price: '10', priceCurrency: 'SGD', description: 'Per game, pay as you play' },
 };
 ---
 <Base>
@@ -65,7 +121,8 @@ const jsonLd = {
 
     <section class="sv-features sv-root" id="why">
       <div class="sv-container">
-        <p class="sv-eyebrow">Why play with Smash Vibes?</p>
+        <h2 class="sv-eyebrow">Why play with Smash Vibes?</h2>
+        <p class="sv-features-intro">{featuresIntro}</p>
         <div class="sv-feature-grid sv-feature-stack">
           {features.map((f) => (
             <Feature icon={f.icon} title={f.title} titleSub={f.titleSub}>{f.body}</Feature>

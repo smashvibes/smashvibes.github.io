@@ -4,19 +4,23 @@
  * `fetchpriority="high"` and counts as the LCP element the browser can prioritise;
  * the gradient scrim sits between it and the copy to hold contrast on the left.
  */
+import { Image } from 'astro:assets';
 import Button from './Button.astro';
 import HighlightStrip from './HighlightStrip.astro';
 import { hero, JOIN_URL, WHATSAPP_GROUP } from '../data/site';
 ---
 <section class="sv-hero sv-root sv-night" id="top">
-  <img
+  <Image
     class="sv-hero-img"
     src={hero.image}
     alt={hero.imageAlt}
+    widths={[640, 960, 1280, 1600]}
+    sizes="(max-width: 860px) 100vw, 62vw"
+    format="webp"
+    quality={78}
+    loading="eager"
     fetchpriority="high"
     decoding="async"
-    width="1600"
-    height="900"
   />
   <div class="sv-hero-scrim" aria-hidden="true"></div>
 

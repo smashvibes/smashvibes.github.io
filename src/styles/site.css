@@ -194,7 +194,8 @@ img { max-width: 100%; height: auto; display: block; }
 /* ---------- Features ---------- */
 
 .sv-features { background: var(--paper); padding-block: var(--space-8); }
-.sv-features .sv-eyebrow { margin-bottom: var(--space-6); }
+.sv-features .sv-eyebrow { margin-bottom: var(--space-3); }
+.sv-features-intro { margin: 0 0 var(--space-6); max-width: 70ch; font: var(--text-body-lg); color: var(--ink-muted); }
 .sv-feature-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
@@ -254,6 +255,7 @@ img { max-width: 100%; height: auto; display: block; }
   list-style: none;
 }
 .sv-faq-item summary::-webkit-details-marker { display: none; }
+.sv-faq-q { margin: 0; font: inherit; color: inherit; }
 .sv-faq-item summary:hover { color: var(--gold-700); }
 .sv-faq-item summary:focus-visible { outline: 2px solid var(--gold-700); outline-offset: 3px; border-radius: var(--radius-sm); }
 /* The design system ships no chevron, so the arrow rotates to point down when open. */

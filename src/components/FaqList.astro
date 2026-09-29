@@ -19,7 +19,7 @@ import { faq } from '../data/site';
       {faq.items.map((item, i) => (
         <details class="sv-faq-item" open={i === 0}>
           <summary>
-            <span>{item.q}</span>
+            <h3 class="sv-faq-q">{item.q}</h3>
             <Icon name="arrow-right" size={20} class="sv-faq-chevron" />
           </summary>
           <div class="sv-faq-answer" set:html={item.a} />

@@ -25,7 +25,8 @@ npm run preview  # serve dist/ locally
 | `src/styles/tokens.css` | **Generated** from `tokens.json`. Do not hand-edit. |
 | `src/styles/ds.css` | **Vendored** design-system component CSS. Do not hand-edit. |
 | `src/styles/site.css` | Page layout. Composes the system; never redefines a token. |
-| `public/images/` | Placeholder photography — see `public/images/README.md`. |
+| `src/assets/images/` | Photography. Processed at build time — see `public/images/README.md`. |
+| `public/` | Files needing stable URLs: favicons, manifest, robots.txt, OG image. |
 
 ## Relationship to the design system
 
@@ -50,6 +51,64 @@ Two components carry additive extensions, both to match the mockup and both opti
 
 - `Feature` takes `titleSub` (the "$10 / per game" card).
 - `HighlightStrip` items take `sub` (the same treatment in the hero row).
+
+## SEO
+
+Everything is driven from `src/data/site.ts`, so there is one place to edit.
+
+| Item | Where | Notes |
+| --- | --- | --- |
+| Title tag | `site.title` | 49 chars. Primary keyword first, brand last. Keep under 60. |
+| Meta description | `site.description` | 158 chars. Keep under 160 or it truncates. |
+| Canonical | `Base.astro` | Built from `site` in `astro.config.mjs`. |
+| Robots meta | `Base.astro` | `index, follow, max-image-preview:large` — opts the photography into full-size previews. |
+| `robots.txt` | `public/robots.txt` | Allows everything, points at the sitemap. |
+| XML sitemap | `@astrojs/sitemap` | Generates `/sitemap-index.xml` at build. **Submit that URL in Search Console.** |
+| Open Graph / Twitter | `Base.astro` | Full card set incl. `og:image:width/height` and image alt. |
+| Structured data | `src/pages/index.astro` | One `@graph`: `WebSite`, `SportsActivityLocation`, `FAQPage`. |
+| Favicons | `public/` | `.ico` (16/32/48), 16/32 PNG, 180 apple-touch, 192/512 + manifest. |
+
+### Keywords
+
+Targeted, in priority order. Chosen from how Singapore players describe the thing, **not
+from volume data** — validate in Search Console once there is traffic and adjust the
+copy. Do not add a `keywords` meta tag; search engines ignore it.
+
+`badminton Singapore` · `badminton games Singapore` · `social badminton Singapore` ·
+`casual badminton Singapore` · `badminton community Singapore` · `badminton kaki` ·
+`badminton for beginners Singapore` · `badminton session Geylang` ·
+`Singapore Badminton Hall` · `$10 badminton Singapore` · `weekly badminton Singapore`
+
+These appear naturally in the title, description, H1/H2s, the features intro and the FAQ
+answers. Nothing is stuffed — if you add copy, keep it readable first.
+
+### Headings
+
+One `<h1>` (the hero), then `<h2>` per section and `<h3>` for feature titles and FAQ
+questions. The FAQ questions are real `<h3>`s inside `<summary>`, which is valid and puts
+them in the document outline.
+
+### Structured data
+
+`FAQPage` is generated from the same array the page renders, so the markup and the
+visible text cannot disagree — Google requires that for the markup to be eligible.
+Validate changes at <https://search.google.com/test/rich-results>.
+
+### Page speed
+
+Photographs are imported through `astro:assets`, which emits WebP with a responsive
+`srcset`. A 1440px desktop load pulls roughly **136KB of imagery, down from ~440KB** of
+raw JPEG; a phone pulls about 97KB. The hero is `loading="eager"` + `fetchpriority="high"`
+as the LCP element; everything below the fold is lazy. CSS is inlined, and the page ships
+no JavaScript at all.
+
+### After the first deploy
+
+1. Verify the property in Google Search Console.
+2. Submit `https://smashvibes.github.io/sitemap-index.xml`.
+3. Run the Rich Results test on the live URL.
+4. Consider a Google Business Profile — this is a local, place-based activity, and that
+   is where most of the local search value sits.
 
 ## Responsive layout
 

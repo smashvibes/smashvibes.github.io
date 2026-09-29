@@ -1,5 +1,6 @@
 ---
 /** Heading row plus the 4-up photo grid. */
+import { Image } from 'astro:assets';
 import Button from './Button.astro';
 import SectionHeading from './SectionHeading.astro';
 import { community } from '../data/site';
@@ -16,7 +17,16 @@ import { community } from '../data/site';
     <ul class="sv-photo-grid">
       {community.photos.map((photo) => (
         <li>
-          <img src={photo.src} alt={photo.alt} loading="lazy" decoding="async" width="600" height="450" />
+          <Image
+            src={photo.src}
+            alt={photo.alt}
+            widths={[300, 450, 600]}
+            sizes="(max-width: 860px) 50vw, 285px"
+            format="webp"
+            quality={78}
+            loading="lazy"
+            decoding="async"
+          />
         </li>
       ))}
     </ul>

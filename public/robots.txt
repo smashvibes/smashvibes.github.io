@@ -1,0 +1,7 @@
+# Smash Vibes — https://smashvibes.github.io
+# Everything on this site is public and crawlable.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://smashvibes.github.io/sitemap-index.xml

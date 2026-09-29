@@ -6,6 +6,19 @@
  */
 import type { IconName } from '../components/icons';
 
+/**
+ * Photographs are imported (not referenced by URL) so Astro's asset pipeline can hash,
+ * convert and generate a responsive srcset for each one at build time. To swap a photo,
+ * replace the file in src/assets/images/ keeping its name.
+ */
+import heroImage from '../assets/images/hero-player.jpg';
+import venueImage from '../assets/images/venue-courts.jpg';
+import ctaImage from '../assets/images/cta-racket.jpg';
+import community1 from '../assets/images/community-1.jpg';
+import community2 from '../assets/images/community-2.jpg';
+import community3 from '../assets/images/community-3.jpg';
+import community4 from '../assets/images/community-4.jpg';
+
 /** Primary WhatsApp contact. Singapore number, country code 65, no spaces. */
 export const WHATSAPP_NUMBER = '9683 4290';
 export const WHATSAPP_CHAT = `https://wa.me/65${WHATSAPP_NUMBER.replace(/\s/g, '')}`;
@@ -22,12 +35,29 @@ export const JOIN_URL = WHATSAPP_CHAT;
 
 export const site = {
   name: 'Smash Vibes',
-  title: 'Smash Vibes — Singapore Badminton Community',
+  /** 48 characters — primary keyword first, brand last. Keep under 60. */
+  title: 'Weekly Badminton Games in Singapore | Smash Vibes',
+  /** 157 characters. Keep under 160 so it is not truncated in results. */
   description:
-    'Weekly badminton games for all levels in Singapore. Every Monday and Wednesday at SBH Premier Courts, $10 per game. Play • Connect • Good Vibes.',
+    'Join friendly, level-matched badminton games in Singapore every Monday and Wednesday, 12-2PM at SBH Premier Courts, Geylang. $10 per game, all levels welcome.',
   url: 'https://smashvibes.github.io',
   locale: 'en_SG',
+  /** Absolute path (served from public/) — social crawlers need a stable, un-hashed URL. */
+  ogImage: '/images/og-cover.jpg',
+  ogImageAlt: 'A Smash Vibes player leaping for an overhead smash, with the session details',
 };
+
+/**
+ * Search terms this page targets, most important first. These are chosen from how
+ * Singapore players actually describe the thing ("badminton kaki", "pay per game"),
+ * not from volume data — validate them in Search Console once the site has traffic,
+ * and adjust the copy rather than adding a keywords meta tag (search engines ignore it).
+ *
+ *   badminton Singapore · badminton games Singapore · social badminton Singapore
+ *   casual badminton Singapore · badminton community Singapore · badminton kaki
+ *   badminton for beginners Singapore · badminton session Geylang
+ *   Singapore Badminton Hall · $10 badminton Singapore · weekly badminton Singapore
+ */
 
 /**
  * The design's nav carries six items, but Tournaments and FAQ have no content yet —
@@ -47,7 +77,7 @@ export const hero = {
   eyebrow: "Singapore's Badminton Community",
   titleLines: ['Play • Connect', 'Good Vibes'],
   lede: 'Weekly badminton games for all levels. Meet new friends, enjoy great matches, and be part of a growing badminton community in Singapore.',
-  image: '/images/hero-player.jpg',
+  image: heroImage,
   imageAlt: 'A Smash Vibes player leaping for an overhead smash under the court lights',
   stats: [
     { icon: 'users', label: 'All levels welcome' },
@@ -69,7 +99,7 @@ export const venue = {
   building: 'Singapore Badminton Hall (SBH) @ Sims',
   address: '1 Lorong 23 Geylang, Singapore 388352',
   mapUrl: 'https://maps.google.com/?q=Singapore+Badminton+Hall,+1+Lorong+23+Geylang,+Singapore+388352',
-  image: '/images/venue-courts.jpg',
+  image: venueImage,
   imageAlt: 'The green courts of Singapore Badminton Hall, lit and empty before a session',
   points: [
     'Premium badminton courts',
@@ -78,6 +108,10 @@ export const venue = {
     'Easy access by MRT and bus',
   ],
 };
+
+/** Lede under the features heading. Carries the primary keywords in natural prose. */
+export const featuresIntro =
+  'Smash Vibes runs social badminton games in Singapore for players of every level — from people picking up a racket again to regulars chasing a good rally. Here is what a session with us looks like.';
 
 export const features: { icon: IconName; title: string; titleSub?: string; body: string }[] = [
   {
@@ -120,10 +154,10 @@ export const community = {
   ctaLabel: 'View More Photos',
   ctaHref: WHATSAPP_GROUP,
   photos: [
-    { src: '/images/community-1.jpg', alt: 'The Smash Vibes group photographed together on court after a session' },
-    { src: '/images/community-2.jpg', alt: 'A doubles rally in play during a weekly Smash Vibes game' },
-    { src: '/images/community-3.jpg', alt: 'A row of feather shuttlecocks ready for the session' },
-    { src: '/images/community-4.jpg', alt: 'Four players smiling together courtside' },
+    { src: community1, alt: 'The Smash Vibes group photographed together on court after a session' },
+    { src: community2, alt: 'A doubles rally in play during a weekly Smash Vibes game' },
+    { src: community3, alt: 'A row of feather shuttlecocks ready for the session' },
+    { src: community4, alt: 'Four players smiling together courtside' },
   ],
 };
 
@@ -149,15 +183,15 @@ export const faq = {
   items: [
     {
       q: 'When and where are Smash Vibes games held?',
-      a: 'Our regular games are held every Monday and Wednesday, from 12:00 PM to 2:00 PM, at SBH Premier Courts, Singapore Badminton Hall @ Sims, 1 Lorong 23 Geylang, Singapore 388352.',
+      a: 'Our regular games are held every Monday and Wednesday, from 12:00 PM to 2:00 PM, at <a href="#about">SBH Premier Courts</a>, Singapore Badminton Hall @ Sims, 1 Lorong 23 Geylang, Singapore 388352.',
     },
     {
       q: 'How much does each game cost?',
-      a: 'Each session is only $10 per player.',
+      a: 'Each session is only $10 per player, paid as you play with no membership and no hidden costs. See <a href="#why">what is included</a>.',
     },
     {
       q: 'What badminton level do I need to join?',
-      a: 'Players of different levels are welcome. We try to match players with others of a similar standard so everyone can enjoy more balanced and enjoyable games.',
+      a: 'Players of different levels are welcome, including beginners. We <a href="#why">match players</a> with others of a similar standard so everyone can enjoy more balanced and enjoyable games.',
     },
     {
       q: 'How do I register or reserve a slot for a game?',
@@ -185,7 +219,7 @@ export const faq = {
     },
     {
       q: 'Do I need to join the WhatsApp group to participate?',
-      a: 'It is not compulsory, but we highly recommend joining. The group is where we share upcoming game slots, updates, announcements and other Smash Vibes activities.',
+      a: 'It is not compulsory, but we highly recommend joining. The group is where we share upcoming game slots, updates, announcements and other Smash Vibes activities. <a href="#join">Join a game</a> to get started.',
     },
   ],
 };
@@ -194,5 +228,5 @@ export const closing = {
   eyebrow: 'Ready to play?',
   title: 'Join Smash Vibes Today',
   lede: "Be part of Singapore's growing badminton community.",
-  image: '/images/cta-racket.jpg',
+  image: ctaImage,
 };
