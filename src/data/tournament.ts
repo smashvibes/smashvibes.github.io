@@ -15,8 +15,17 @@ import guest2 from '../assets/tournament/guest-2.jpg';
 import guest3 from '../assets/tournament/guest-3.jpg';
 import guest4 from '../assets/tournament/guest-4.jpg';
 
-/** TODO: replace with the real registration form or booking URL once one exists. */
-export const REGISTER_URL = WHATSAPP_CHAT;
+/**
+ * Where every "Register Now" button points.
+ *
+ * Paste the Google Form's published URL here (the /viewform one, not /edit) and every
+ * CTA on the page switches over — nav, hero and the closing band. Build the form by
+ * running scripts/create-registration-form.gs; until a URL is set, the buttons fall
+ * back to the WhatsApp chat so they are never dead.
+ */
+export const REGISTRATION_FORM_URL = '';
+
+export const REGISTER_URL = REGISTRATION_FORM_URL || WHATSAPP_CHAT;
 
 export const tournament = {
   name: 'StarRise Cup',

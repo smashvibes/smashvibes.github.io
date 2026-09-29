@@ -132,6 +132,25 @@ Four outline icons the system does not ship (`clock`, `bracket`, `chart`, `rules
 four social marks were added to `src/design-system/site-icons.json`, drawn to the
 system's rules: 24px grid, 1.75 stroke, round caps, `currentColor`.
 
+## Tournament registration
+
+`scripts/create-registration-form.gs` builds the StarRise Cup registration Google Form
+and its response sheet in one run. Paste it into a new project at script.google.com, run
+`createRegistrationForm`, and the log prints the form and sheet URLs.
+
+Put the published form URL (the `/viewform` one) into `REGISTRATION_FORM_URL` in
+`src/data/tournament.ts`. Every "Register Now" button — nav, hero and closing band —
+reads from it. While it is empty they fall back to the WhatsApp chat, so no button is
+ever dead.
+
+The script also carries `updateCategoryAvailability()`: Google Forms cannot cap
+responses, so this removes a category from the list once it hits its entry limit
+(16 / 16 / 5 / 5). Install it with `installCapTrigger()` if you want that automatic.
+
+**Confirm before running:** the under-17 cut-off is set to "under 17 on the event date"
+(born on or after 15 November 2009). Age-as-at-event-date versus age-as-at-1-January is
+the most common eligibility dispute in junior draws — pick one and state it.
+
 ## Responsive layout
 
 Breakpoints, widest first — all in `src/styles/site.css`:
