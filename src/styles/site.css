@@ -24,6 +24,17 @@ body {
 
 img { max-width: 100%; height: auto; display: block; }
 
+/* Raster icons render as a mask filled with currentColor, so they follow the design
+   system's colour rules exactly as the SVG icons do. */
+.sv-ico-mask {
+  display: inline-block;
+  flex: none;
+  vertical-align: middle;
+  background-color: currentColor;
+  -webkit-mask: var(--sv-icon) center / contain no-repeat;
+  mask: var(--sv-icon) center / contain no-repeat;
+}
+
 /* Anchor targets clear the overlaid nav bar. */
 [id] { scroll-margin-top: calc(var(--nav-height) + var(--space-4)); }
 
@@ -196,6 +207,14 @@ img { max-width: 100%; height: auto; display: block; }
 .sv-features { background: var(--paper); padding-block: var(--space-8); }
 .sv-features .sv-eyebrow { margin-bottom: var(--space-3); }
 .sv-features-intro { margin: 0 0 var(--space-6); max-width: 70ch; font: var(--text-body-lg); color: var(--ink-muted); }
+
+/* Centred variant: heading, intro and each card share one axis, so a five-up row of
+   short cards reads as a deliberate block rather than five ragged columns. */
+.sv-features-centered { text-align: center; }
+.sv-features-centered .sv-features-intro { margin-inline: auto; }
+.sv-features-centered .sv-feature { align-items: center; }
+.sv-features-centered .sv-feature > div { display: grid; justify-items: center; }
+.sv-features-centered .sv-feature-text { max-width: 30ch; }
 .sv-feature-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));

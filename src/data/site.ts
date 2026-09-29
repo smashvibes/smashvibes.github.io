@@ -141,7 +141,7 @@ export const features: { icon: IconName; title: string; titleSub?: string; body:
 export const highlights: { icon: IconName; label: string }[] = [
   { icon: 'users', label: 'All levels welcome' },
   { icon: 'shuttlecock', label: 'Regular weekly games' },
-  { icon: 'community', label: 'Play • Connect Good Vibes' },
+  { icon: 'connect', label: 'Play • Connect Good Vibes' },
 ];
 
 export const community = {

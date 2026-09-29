@@ -101,8 +101,9 @@
   grid-template-columns: repeat(2, 1fr);
   gap: var(--space-5);
   margin-top: var(--space-6);
-  align-items: start;
 }
+/* The card must fill its stretched grid cell, so both boxes end the same height. */
+.sv-card { display: flex; flex-direction: column; }
 .sv-category-head { display: flex; gap: var(--space-4); align-items: flex-start; margin-bottom: var(--space-5); }
 .sv-category-mark { flex: none; color: var(--gold-500); }
 
@@ -114,21 +115,93 @@
   grid-template-columns: repeat(3, 1fr);
   gap: var(--space-5);
   margin-top: var(--space-6);
-  align-items: start;
 }
-.sv-prize { display: flex; gap: var(--space-4); align-items: flex-start; }
-.sv-prize-mark { flex: none; color: var(--gold-500); }
-.sv-prize-body { flex: 1; }
-.sv-prize-rows {
+
+.sv-prize {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: var(--space-6) var(--space-5) var(--space-5);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  font-family: var(--font-body);
+}
+/* A gold cap on each card — the one piece of colour that makes the row feel like prizes
+   rather than a pricing table. */
+.sv-prize::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  background: linear-gradient(90deg, var(--gold-300), var(--gold-500));
+}
+
+.sv-prize-head { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-5); }
+.sv-prize-disc {
+  flex: none;
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--space-1) var(--space-5);
-  margin: var(--space-3) 0 0;
-  font: var(--text-body);
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--gold-100);
+  color: var(--gold-600);
 }
-.sv-prize-rows dt { font-weight: 600; color: var(--ink); }
-.sv-prize-rows dd { margin: 0; color: var(--ink-muted); }
-.sv-prize-second { margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--line); }
+.sv-prize-title { margin: 0; font: var(--text-heading-md); color: var(--ink); }
+
+.sv-prize-champion {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-1);
+  padding: var(--space-5) var(--space-4);
+  background: var(--gold-100);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+.sv-prize-rank {
+  margin: 0;
+  font: var(--text-eyebrow);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--gold-700);
+}
+.sv-prize-amount {
+  margin: 0;
+  font: var(--text-display-lg);
+  font-size: clamp(34px, 3.4vw, 42px);
+  color: var(--gold-700);
+}
+
+.sv-prize-extras { list-style: none; margin: var(--space-4) 0 0; padding: 0; display: grid; gap: var(--space-2); }
+.sv-prize-extras li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  font: var(--text-body);
+  color: var(--ink-muted);
+}
+.sv-prize-extras strong { font-weight: 600; color: var(--ink); }
+
+/* `margin-top: auto` is what keeps the runner-up rows aligned across cards that carry
+   different numbers of supporting awards. */
+.sv-prize-runner {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: auto;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
+  font: var(--text-body);
+  color: var(--ink-muted);
+}
+.sv-prize-runner { margin-top: auto; }
+.sv-prize-runner span { font-weight: 600; color: var(--ink); }
+.sv-prize-runner strong { font: var(--text-heading-md); color: var(--gold-700); }
 
 /* ---------- Key information ---------- */
 

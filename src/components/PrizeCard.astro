@@ -1,5 +1,9 @@
 ---
-/** Prize card: trophy, title, the first-prize rows, a rule, then the second prize. */
+/**
+ * Prize card. The first-prize amount is the card's hero — set large in gold on a tinted
+ * panel — with the supporting awards beneath and the runner-up pinned to the bottom so
+ * cards of different lengths still line up across the row.
+ */
 import Icon from './Icon.astro';
 
 interface Props {
@@ -8,22 +12,33 @@ interface Props {
   second: { label: string; value: string };
 }
 const { title, first, second } = Astro.props;
+
+const [champion, ...extras] = first;
 ---
-<article class="sv-card sv-prize">
-  <Icon name="trophy" size={44} class="sv-prize-mark" />
-  <div class="sv-prize-body">
-    <h3 class="sv-card-title">{title}</h3>
-    <dl class="sv-prize-rows">
-      {first.map((row) => (
-        <>
-          <dt>{row.label}</dt>
-          <dd>{row.value}</dd>
-        </>
-      ))}
-    </dl>
-    <dl class="sv-prize-rows sv-prize-second">
-      <dt>{second.label}</dt>
-      <dd>{second.value}</dd>
-    </dl>
+<article class="sv-prize">
+  <header class="sv-prize-head">
+    <span class="sv-prize-disc"><Icon name="trophy" size={26} /></span>
+    <h3 class="sv-prize-title">{title}</h3>
+  </header>
+
+  <div class="sv-prize-champion">
+    <p class="sv-prize-rank">{champion.label.replace(/:$/, '')}</p>
+    <p class="sv-prize-amount">{champion.value}</p>
   </div>
+
+  {extras.length > 0 && (
+    <ul class="sv-prize-extras">
+      {extras.map((row) => (
+        <li>
+          <span>{row.label.replace(/:$/, '')}</span>
+          <strong>{row.value}</strong>
+        </li>
+      ))}
+    </ul>
+  )}
+
+  <footer class="sv-prize-runner">
+    <span>{second.label.replace(/:$/, '')}</span>
+    <strong>{second.value}</strong>
+  </footer>
 </article>

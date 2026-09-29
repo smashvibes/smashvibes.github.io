@@ -7,7 +7,7 @@
 import { Image } from 'astro:assets';
 import Button from './Button.astro';
 import HighlightStrip from './HighlightStrip.astro';
-import { hero, JOIN_URL, WHATSAPP_GROUP } from '../data/site';
+import { hero, WHATSAPP_GROUP } from '../data/site';
 ---
 <section class="sv-hero sv-root sv-night" id="top">
   <Image
@@ -33,8 +33,7 @@ import { hero, JOIN_URL, WHATSAPP_GROUP } from '../data/site';
     <p class="sv-hero-lede">{hero.lede}</p>
 
     <div class="sv-hero-actions">
-      <Button variant="primary" arrow href={JOIN_URL}>Join a Game Now</Button>
-      <Button variant="outline-night" icon="whatsapp" href={WHATSAPP_GROUP} target="_blank">
+      <Button variant="primary" size="lg" icon="whatsapp" href={WHATSAPP_GROUP} target="_blank">
         Join WhatsApp Group
       </Button>
     </div>

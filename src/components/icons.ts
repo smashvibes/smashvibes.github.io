@@ -1,8 +1,6 @@
 /**
  * Icon registry. `icon-paths.json` is generated from the design system's SVG assets
- * (`npm run sync:ds`); `site-icons.json` holds marks the system doesn't ship — today
- * just the WhatsApp mark, which its README asks us to take from WhatsApp's brand
- * resources rather than approximate with the outline `chat` icon.
+ * (`npm run sync:ds`); `site-icons.json` holds marks the system doesn't ship.
  */
 import dsPaths from '../design-system/icon-paths.json';
 import sitePaths from '../design-system/site-icons.json';
@@ -25,3 +23,14 @@ export type IconName = DesignSystemIconName | keyof typeof sitePaths;
  * grid. Keep the wrapper if you ever re-export it.
  */
 export const SOLID_ICONS = new Set<string>(['whatsapp']);
+
+/**
+ * Icons supplied as raster artwork rather than a path. They render as a CSS mask filled
+ * with `currentColor`, so a PNG still obeys the system's colour rules — gold-400 on dark,
+ * gold-600 on light — instead of being locked to the colour it was exported in.
+ *
+ * The file must have a real alpha channel; the mask uses its transparency, not its pixels.
+ */
+export const MASK_ICONS: Record<string, string> = {
+  shuttlecock: '/birdie.png',
+};
