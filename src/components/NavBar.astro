@@ -18,9 +18,11 @@ interface Props {
   homeHref?: string;
   links: NavLink[];
   cta?: { label: string; href: string; icon?: IconName };
+  /** Trailing arrow instead of a leading icon — used by the tournament page. */
+  ctaArrow?: boolean;
 }
 
-const { logoSrc, homeHref = '/', links, cta } = Astro.props;
+const { logoSrc, homeHref = '/', links, cta, ctaArrow = false } = Astro.props;
 ---
 <nav class="sv-nav sv-root sv-night" aria-label="Main">
   <a class="sv-nav-home" href={homeHref}>
@@ -45,7 +47,14 @@ const { logoSrc, homeHref = '/', links, cta } = Astro.props;
   </ul>
 
   {cta && (
-    <Button variant="primary" size="sm" icon={cta.icon ?? 'chat'} href={cta.href} class="sv-nav-cta">
+    <Button
+      variant="primary"
+      size="sm"
+      icon={ctaArrow ? undefined : (cta.icon ?? 'chat')}
+      arrow={ctaArrow}
+      href={cta.href}
+      class="sv-nav-cta"
+    >
       {cta.label}
     </Button>
   )}

@@ -1,0 +1,27 @@
+---
+/** Featured-guest card: portrait above name and role. */
+import { Image } from 'astro:assets';
+
+interface Props {
+  name: string;
+  role: string;
+  photo: ImageMetadata;
+}
+const { name, role, photo } = Astro.props;
+---
+<article class="sv-guest">
+  <Image
+    src={photo}
+    alt={`${name}, ${role}`}
+    widths={[220, 340, 480]}
+    sizes="(max-width: 520px) 100vw, (max-width: 900px) 45vw, 280px"
+    format="webp"
+    quality={80}
+    loading="lazy"
+    decoding="async"
+  />
+  <div class="sv-guest-body">
+    <h3 class="sv-guest-name">{name}</h3>
+    <p class="sv-guest-role">{role}</p>
+  </div>
+</article>

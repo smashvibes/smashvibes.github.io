@@ -1,0 +1,61 @@
+---
+/**
+ * Tournament hero. Same construction as the Smash Vibes hero — real <img> as the LCP
+ * element with a scrim over it — but the copy block leads with the event wordmark.
+ */
+import { Image } from 'astro:assets';
+import Button from './Button.astro';
+import Icon from './Icon.astro';
+import { hero, REGISTER_URL, tournament } from '../data/tournament';
+---
+<section class="sv-hero sv-tr-hero sv-root sv-night" id="top">
+  <Image
+    class="sv-hero-img"
+    src={hero.image}
+    alt={hero.imageAlt}
+    widths={[640, 960, 1254]}
+    sizes="(max-width: 860px) 100vw, 58vw"
+    format="webp"
+    quality={78}
+    loading="eager"
+    fetchpriority="high"
+    decoding="async"
+  />
+  <div class="sv-hero-scrim" aria-hidden="true"></div>
+
+  <div class="sv-container sv-hero-inner">
+    <h1 class="sv-tr-lockup">
+      <img src={tournament.logo} alt={tournament.name} width="314" height="90" />
+      <span class="sv-tr-collab">{tournament.collaboration}</span>
+    </h1>
+
+    <p class="sv-tr-tagline">
+      {tournament.tagline.map((word, i) => (
+        <>
+          {i > 0 && <i class="sv-tr-dot" aria-hidden="true">•</i>}
+          <span class:list={[i === tournament.taglineAccentIndex && 'sv-tr-tagline-accent']}>{word}</span>
+        </>
+      ))}
+    </p>
+
+    <ul class="sv-tr-facts">
+      {hero.facts.map((fact) => (
+        <li>
+          <Icon name={fact.icon} size={26} />
+          <span><strong>{fact.value}</strong> {fact.note}</span>
+        </li>
+      ))}
+      <li>
+        <Icon name={hero.venue.icon} size={26} />
+        <span>
+          <strong>{hero.venue.name}</strong>
+          {hero.venue.lines.map((line) => <span class="sv-tr-fact-line">{line}</span>)}
+        </span>
+      </li>
+    </ul>
+
+    <Button variant="primary" size="lg" arrow href={REGISTER_URL} class="sv-tr-cta">
+      {tournament.registerLabel}
+    </Button>
+  </div>
+</section>

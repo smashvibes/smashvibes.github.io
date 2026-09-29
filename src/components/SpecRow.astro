@@ -1,0 +1,14 @@
+---
+/** Icon + optional bold label + text. The repeating unit of the category and detail lists. */
+import Icon from './Icon.astro';
+import type { SpecRow } from '../data/tournament';
+
+type Props = SpecRow;
+const { icon, label, text } = Astro.props;
+---
+<li class="sv-spec">
+  <Icon name={icon} size={22} class="sv-spec-icon" />
+  <span class="sv-spec-text">
+    {label && <strong>{label}</strong>}{label ? ' ' : ''}{text}
+  </span>
+</li>

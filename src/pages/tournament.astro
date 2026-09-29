@@ -1,0 +1,163 @@
+---
+import { Image } from 'astro:assets';
+import '../styles/tournament.css';
+import Base from '../layouts/Base.astro';
+import NavBar from '../components/NavBar.astro';
+import TournamentHero from '../components/TournamentHero.astro';
+import TournamentFooter from '../components/TournamentFooter.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import CategoryCard from '../components/CategoryCard.astro';
+import PrizeCard from '../components/PrizeCard.astro';
+import GuestCard from '../components/GuestCard.astro';
+import SpecRow from '../components/SpecRow.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+import {
+  about, categories, details, guests, prizes, REGISTER_URL, sponsors,
+  tournament, tournamentNav,
+} from '../data/tournament';
+
+/**
+ * Event structured data. `SportsEvent` is what a search for "badminton tournament
+ * Singapore November" can actually surface — date, venue, organiser and entry offer.
+ */
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SportsEvent',
+  name: `${tournament.name} 2026`,
+  description: tournament.description,
+  url: `${site.url}/tournament/`,
+  sport: 'Badminton',
+  eventStatus: 'https://schema.org/EventScheduled',
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  startDate: '2026-11-14T10:00:00+08:00',
+  endDate: '2026-11-14T15:00:00+08:00',
+  image: new URL(site.ogImage, site.url).href,
+  location: {
+    '@type': 'Place',
+    name: 'SBH VIP Hall @ Sims',
+    address: {
+      '@type': 'PostalAddress',
+      name: 'Singapore Badminton Hall (SBH) @ Sims',
+      streetAddress: '1 Lorong 23 Geylang',
+      addressLocality: 'Singapore',
+      postalCode: '388352',
+      addressCountry: 'SG',
+    },
+  },
+  organizer: { '@type': 'Organization', name: site.name, url: `${site.url}/` },
+  offers: {
+    '@type': 'Offer',
+    url: `${site.url}/tournament/`,
+    availability: 'https://schema.org/InStock',
+  },
+};
+---
+<Base title={tournament.title} description={tournament.description}>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} is:inline />
+
+  <header class="sv-header">
+    <NavBar
+      logoSrc={tournament.logo}
+      homeHref="#top"
+      links={tournamentNav}
+      cta={{ label: tournament.registerLabel, href: REGISTER_URL }}
+      ctaArrow
+    />
+  </header>
+
+  <main id="main">
+    <TournamentHero />
+
+    <section class="sv-tr-about sv-root" id="about">
+      <div class="sv-container sv-tr-about-inner">
+        <SectionHeading eyebrow={about.eyebrow} title={about.title} />
+        <div class="sv-tr-about-copy">
+          {about.body.map((para) => <p>{para}</p>)}
+        </div>
+      </div>
+      <Image
+        class="sv-tr-about-img"
+        src={about.image}
+        alt={about.imageAlt}
+        widths={[480, 720, 984]}
+        sizes="(max-width: 900px) 60vw, 380px"
+        format="webp"
+        quality={78}
+        loading="lazy"
+        decoding="async"
+      />
+    </section>
+
+    <section class="sv-tr-categories sv-root sv-night" id="categories">
+      <div class="sv-container">
+        <SectionHeading tone="night" eyebrow={categories.eyebrow} title={categories.title} />
+        <div class="sv-tr-category-grid">
+          {categories.items.map((item) => <CategoryCard {...item} />)}
+        </div>
+      </div>
+    </section>
+
+    <section class="sv-tr-prizes sv-root" id="prizes">
+      <div class="sv-container">
+        <SectionHeading eyebrow={prizes.eyebrow} title={prizes.title} />
+        <div class="sv-tr-prize-grid">
+          {prizes.items.map((item) => <PrizeCard {...item} />)}
+        </div>
+      </div>
+    </section>
+
+    <section class="sv-tr-details sv-root" id="details">
+      <div class="sv-container sv-tr-details-inner">
+        <div>
+          <SectionHeading eyebrow={details.eyebrow} title={details.title} />
+          <ul class="sv-spec-list sv-tr-details-list">
+            {details.rows.map((row) => <SpecRow {...row} />)}
+          </ul>
+        </div>
+
+        <figure class="sv-tr-venue">
+          <Image
+            src={details.venue.image}
+            alt={details.venue.imageAlt}
+            widths={[480, 720, 1260]}
+            sizes="(max-width: 900px) 100vw, 560px"
+            format="webp"
+            quality={78}
+            loading="lazy"
+            decoding="async"
+          />
+          <figcaption>
+            <Icon name="pin" size={26} />
+            <span>
+              <strong>{details.venue.name}</strong>
+              {details.venue.lines.map((line) => <span>{line}</span>)}
+            </span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="sv-tr-sponsors sv-root" id="sponsors">
+      <div class="sv-container">
+        <SectionHeading eyebrow={sponsors.eyebrow} title={sponsors.title} />
+        <ul class="sv-tr-sponsor-grid">
+          {sponsors.items.map((s) => (
+            <li><img src={s.logo} alt={s.name} loading="lazy" decoding="async" /></li>
+          ))}
+        </ul>
+      </div>
+    </section>
+
+    <section class="sv-tr-guests sv-root" id="guests">
+      <div class="sv-container">
+        <SectionHeading eyebrow={guests.eyebrow} title={guests.title} />
+        <div class="sv-tr-guest-grid">
+          {guests.items.map((g) => <GuestCard {...g} />)}
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <TournamentFooter />
+</Base>

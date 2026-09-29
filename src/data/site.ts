@@ -59,17 +59,13 @@ export const site = {
  *   Singapore Badminton Hall · $10 badminton Singapore · weekly badminton Singapore
  */
 
-/**
- * The design's nav carries six items, but Tournaments and FAQ have no content yet —
- * they point at the closing CTA rather than at an invented empty section. Give them
- * real sections (and real anchors) before launch, or drop them from this list.
- */
+/** `Tournaments` leaves the page — it is the only cross-page link in the nav. */
 export const nav: { label: string; href: string; active?: boolean }[] = [
   { label: 'Home', href: '#top', active: true },
   { label: 'Our Games', href: '#games' },
   { label: 'About', href: '#about' },
   { label: 'Community', href: '#community' },
-  { label: 'Tournaments', href: '#join' },
+  { label: 'Tournaments', href: '/tournament/' },
   { label: 'FAQ', href: '#faq' },
 ];
 

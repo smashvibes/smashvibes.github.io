@@ -1,0 +1,29 @@
+---
+/** Prize card: trophy, title, the first-prize rows, a rule, then the second prize. */
+import Icon from './Icon.astro';
+
+interface Props {
+  title: string;
+  first: { label: string; value: string }[];
+  second: { label: string; value: string };
+}
+const { title, first, second } = Astro.props;
+---
+<article class="sv-card sv-prize">
+  <Icon name="trophy" size={44} class="sv-prize-mark" />
+  <div class="sv-prize-body">
+    <h3 class="sv-card-title">{title}</h3>
+    <dl class="sv-prize-rows">
+      {first.map((row) => (
+        <>
+          <dt>{row.label}</dt>
+          <dd>{row.value}</dd>
+        </>
+      ))}
+    </dl>
+    <dl class="sv-prize-rows sv-prize-second">
+      <dt>{second.label}</dt>
+      <dd>{second.value}</dd>
+    </dl>
+  </div>
+</article>

@@ -18,7 +18,10 @@ npm run preview  # serve dist/ locally
 | Path | What it is |
 | --- | --- |
 | `src/data/site.ts` | **All copy and links.** Edit here for content changes — no markup involved. |
-| `src/pages/index.astro` | Section order for the page, plus the `SportsActivityLocation` JSON-LD. |
+| `src/pages/index.astro` | Section order for the homepage, plus its JSON-LD. |
+| `src/pages/tournament.astro` | The StarRise Cup event page (`/tournament/`), plus `SportsEvent` JSON-LD. |
+| `src/data/tournament.ts` | **All StarRise Cup copy, links and imagery.** |
+| `src/styles/tournament.css` | Tournament layout. `sv-tr-` prefixed so it cannot collide with the homepage. |
 | `src/components/` | Design-system components ported to `.astro`, plus page-specific compositions. |
 | `src/design-system/site-icons.json` | Marks the design system does not ship — currently the WhatsApp logo. |
 | `src/design-system/` | Vendored from the design system: `tokens.json`, `icon-paths.json`. Do not hand-edit. |
@@ -110,6 +113,23 @@ no JavaScript at all.
 4. Consider a Google Business Profile — this is a local, place-based activity, and that
    is where most of the local search value sits.
 
+## Pages
+
+| Route | What it is |
+| --- | --- |
+| `/` | The Smash Vibes homepage. |
+| `/tournament/` | StarRise Cup — the event page, linked from the main nav as "Tournaments". |
+
+The tournament page is a separate event brand run in collaboration with Smash Vibes, so
+it keeps its own wordmark and navigation but is built entirely from the Smash Vibes
+design system: the same `Button`, `NavBar`, `SectionHeading` and `Icon` components, the
+same tokens, and the same dark/light ground alternation. Its own classes are `sv-tr-`
+prefixed.
+
+Four outline icons the system does not ship (`clock`, `bracket`, `chart`, `rules`) and
+four social marks were added to `src/design-system/site-icons.json`, drawn to the
+system's rules: 24px grid, 1.75 stroke, round caps, `currentColor`.
+
 ## Responsive layout
 
 Breakpoints, widest first — all in `src/styles/site.css`:
@@ -156,6 +176,11 @@ deployment → Source* must be set to **GitHub Actions**.
 - [ ] Replace `public/smash-vibes-logo.png` with a vector master when one exists. It is
       currently a keyed-out raster of the supplied wordmark, and `sync:ds` deliberately
       does **not** overwrite it (the design system's own copy is a lower-res crop).
-- [ ] Decide on **Tournaments** — its nav link still points at the closing CTA because
-      the section does not exist. (FAQ is now a real section.)
+- [ ] **StarRise Cup**: supply a real registration URL (`REGISTER_URL` currently falls
+      back to the WhatsApp chat), the StarRise wordmark as a vector, sponsor websites,
+      social handles (`socials` in `src/data/tournament.ts` — the icons render as muted
+      marks until each gets an `href`), and tournament-specific FAQ copy (that nav item
+      currently points at the Smash Vibes FAQ).
+- [ ] Replace the StarRise Cup photography — the hero, venue, guest portraits and every
+      sponsor logo are crops of the tournament mockup.
 - [ ] Confirm the `SportsActivityLocation` JSON-LD in `src/pages/index.astro` is accurate.

@@ -1,0 +1,300 @@
+/* StarRise Cup tournament page.
+ *
+ * Composes the Smash Vibes design system exactly as site.css does — no new colours,
+ * type sizes or spacing values, only arrangement. Classes are prefixed `sv-tr-` so they
+ * never collide with the homepage's.
+ */
+
+/* ---------- Shared card + spec list ---------- */
+
+.sv-card {
+  background: var(--paper);
+  border: 1px solid var(--gold-300);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  font-family: var(--font-body);
+}
+.sv-card-title { margin: 0; font: var(--text-heading-md); color: var(--ink); }
+.sv-card-sub { margin: var(--space-1) 0 0; font: var(--text-body); color: var(--ink-muted); }
+
+.sv-spec-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
+.sv-spec { display: flex; align-items: flex-start; gap: var(--space-3); }
+.sv-spec-icon { flex: none; margin-top: 1px; color: var(--gold-600); }
+.sv-spec-text { font: var(--text-body); color: var(--ink-muted); }
+.sv-spec-text strong { font-weight: 600; color: var(--ink); }
+
+/* ---------- Hero ---------- */
+
+.sv-tr-hero .sv-hero-img { width: 58%; object-position: 60% 40%; }
+.sv-tr-hero .sv-hero-scrim {
+  background:
+    linear-gradient(90deg, var(--night-900) 34%, rgba(11, 11, 12, .82) 48%, rgba(11, 11, 12, 0) 70%),
+    linear-gradient(0deg, rgba(11, 11, 12, .9), rgba(11, 11, 12, 0) 35%);
+}
+
+.sv-tr-lockup { margin: 0; display: grid; gap: var(--space-2); justify-items: start; }
+.sv-tr-lockup img { height: 90px; width: auto; }
+.sv-tr-collab { font: var(--text-body); color: var(--on-night-muted); }
+
+.sv-tr-tagline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-5) 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(15px, 2.4vw, 22px);
+  font-weight: 700;
+  /* Wide tracking is what makes this read as a tagline rather than a heading. */
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--on-night);
+  flex-wrap: wrap;
+}
+.sv-tr-tagline-accent { color: var(--gold-400); }
+.sv-tr-dot { font-style: normal; color: var(--gold-400); }
+
+.sv-tr-facts {
+  list-style: none;
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+  font-family: var(--font-body);
+}
+.sv-tr-facts li { display: flex; align-items: flex-start; gap: var(--space-4); color: var(--on-night-muted); }
+.sv-tr-facts .sv-ico { flex: none; color: var(--gold-400); margin-top: 2px; }
+.sv-tr-facts strong { display: block; font: var(--text-heading-md); font-size: 18px; color: var(--on-night); }
+.sv-tr-facts li > span { font: var(--text-body); }
+.sv-tr-fact-line { display: block; font-size: 14px; line-height: 21px; }
+.sv-tr-cta { margin-top: var(--space-6); }
+
+/* ---------- About ---------- */
+
+.sv-tr-about {
+  position: relative;
+  overflow: hidden;
+  background: var(--paper);
+  padding-block: var(--space-8);
+  font-family: var(--font-body);
+}
+.sv-tr-about-inner { position: relative; z-index: 1; max-width: var(--container); }
+.sv-tr-about-copy { margin-top: var(--space-4); max-width: 68ch; }
+.sv-tr-about-copy p { margin: 0 0 var(--space-2); font: var(--text-body-lg); color: var(--ink-muted); }
+/* The shuttle bleeds off the right edge behind the copy, its left edge masked into the
+   white ground so it reads as part of the section rather than a pasted-on picture. */
+.sv-tr-about-img {
+  position: absolute;
+  inset: 0 0 0 auto;
+  z-index: 0;
+  width: 34%;
+  height: 100%;
+  object-fit: cover;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 38%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 38%);
+}
+
+/* ---------- Categories ---------- */
+
+.sv-tr-categories { background: var(--night-900); padding-block: var(--space-8); }
+.sv-tr-category-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-5);
+  margin-top: var(--space-6);
+  align-items: start;
+}
+.sv-category-head { display: flex; gap: var(--space-4); align-items: flex-start; margin-bottom: var(--space-5); }
+.sv-category-mark { flex: none; color: var(--gold-500); }
+
+/* ---------- Prizes ---------- */
+
+.sv-tr-prizes { background: var(--cream-50); padding-block: var(--space-8); }
+.sv-tr-prize-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-5);
+  margin-top: var(--space-6);
+  align-items: start;
+}
+.sv-prize { display: flex; gap: var(--space-4); align-items: flex-start; }
+.sv-prize-mark { flex: none; color: var(--gold-500); }
+.sv-prize-body { flex: 1; }
+.sv-prize-rows {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-1) var(--space-5);
+  margin: var(--space-3) 0 0;
+  font: var(--text-body);
+}
+.sv-prize-rows dt { font-weight: 600; color: var(--ink); }
+.sv-prize-rows dd { margin: 0; color: var(--ink-muted); }
+.sv-prize-second { margin-top: var(--space-3); padding-top: var(--space-3); border-top: 1px solid var(--line); }
+
+/* ---------- Key information ---------- */
+
+.sv-tr-details { background: var(--paper); padding-block: var(--space-8); }
+.sv-tr-details-inner {
+  display: grid;
+  grid-template-columns: 1fr 1.05fr;
+  gap: var(--space-7);
+  align-items: center;
+}
+.sv-tr-details-list { margin-top: var(--space-5); }
+.sv-tr-details-list .sv-spec-icon { color: var(--ink); }
+
+.sv-tr-venue { position: relative; margin: 0; border-radius: var(--radius-lg); overflow: hidden; }
+.sv-tr-venue img { width: 100%; height: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+.sv-tr-venue figcaption {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  max-width: 78%;
+  padding: var(--space-4) var(--space-5);
+  background: rgba(11, 11, 12, .82);
+  border-radius: var(--radius-lg) 0 var(--radius-lg) 0;
+  font-family: var(--font-body);
+  color: var(--on-night-muted);
+  font-size: 13px;
+  line-height: 20px;
+}
+.sv-tr-venue figcaption .sv-ico { flex: none; color: var(--gold-400); }
+.sv-tr-venue figcaption strong { display: block; font: var(--text-heading-md); font-size: 17px; color: var(--on-night); }
+.sv-tr-venue figcaption span span { display: block; }
+
+/* ---------- Sponsors ---------- */
+
+.sv-tr-sponsors { background: var(--cream-50); padding-block: var(--space-8); }
+.sv-tr-sponsor-grid {
+  list-style: none;
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-4);
+}
+.sv-tr-sponsor-grid li {
+  display: grid;
+  place-items: center;
+  min-height: 112px;
+  padding: var(--space-4);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+.sv-tr-sponsor-grid img { max-height: 62px; max-width: 100%; width: auto; object-fit: contain; }
+
+/* ---------- Guests ---------- */
+
+.sv-tr-guests { background: var(--paper); padding-block: var(--space-8); }
+.sv-tr-guest-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+.sv-guest {
+  overflow: hidden;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  font-family: var(--font-body);
+}
+.sv-guest img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.sv-guest-body { padding: var(--space-4); text-align: center; }
+.sv-guest-name { margin: 0; font: var(--text-heading-sm); font-size: 16px; color: var(--ink); }
+.sv-guest-role { margin: var(--space-1) 0 0; font: var(--text-body-sm); color: var(--ink-muted); }
+
+/* ---------- Footer ---------- */
+
+.sv-tr-footer { background: var(--night-900); font-family: var(--font-body); }
+.sv-tr-footer-cta {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+  padding-block: var(--space-8);
+  text-align: center;
+}
+.sv-tr-secure {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(16px, 2.2vw, 20px);
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--gold-400);
+}
+.sv-tr-footer-base {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+  padding-block: var(--space-5);
+  border-top: 1px solid var(--night-600);
+}
+.sv-tr-footer-logo img { height: 45px; width: auto; }
+.sv-tr-footer-nav { flex: 1; }
+.sv-tr-footer-nav ul { display: flex; gap: var(--space-5); flex-wrap: wrap; list-style: none; margin: 0; padding: 0; }
+.sv-tr-footer-nav a { color: var(--on-night-muted); font-size: 14px; text-decoration: none; }
+.sv-tr-footer-nav a:hover { color: var(--gold-400); }
+.sv-tr-footer-nav a:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: var(--radius-sm); }
+
+.sv-tr-socials { display: flex; gap: var(--space-4); list-style: none; margin: 0; padding: 0; }
+.sv-tr-socials a, .sv-tr-social-pending { display: grid; place-items: center; color: var(--on-night); }
+.sv-tr-socials a:hover { color: var(--gold-400); }
+.sv-tr-socials a:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; border-radius: var(--radius-sm); }
+/* No handle supplied yet. Shown at the design's weight so the row reads correctly,
+   but it is a <span>, not a link to nowhere. */
+.sv-tr-social-pending { color: var(--on-night-muted); cursor: default; }
+
+.sv-tr-copy { margin: 0; font-size: 13px; color: var(--on-night-muted); }
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1080px) {
+  .sv-tr-sponsor-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 900px) {
+  .sv-tr-category-grid,
+  .sv-tr-prize-grid,
+  .sv-tr-details-inner { grid-template-columns: 1fr; }
+  .sv-tr-guest-grid { grid-template-columns: repeat(2, 1fr); }
+  /* The shuttle stops being a backdrop and gets out of the copy's way. */
+  .sv-tr-about-img {
+    position: static;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 21 / 9;
+    margin-top: var(--space-6);
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .sv-tr-about { padding-bottom: 0; }
+  .sv-tr-about-inner { max-width: none; }
+}
+
+@media (max-width: 860px) {
+  .sv-tr-hero .sv-hero-img { width: 100%; object-position: 58% 30%; }
+  .sv-tr-lockup img { height: 72px; }
+}
+
+@media (max-width: 720px) {
+  .sv-tr-about, .sv-tr-categories, .sv-tr-prizes, .sv-tr-details,
+  .sv-tr-sponsors, .sv-tr-guests { padding-block: var(--space-7); }
+  .sv-tr-sponsor-grid { grid-template-columns: repeat(2, 1fr); }
+  .sv-tr-footer-cta { padding-block: var(--space-7); }
+  .sv-tr-footer-base { justify-content: center; text-align: center; }
+  .sv-tr-footer-nav { flex-basis: 100%; }
+  .sv-tr-footer-nav ul { justify-content: center; }
+  .sv-tr-venue figcaption { position: static; max-width: none; border-radius: 0; }
+}
+
+@media (max-width: 520px) {
+  .sv-tr-guest-grid { grid-template-columns: 1fr; }
+  .sv-tr-tagline { gap: var(--space-2); letter-spacing: .1em; }
+  .sv-tr-cta, .sv-tr-footer-cta .sv-btn { width: 100%; }
+}
