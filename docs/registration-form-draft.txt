@@ -1,0 +1,241 @@
+===============================================================================
+STARRISE CUP 2026 - PLAYER REGISTRATION FORM (DRAFT FOR REVIEW)
+===============================================================================
+
+This is the full text of the Google Form, for the team to check before it goes
+live. Built by scripts/create-registration-form.gs.
+
+Please review:
+  (a) every question below,
+  (b) the FIVE OPEN QUESTIONS at the end - we need decisions on those.
+
+-------------------------------------------------------------------------------
+FORM TITLE
+-------------------------------------------------------------------------------
+
+StarRise Cup 2026 - Player Registration
+
+-------------------------------------------------------------------------------
+FORM DESCRIPTION (shown at the top)
+-------------------------------------------------------------------------------
+
+StarRise Cup 2026
+14 November 2026 (Saturday), 10:00 AM - 3:00 PM
+SBH VIP Hall @ Sims, 1 Lorong 23 Geylang, Singapore 388352
+
+One submission per entry. Doubles pairs submit ONCE, with both players listed.
+Questions: WhatsApp 9683 4290
+
+
+===============================================================================
+SECTION 1 - CATEGORY (everyone sees this)
+===============================================================================
+
+Q1. Which category are you entering?   [REQUIRED - pick one]
+
+    Help text:
+      Under-17: born on or after 15 November 2009 (i.e. under 17 on the event
+      date).
+      Adults: open to social and recreational players. National- and state-level
+      players are not eligible.
+
+    Options:
+      ( ) Under-17 Singles            -> goes to SECTION 2
+      ( ) Under-17 Doubles            -> goes to SECTION 3
+      ( ) Adults - Men's Doubles      -> goes to SECTION 4
+      ( ) Adults - Mixed Doubles      -> goes to SECTION 4
+
+    NOTE: the answer decides which section the entrant sees next. Nobody fills
+    in questions that do not apply to them.
+
+
+===============================================================================
+SECTION 2 - UNDER-17 SINGLES
+===============================================================================
+
+--- Player ---
+
+Q2.  Player - full name                                          [REQUIRED]
+     Help: Exactly as printed on the NRIC or passport you will bring on the day.
+
+Q3.  Player - gender                                             [REQUIRED]
+     ( ) Male    ( ) Female
+
+Q4.  Player - date of birth                                      [REQUIRED]
+     Help: Used only to confirm age eligibility.
+
+Q5.  Player - mobile number                                      [REQUIRED]
+     Help: WhatsApp preferred. Include the country code if not a Singapore
+     number. (Accepts 8-15 digits; + and spaces allowed.)
+
+Q6.  Player - email                                              [REQUIRED]
+     Help: Where the draw and schedule will be sent.
+
+Q7.  Player - school or club                                     [REQUIRED]
+     Help: Used to keep players from the same school or club apart in round one.
+     Enter "None" if you do not belong to one.
+
+--- Parent or guardian ---
+    (Required for all under-17 entries. Also used as the emergency contact.)
+
+Q8.  Parent / guardian - full name                               [REQUIRED]
+Q9.  Parent / guardian - mobile number                           [REQUIRED]
+Q10. Parent / guardian - relationship to player                  [REQUIRED]
+     Help: e.g. Mother, Father, Legal guardian
+
+--- Declarations ---
+
+Q11. Eligibility   [REQUIRED - must tick both]
+     [ ] I confirm every player listed is born on or after 15 November 2009
+         (i.e. under 17 on the event date).
+     [ ] I confirm no player listed is a current Junior National player, or
+         represents any country in any form.
+
+Q12. Rules and accuracy   [REQUIRED - must tick all three]
+     [ ] The details above are accurate, and I will bring photo ID for
+         verification at check-in.
+     [ ] I accept the tournament format, rules and the referee's decisions.
+     [ ] I understand that entry is confirmed only when the organiser replies,
+         and that slots are limited.
+
+Q13. Photo and video consent   [REQUIRED - pick one]
+     Help: Selected matches may be recorded, and photos or clips may be shared
+     on the tournament's channels. This is optional and does not affect your
+     entry. As parent or guardian, answer on the player's behalf.
+     ( ) Yes - happy to appear in photos and video
+     ( ) No - please keep me out of published photos and video
+
+Q14. Anything we should know?                                    [optional]
+     Help: Medical conditions, injuries, accessibility needs, or scheduling
+     constraints.
+
+     --> SUBMIT
+
+
+===============================================================================
+SECTION 3 - UNDER-17 DOUBLES
+===============================================================================
+
+Section help: Submit once per pair. Both players must meet the age cut-off.
+
+--- Player 1 ---
+     Full name / gender / date of birth / mobile number / email /
+     school or club                                   (same as Q2-Q7 above)
+
+--- Player 2 (partner) ---
+     Full name / gender / date of birth / mobile number /
+     school or club                                   (same, but NO email -
+                                                       we correspond with
+                                                       Player 1 only)
+
+--- Parent or guardian ---
+     Full name / mobile number / relationship to player    (same as Q8-Q10)
+
+--- Declarations ---
+     Eligibility / Rules and accuracy / Photo and video consent /
+     Anything we should know?                              (same as Q11-Q14)
+
+     --> SUBMIT
+
+
+===============================================================================
+SECTION 4 - ADULTS DOUBLES (Men's and Mixed)
+===============================================================================
+
+Section help: Submit once per pair. Mixed Doubles pairs must be one man and one
+woman.
+
+--- Player 1 ---
+     Full name / gender / date of birth / mobile number / email /
+     school or club                                   (same as Q2-Q7 above)
+
+--- Player 2 (partner) ---
+     Full name / gender / date of birth / mobile number /
+     school or club                                   (no email)
+
+--- Emergency contact ---
+    (Someone who is NOT playing in this pair.)
+
+     Full name                                                   [REQUIRED]
+     Mobile number                                               [REQUIRED]
+     Relationship to player                                      [REQUIRED]
+
+--- Declarations ---
+
+     Eligibility   [REQUIRED]
+     [ ] I confirm neither player is a national-level or state-level player.
+
+     Rules and accuracy / Photo and video consent /
+     Anything we should know?                              (same as Q12-Q14)
+
+     --> SUBMIT
+
+
+===============================================================================
+CONFIRMATION MESSAGE (shown after submitting)
+===============================================================================
+
+Thanks - your entry is in. We will confirm your slot by WhatsApp before the
+event. If your plans change, tell us early so the slot can go to another player.
+
+
+===============================================================================
+ENTRY CAPS
+===============================================================================
+
+    Under-17 Singles           16 entries
+    Under-17 Doubles           16 pairs
+    Adults - Men's Doubles      5 pairs
+    Adults - Mixed Doubles      5 pairs
+
+Google Forms cannot limit responses by itself. A script removes a category from
+the list the moment it fills, so we never take an entry we cannot honour.
+
+
+===============================================================================
+THREE THINGS WE CHANGED FROM THE ORIGINAL FIELD LIST
+===============================================================================
+
+1. WE ARE NOT COLLECTING IC / NRIC NUMBERS.
+   Date of birth already proves age eligibility, and we can check photo ID at
+   the desk on the day without writing the number down. Singapore's PDPA rules
+   on collecting NRIC numbers are strict, and a shared Google Sheet is the wrong
+   place to keep them. Same checks, far less risk.
+
+2. WE ADDED PARTNER DETAILS.
+   Three of our four categories are doubles. The original list covered one
+   player only, so for a pair we would have had no partner name, age or contact
+   - we could not have verified eligibility or built the draw.
+
+3. PHOTO / VIDEO CONSENT IS OPTIONAL, NOT A REQUIRED TICK.
+   We record matches and share clips. Consent that cannot be refused is not
+   consent, so it is a clear yes/no and does not block entry. Anyone who says no
+   stays out of published footage - someone needs to own that on the day.
+
+
+===============================================================================
+FIVE OPEN QUESTIONS - WE NEED DECISIONS
+===============================================================================
+
+1. AGE CUT-OFF. We have set "under 17 on the event date" = born on or after
+   15 November 2009. The other common rule is "under 17 as at 1 January 2026".
+   These give different eligibility lists. Which one?
+
+2. ENTRY FEE. The tournament page does not mention one. If there is a fee, the
+   form needs a payment step and a "payment made" question, and the flow
+   changes. Is entry free?
+
+3. MEN'S vs MIXED DOUBLES. The page says "Men's Doubles & Mixed Doubles
+   combined", "2 groups of 5 pairs". We have made them two separate choices of
+   5 pairs each. Is that right, or is it 10 pairs across one combined draw?
+
+4. U17 SINGLES - ONE DRAW OR TWO? The prize list shows a single "Singles
+   Under 17" prize, but we collect gender. Is it one open draw of 16, or
+   separate boys' and girls' draws?
+
+5. WHO OWNS THE RESPONSE SHEET? It will hold minors' names, dates of birth,
+   contact numbers and parents' numbers. It should be shared with the smallest
+   possible group, and deleted after the event. Who is responsible?
+
+
+===============================================================================
