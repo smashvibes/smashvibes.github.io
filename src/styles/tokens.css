@@ -1,0 +1,67 @@
+/* GENERATED FILE — do not edit.
+ * Source: src/design-system/tokens.json · regenerate with `npm run tokens`
+ */
+:root {
+
+  /* Colour */
+  --night-900: #0b0b0c;
+  --night-800: #17171a;
+  --night-600: #3a3a3e;
+  --gold-300: #f8d27a;
+  --gold-400: #f2bc4f;
+  --gold-500: #e6a532;
+  --gold-600: #9a6a10;
+  --gold-700: #8a5d0b;
+  --gold-100: #fcefd3;
+  --cream-50: #fcf8f0;
+  --paper: #ffffff;
+  --line: #e7e2d8;
+  --ink: #141414;
+  --ink-muted: #5c5a55;
+  --on-night: #ffffff;
+  --on-night-muted: #c9c6bf;
+  --on-gold: #1a1406;
+  --focus: #f2bc4f;
+
+  /* Type */
+  --font-display: Montserrat, "Arial Black", system-ui, sans-serif;
+  --font-body: Poppins, "Segoe UI", system-ui, sans-serif;
+  --text-display-xl: 800 56px/60px var(--font-display);
+  --tracking-display-xl: -0.01em;
+  --text-display-lg: 700 40px/48px var(--font-display);
+  --text-heading-lg: 700 32px/40px var(--font-display);
+  --text-heading-md: 700 20px/28px var(--font-display);
+  --text-heading-sm: 700 15px/20px var(--font-display);
+  --text-eyebrow: 700 13px/16px var(--font-display);
+  --tracking-eyebrow: 0.08em;
+  --text-body-lg: 400 17px/28px var(--font-body);
+  --text-body: 400 15px/24px var(--font-body);
+  --text-body-sm: 400 13px/20px var(--font-body);
+  --text-label: 600 15px/20px var(--font-body);
+  --text-nav: 500 14px/20px var(--font-body);
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* Shadow */
+  --shadow-gold: 0 8px 24px rgba(242, 188, 79, 0.28);
+  --shadow-card: 0 2px 12px rgba(20, 20, 20, 0.06);
+
+  /* Layout */
+  --container: 1200px;
+  --nav-height: 72px;
+}

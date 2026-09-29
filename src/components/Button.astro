@@ -1,0 +1,47 @@
+---
+/**
+ * Design-system Button. Renders an <a> when `href` is set, a <button> otherwise —
+ * the distinction matters for keyboard and screen-reader semantics, so don't paper
+ * over it with a click handler on a div.
+ *
+ * `primary` (gold pill) is limited to one per view area per the design system.
+ */
+import Icon from './Icon.astro';
+import type { IconName } from './icons';
+
+interface Props {
+  variant?: 'primary' | 'outline' | 'outline-night';
+  size?: 'sm' | 'md' | 'lg';
+  icon?: IconName;
+  arrow?: boolean;
+  href?: string;
+  target?: string;
+  type?: 'button' | 'submit';
+  disabled?: boolean;
+  class?: string;
+}
+
+const {
+  variant = 'primary',
+  size = 'md',
+  icon,
+  arrow = false,
+  href,
+  target,
+  type = 'button',
+  disabled,
+  class: className,
+} = Astro.props;
+
+const glyph = size === 'sm' ? 16 : 20;
+const classes = ['sv-btn', `sv-btn-${variant}`, size !== 'md' && `sv-btn-${size}`, className];
+const Tag = href ? 'a' : 'button';
+const attrs = href
+  ? { href, target, rel: target === '_blank' ? 'noopener noreferrer' : undefined }
+  : { type, disabled };
+---
+<Tag class:list={classes} {...attrs}>
+  {icon && <Icon name={icon} size={glyph} />}
+  <span><slot /></span>
+  {arrow && <Icon name="arrow-right" size={glyph} />}
+</Tag>

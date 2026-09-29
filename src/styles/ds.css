@@ -1,0 +1,85 @@
+/* Vendored from smash-vibes-design-system/components/bundle.css — do not edit.
+ * Refresh with `npm run sync:ds`. Font @import stripped; fonts are linked in Base.astro.
+ */
+/* Smash Vibes — component styles. Tokens come from tokens.css. */
+.sv-root, .sv-root * { box-sizing: border-box; }
+.sv-ico { display: inline-block; flex: none; vertical-align: middle; }
+
+/* Button */
+.sv-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-3);
+  font-family: var(--font-body); font-size: 15px; line-height: 20px; font-weight: 600; text-decoration: none;
+  border-radius: var(--radius-pill); border: 1.5px solid transparent; cursor: pointer; white-space: nowrap;
+  padding: 14px 28px; transition: transform .15s ease, box-shadow .15s ease, background-color .15s ease; }
+.sv-btn:focus-visible { outline: 2px solid var(--gold-700); outline-offset: 3px; }
+.sv-btn-sm { padding: 9px 18px; font-size: 14px; gap: var(--space-2); }
+.sv-btn-lg { padding: 18px 36px; font-size: 16px; }
+.sv-btn-primary { color: var(--on-gold); background: linear-gradient(180deg, var(--gold-300), var(--gold-500)); box-shadow: var(--shadow-gold); }
+.sv-btn-primary:hover { transform: translateY(-1px); background: linear-gradient(180deg, var(--gold-300), var(--gold-400)); }
+.sv-btn-primary:active { transform: none; background: var(--gold-500); }
+.sv-btn-outline { color: var(--ink); background: transparent; border-color: var(--ink); }
+.sv-btn-outline:hover { background: var(--ink); color: var(--paper); }
+.sv-btn-outline-night { color: var(--on-night); background: transparent; border-color: var(--on-night-muted); }
+.sv-btn-outline-night:hover { border-color: var(--gold-400); color: var(--gold-400); }
+.sv-btn-outline-night:focus-visible, .sv-night .sv-btn:focus-visible { outline-color: var(--focus); }
+
+/* Nav */
+.sv-nav { display: flex; align-items: center; gap: var(--space-7); height: var(--nav-height); padding: 0 var(--space-7);
+  background: var(--night-900); font-family: var(--font-body); }
+.sv-nav-logo { height: 40px; width: auto; display: block; }
+.sv-nav-links { display: flex; gap: var(--space-6); list-style: none; margin: 0; padding: 0; flex: 1; }
+.sv-nav-link { white-space: nowrap; color: var(--on-night-muted); text-decoration: none; font-size: 14px; line-height: 20px; font-weight: 500; padding: 6px 0; border-bottom: 2px solid transparent; }
+.sv-nav-link:hover { color: var(--on-night); }
+.sv-nav-link[aria-current="page"] { color: var(--gold-400); border-bottom-color: var(--gold-400); }
+.sv-nav-link:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
+
+/* Section heading */
+.sv-heading { font-family: var(--font-body); max-width: 640px; }
+.sv-eyebrow { margin: 0 0 var(--space-2); font-family: var(--font-display); font-size: 13px; line-height: 16px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gold-700); }
+.sv-heading-title { margin: 0; font-family: var(--font-display); font-size: 32px; line-height: 40px; font-weight: 700; color: var(--ink); }
+.sv-heading-lede { margin: var(--space-3) 0 0; font-size: 17px; line-height: 28px; color: var(--ink-muted); }
+.sv-night .sv-eyebrow { color: var(--gold-400); }
+.sv-night .sv-heading-title { color: var(--on-night); }
+.sv-night .sv-heading-lede { color: var(--on-night-muted); }
+
+/* Feature */
+.sv-feature { display: flex; gap: var(--space-3); align-items: flex-start; font-family: var(--font-body); max-width: 260px; }
+.sv-disc { flex: none; width: 56px; height: 56px; border-radius: 50%; background: var(--gold-100); color: var(--gold-600); display: grid; place-items: center; }
+.sv-feature-title { margin: 4px 0 var(--space-1); font-family: var(--font-display); font-size: 15px; line-height: 20px; font-weight: 700; color: var(--ink); }
+.sv-feature-text { margin: 0; font-size: 13px; line-height: 20px; color: var(--ink-muted); }
+
+/* Highlight strip */
+.sv-strip { display: flex; background: var(--night-900); padding: var(--space-6) var(--space-7); font-family: var(--font-body); }
+.sv-strip-item { flex: 1; display: flex; align-items: center; justify-content: center; gap: var(--space-4); color: var(--on-night); font-size: 15px; line-height: 22px; font-weight: 500; }
+.sv-strip-item + .sv-strip-item { border-left: 1px solid var(--night-600); }
+.sv-strip-item .sv-ico { color: var(--gold-400); }
+.sv-strip-compact { background: transparent; padding: 0; gap: var(--space-6); }
+.sv-strip-compact .sv-strip-item { flex: none; justify-content: flex-start; gap: var(--space-2); font-size: 13px; line-height: 18px; }
+.sv-strip-compact .sv-strip-item + .sv-strip-item { border-left: 0; }
+
+/* Check list */
+.sv-checks { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); font-family: var(--font-body); }
+.sv-checks li { display: flex; align-items: center; gap: var(--space-3); font-size: 15px; line-height: 24px; color: var(--ink); }
+.sv-check { flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--gold-100); color: var(--gold-600); display: grid; place-items: center; }
+
+/* Schedule bar */
+.sv-schedule { display: flex; align-items: center; justify-content: space-between; gap: var(--space-6); flex-wrap: wrap;
+  background: var(--cream-50); padding: var(--space-6) var(--space-7); font-family: var(--font-body); }
+.sv-schedule-meta { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; margin-top: var(--space-2); font-size: 17px; line-height: 24px; color: var(--ink); }
+.sv-schedule-meta span { display: inline-flex; align-items: center; gap: var(--space-2); }
+.sv-schedule-meta .sv-ico { color: var(--ink); }
+.sv-sep { width: 1px; height: 20px; background: var(--ink-muted); }
+
+/* CTA banner */
+.sv-cta { background: var(--night-900); padding: var(--space-8) var(--space-7); font-family: var(--font-body); }
+.sv-cta .sv-heading-title { font-size: 40px; line-height: 48px; }
+.sv-cta-actions { display: flex; gap: var(--space-4); flex-wrap: wrap; margin-top: var(--space-6); }
+
+@media (max-width: 720px) {
+  .sv-nav-links { display: none; }
+  .sv-nav { padding: 0 var(--space-4); justify-content: space-between; }
+  .sv-strip { flex-direction: column; gap: var(--space-4); padding: var(--space-6) var(--space-4); }
+  .sv-strip-item { justify-content: flex-start; }
+  .sv-strip-item + .sv-strip-item { border-left: 0; }
+  .sv-schedule, .sv-cta { padding-left: var(--space-4); padding-right: var(--space-4); }
+  .sv-cta .sv-heading-title { font-size: 32px; line-height: 40px; }
+}

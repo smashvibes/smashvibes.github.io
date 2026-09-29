@@ -1,0 +1,30 @@
+---
+/**
+ * FAQ accordion built on <details>/<summary> — native disclosure semantics, keyboard
+ * operable and findable by in-page search, with no JavaScript. The first item opens by
+ * default so the section doesn't read as a wall of closed bars.
+ *
+ * `answer` is authored HTML (we write it in src/data/site.ts, it is never user input),
+ * which lets a single answer carry the contact links.
+ */
+import Icon from './Icon.astro';
+import SectionHeading from './SectionHeading.astro';
+import { faq } from '../data/site';
+---
+<section class="sv-faq sv-root" id="faq">
+  <div class="sv-container">
+    <SectionHeading eyebrow={faq.eyebrow} title={faq.title} />
+
+    <div class="sv-faq-list">
+      {faq.items.map((item, i) => (
+        <details class="sv-faq-item" open={i === 0}>
+          <summary>
+            <span>{item.q}</span>
+            <Icon name="arrow-right" size={20} class="sv-faq-chevron" />
+          </summary>
+          <div class="sv-faq-answer" set:html={item.a} />
+        </details>
+      ))}
+    </div>
+  </div>
+</section>

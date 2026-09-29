@@ -1,0 +1,36 @@
+---
+/**
+ * Design-system Icon. Outline, 24px grid, 1.75 stroke, inherits `currentColor`.
+ *
+ * Omit `label` for decorative icons — they are then hidden from assistive tech,
+ * which is the right default when adjacent text already carries the meaning.
+ */
+import { ICON_PATHS, SOLID_ICONS, type IconName } from './icons';
+
+interface Props {
+  name: IconName;
+  size?: number;
+  label?: string;
+  class?: string;
+}
+
+const { name, size = 24, label, class: className } = Astro.props;
+const markup = ICON_PATHS[name] ?? '';
+const solid = SOLID_ICONS.has(name);
+---
+<svg
+  class:list={['sv-ico', className]}
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill={solid ? 'currentColor' : 'none'}
+  fill-rule={solid ? 'evenodd' : undefined}
+  stroke={solid ? undefined : 'currentColor'}
+  stroke-width={solid ? undefined : 1.75}
+  stroke-linecap={solid ? undefined : 'round'}
+  stroke-linejoin={solid ? undefined : 'round'}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+  set:html={markup}
+/>

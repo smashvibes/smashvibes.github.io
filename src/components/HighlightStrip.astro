@@ -1,0 +1,35 @@
+---
+/**
+ * Icon + label row. `compact` is the inline hero variant; the default is the
+ * full-width dark band that separates the light sections.
+ *
+ * `sub` is an additive extension: the hero's "$10 / per game" item sets the value
+ * in heading-md with the unit beneath, matching the mockup.
+ */
+import Icon from './Icon.astro';
+import type { IconName } from './icons';
+
+export interface StripItem {
+  icon: IconName;
+  label: string;
+  sub?: string;
+}
+
+interface Props {
+  items: StripItem[];
+  compact?: boolean;
+  class?: string;
+}
+
+const { items, compact = false, class: className } = Astro.props;
+---
+<div class:list={['sv-strip', compact && 'sv-strip-compact', className]}>
+  {items.map((item) => (
+    <div class="sv-strip-item">
+      <Icon name={item.icon} size={compact ? 28 : 44} />
+      {item.sub
+        ? <span class="sv-strip-stack"><strong>{item.label}</strong>{item.sub}</span>
+        : <span>{item.label}</span>}
+    </div>
+  ))}
+</div>

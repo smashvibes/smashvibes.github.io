@@ -1,0 +1,24 @@
+---
+/** Heading row plus the 4-up photo grid. */
+import Button from './Button.astro';
+import SectionHeading from './SectionHeading.astro';
+import { community } from '../data/site';
+---
+<section class="sv-community sv-root" id="community">
+  <div class="sv-container">
+    <div class="sv-community-head">
+      <SectionHeading eyebrow={community.eyebrow} title={community.title} />
+      <Button variant="outline" size="sm" arrow href={community.ctaHref} target="_blank">
+        {community.ctaLabel}
+      </Button>
+    </div>
+
+    <ul class="sv-photo-grid">
+      {community.photos.map((photo) => (
+        <li>
+          <img src={photo.src} alt={photo.alt} loading="lazy" decoding="async" width="600" height="450" />
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>

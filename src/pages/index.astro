@@ -1,0 +1,97 @@
+---
+import Base from '../layouts/Base.astro';
+import NavBar from '../components/NavBar.astro';
+import Hero from '../components/Hero.astro';
+import ScheduleBar from '../components/ScheduleBar.astro';
+import VenuePanel from '../components/VenuePanel.astro';
+import Feature from '../components/Feature.astro';
+import HighlightStrip from '../components/HighlightStrip.astro';
+import CommunityGrid from '../components/CommunityGrid.astro';
+import FaqList from '../components/FaqList.astro';
+import CtaBanner from '../components/CtaBanner.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import {
+  closing, features, highlights, JOIN_URL, nav, schedule, site, WHATSAPP_GROUP,
+} from '../data/site';
+
+/* LocalBusiness/SportsActivityLocation markup: the weekly game is the thing people
+   search for, so day, time, venue and price are all exposed to search engines. */
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SportsActivityLocation',
+  name: site.name,
+  description: site.description,
+  url: site.url,
+  sport: 'Badminton',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: '1 Lorong 23 Geylang',
+    addressLocality: 'Singapore',
+    postalCode: '388352',
+    addressCountry: 'SG',
+  },
+  openingHoursSpecification: [
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Wednesday'], opens: '12:00', closes: '14:00' },
+  ],
+  offers: { '@type': 'Offer', price: '10', priceCurrency: 'SGD', description: 'Per game, pay as you play' },
+};
+---
+<Base>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} is:inline />
+
+  <header class="sv-header">
+    <NavBar
+      logoSrc="/smash-vibes-logo.png"
+      homeHref="#top"
+      links={nav}
+      cta={{ label: 'Join a Game', href: JOIN_URL, icon: 'whatsapp' }}
+    />
+  </header>
+
+  <main id="main">
+    <Hero />
+
+    <ScheduleBar
+      id="games"
+      eyebrow={schedule.eyebrow}
+      days={schedule.days}
+      time={schedule.time}
+      venue={schedule.venue}
+      ctaLabel="Join a Game"
+      ctaHref={JOIN_URL}
+    />
+
+    <VenuePanel />
+
+    <section class="sv-features sv-root" id="why">
+      <div class="sv-container">
+        <p class="sv-eyebrow">Why play with Smash Vibes?</p>
+        <div class="sv-feature-grid sv-feature-stack">
+          {features.map((f) => (
+            <Feature icon={f.icon} title={f.title} titleSub={f.titleSub}>{f.body}</Feature>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <div class="sv-band sv-root sv-night">
+      <HighlightStrip items={highlights} />
+    </div>
+
+    <CommunityGrid />
+
+    <FaqList />
+
+    <CtaBanner
+      id="join"
+      eyebrow={closing.eyebrow}
+      title={closing.title}
+      lede={closing.lede}
+      image={closing.image}
+      primary={{ label: 'Join a Game', href: JOIN_URL }}
+      secondary={{ label: 'Join WhatsApp Group', href: WHATSAPP_GROUP, icon: 'whatsapp' }}
+    />
+  </main>
+
+  <SiteFooter />
+</Base>

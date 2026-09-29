@@ -1,0 +1,453 @@
+/* Page-level layout for the Smash Vibes one-pager.
+ *
+ * Everything here composes the design system — it never redefines a colour, type
+ * scale or spacing value, only arranges components with the tokens in tokens.css.
+ */
+
+/* ---------- Base ---------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: var(--text-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+
+/* Anchor targets clear the overlaid nav bar. */
+[id] { scroll-margin-top: calc(var(--nav-height) + var(--space-4)); }
+
+.sv-container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--space-7);
+}
+
+.sv-skip {
+  position: absolute;
+  left: var(--space-4);
+  top: -100px;
+  z-index: 100;
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-pill);
+  background: var(--gold-400);
+  color: var(--on-gold);
+  font: var(--text-label);
+  text-decoration: none;
+  transition: top .15s ease;
+}
+.sv-skip:focus { top: var(--space-4); }
+
+/* ---------- Navigation ---------- */
+
+/* The bar overlays the hero photograph rather than sitting above it, so the court
+   lights carry through the full height of the section as they do in the design. */
+.sv-header {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 10;
+}
+.sv-header .sv-nav {
+  background: transparent;
+  max-width: calc(var(--container) + var(--space-7) * 2);
+  margin-inline: auto;
+}
+.sv-nav-home { display: inline-flex; align-items: center; }
+.sv-nav-home:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; border-radius: var(--radius-sm); }
+.sv-nav-wordmark { color: var(--gold-400); font-size: 20px; margin: 0; }
+.sv-nav-links { justify-content: flex-start; }
+
+/* Mobile disclosure: a focusable checkbox drives the menu, so the whole thing
+   works with no JavaScript and stays keyboard-operable. */
+.sv-nav-burger { position: relative; display: none; width: 44px; height: 44px; place-items: center; cursor: pointer; }
+.sv-nav-toggle { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.sv-nav-burger > span,
+.sv-nav-burger > span::before,
+.sv-nav-burger > span::after {
+  display: block; width: 22px; height: 2px; border-radius: 2px; background: var(--on-night); content: '';
+}
+.sv-nav-burger > span::before { transform: translateY(-7px); }
+.sv-nav-burger > span::after { transform: translateY(5px); }
+.sv-nav-burger:has(.sv-nav-toggle:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: var(--radius-sm); }
+
+/* ---------- Hero ---------- */
+
+.sv-hero {
+  position: relative;
+  isolation: isolate;
+  background: var(--night-900);
+  padding: calc(var(--nav-height) + var(--space-8)) 0 var(--space-8);
+  overflow: hidden;
+}
+.sv-hero-img {
+  position: absolute;
+  inset: 0 0 0 auto;
+  z-index: -2;
+  width: 62%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 68% 35%;
+}
+/* Scrim, not an opacity drop on the photo: it keeps the subject bright on the right
+   while guaranteeing the copy clears AA against the ground on the left. */
+.sv-hero-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(90deg, var(--night-900) 30%, rgba(11, 11, 12, .82) 46%, rgba(11, 11, 12, 0) 68%),
+    linear-gradient(0deg, rgba(11, 11, 12, .85), rgba(11, 11, 12, 0) 40%);
+}
+.sv-hero-inner { max-width: 1200px; }
+.sv-hero .sv-eyebrow { color: var(--gold-400); }
+
+.sv-hero-title {
+  margin: var(--space-3) 0 0;
+  max-width: 14ch;
+  font-family: var(--font-display);
+  font-size: clamp(30px, 9.2vw, 56px);
+  line-height: 1.07;
+  font-weight: 800;
+  letter-spacing: var(--tracking-display-xl);
+  text-transform: uppercase;
+  color: var(--on-night);
+}
+.sv-hero-title span { display: block; }
+.sv-hero-title-accent { color: var(--gold-400); }
+
+.sv-hero-lede {
+  margin: var(--space-5) 0 0;
+  max-width: 46ch;
+  font: var(--text-body-lg);
+  color: var(--on-night-muted);
+}
+.sv-hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-6); }
+.sv-hero-stats { margin-top: var(--space-8); max-width: 760px; flex-wrap: wrap; row-gap: var(--space-5); }
+
+/* ---------- Highlight strip variants ---------- */
+
+.sv-strip-stack { display: flex; flex-direction: column; line-height: 1.25; }
+.sv-strip-stack strong { font: var(--text-heading-md); font-size: 18px; color: inherit; }
+.sv-strip-compact .sv-strip-item { max-width: 15ch; color: var(--on-night); }
+.sv-strip-compact .sv-strip-item .sv-ico { color: var(--gold-400); }
+
+.sv-band { background: var(--night-900); }
+.sv-band .sv-strip {
+  background: transparent;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-block: var(--space-7);
+}
+
+/* ---------- Schedule ---------- */
+
+.sv-schedule { padding-inline: 0; }
+.sv-schedule-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+.sv-schedule .sv-heading-title { margin: var(--space-1) 0 0; }
+
+/* ---------- Venue ---------- */
+
+.sv-venue { background: var(--cream-50); padding-block: var(--space-8); font-family: var(--font-body); }
+/* A card on the warm ground rather than a bleed to the viewport edge: the photograph
+   running off the left of the page fought the container every other section sits in. */
+.sv-venue-card {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  overflow: hidden;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+.sv-venue-media { margin: 0; min-height: 100%; }
+.sv-venue-media img { width: 100%; height: 100%; object-fit: cover; }
+.sv-venue-body {
+  display: grid;
+  align-content: center;
+  gap: var(--space-5);
+  padding: var(--space-7);
+}
+.sv-venue-head { display: flex; gap: var(--space-4); align-items: flex-start; }
+.sv-venue-pin { flex: none; color: var(--gold-600); }
+.sv-venue-name { margin: 0 0 var(--space-2); font: var(--text-heading-md); color: var(--ink); }
+.sv-venue-address { margin: 0; font: var(--text-body); color: var(--ink-muted); }
+.sv-venue-address a { color: inherit; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.sv-venue-address a:hover { color: var(--gold-700); }
+.sv-venue-address a:focus-visible { outline: 2px solid var(--gold-700); outline-offset: 3px; border-radius: var(--radius-sm); }
+
+/* ---------- Features ---------- */
+
+.sv-features { background: var(--paper); padding-block: var(--space-8); }
+.sv-features .sv-eyebrow { margin-bottom: var(--space-6); }
+.sv-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: var(--space-5);
+  align-items: start;
+}
+.sv-feature-grid .sv-feature { max-width: none; }
+/* Stacked: icon, then title, then description. The design system's default is a
+   horizontal icon+text pair, which squeezed the copy into a very narrow measure
+   once five cards shared a 1200px row. */
+.sv-feature-stack .sv-feature { flex-direction: column; gap: var(--space-4); }
+.sv-feature-title-lead { font: var(--text-heading-md); margin-top: 0; }
+.sv-feature-title-sub { display: block; font: var(--text-heading-sm); color: var(--ink); }
+
+/* ---------- Community ---------- */
+
+.sv-community { background: var(--paper); padding-block: var(--space-8); }
+.sv-community-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-6);
+}
+.sv-photo-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+.sv-photo-grid img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+}
+
+/* ---------- FAQ ---------- */
+
+.sv-faq { background: var(--cream-50); padding-block: var(--space-8); font-family: var(--font-body); }
+.sv-faq-list { margin-top: var(--space-6); max-width: 860px; border-top: 1px solid var(--line); }
+.sv-faq-item { border-bottom: 1px solid var(--line); }
+.sv-faq-item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) 0;
+  font: var(--text-heading-sm);
+  font-size: 17px;
+  line-height: 24px;
+  color: var(--ink);
+  cursor: pointer;
+  list-style: none;
+}
+.sv-faq-item summary::-webkit-details-marker { display: none; }
+.sv-faq-item summary:hover { color: var(--gold-700); }
+.sv-faq-item summary:focus-visible { outline: 2px solid var(--gold-700); outline-offset: 3px; border-radius: var(--radius-sm); }
+/* The design system ships no chevron, so the arrow rotates to point down when open. */
+.sv-faq-chevron { flex: none; color: var(--gold-600); transform: rotate(90deg); transition: transform .18s ease; }
+.sv-faq-item[open] .sv-faq-chevron { transform: rotate(-90deg); }
+.sv-faq-answer { padding: 0 var(--space-7) var(--space-5) 0; font: var(--text-body); color: var(--ink-muted); }
+.sv-faq-answer a { color: var(--gold-700); text-underline-offset: 3px; }
+.sv-faq-answer a:focus-visible { outline: 2px solid var(--gold-700); outline-offset: 3px; border-radius: var(--radius-sm); }
+
+/* ---------- Closing CTA ---------- */
+
+.sv-cta { position: relative; isolation: isolate; padding-inline: 0; overflow: hidden; }
+.sv-cta-bg {
+  position: absolute;
+  inset: 0 0 0 auto;
+  z-index: -2;
+  width: 62%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 60% center;
+}
+.sv-cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(90deg, var(--night-900) 34%, rgba(11, 11, 12, .8) 50%, rgba(11, 11, 12, .1) 100%);
+}
+.sv-cta-inner { position: relative; }
+
+/* ---------- Footer ---------- */
+
+/* Continues the CTA's ground, divided by a hairline rather than a new section colour. */
+.sv-footer {
+  background: var(--night-900);
+  border-top: 1px solid var(--night-600);
+  font-family: var(--font-body);
+  color: var(--on-night-muted);
+}
+.sv-footer-inner {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1.2fr 1.2fr;
+  gap: var(--space-6);
+  padding-block: var(--space-8);
+}
+.sv-footer-brand img { height: 40px; width: auto; }
+.sv-footer-brand p { margin: var(--space-4) 0 0; font: var(--text-body-sm); color: var(--gold-400); }
+.sv-footer-title {
+  margin: 0 0 var(--space-4);
+  font: var(--text-eyebrow);
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--on-night);
+}
+.sv-footer p { margin: 0 0 var(--space-3); font: var(--text-body-sm); line-height: 22px; }
+.sv-footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.sv-footer a { color: var(--on-night-muted); font: var(--text-body-sm); text-decoration: none; }
+.sv-footer a:hover { color: var(--gold-400); }
+.sv-footer a:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: var(--radius-sm); }
+.sv-footer-wa { display: inline-flex; align-items: center; gap: var(--space-2); }
+.sv-footer-base {
+  padding-block: var(--space-5);
+  border-top: 1px solid var(--night-600);
+}
+.sv-footer-base p { margin: 0; font-size: 13px; }
+
+/* ---------- Responsive ---------- */
+
+/* Breakpoints, widest first:
+ *   1080  venue splits stack, footer halves
+ *    920  nav collapses to the burger (six links + logo + CTA stop fitting well before
+ *         the design system's own 720px nav breakpoint)
+ *    860  hero and closing CTA switch from photo-behind-text to photo-as-band
+ *    720  phone gutters and section padding
+ *    480  actions go full width
+ *    380  the duplicate nav CTA goes
+ */
+
+@media (max-width: 1080px) {
+  .sv-venue-card { grid-template-columns: 1fr; }
+  .sv-venue-media img { aspect-ratio: 16 / 9; }
+  .sv-footer-inner { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 920px) {
+  .sv-header .sv-nav { flex-wrap: wrap; height: auto; gap: var(--space-3); padding-block: var(--space-3); row-gap: var(--space-3); }
+  .sv-nav-logo { height: 36px; }
+  .sv-nav-burger { display: grid; order: 3; }
+  .sv-nav-cta { order: 2; margin-left: auto; }
+  .sv-nav-links {
+    display: none;
+    order: 4;
+    flex-basis: 100%;
+    flex-direction: column;
+    gap: 0;
+    padding-bottom: var(--space-2);
+    border-top: 1px solid var(--night-600);
+  }
+  .sv-nav-burger:has(.sv-nav-toggle:checked) ~ .sv-nav-links { display: flex; }
+  /* 44px minimum touch target — the desktop 6px padding is far too tight for a thumb. */
+  .sv-nav-link { padding: var(--space-3) 0; border-bottom: 0; }
+}
+
+@media (max-width: 860px) {
+  /* The photograph becomes a band beneath the copy rather than a backdrop. Behind text
+     at 0.38 opacity it read as grey mud; at full strength with a masked top edge it
+     keeps the action shot the design is built around. */
+  .sv-hero {
+    display: flex;
+    flex-direction: column;
+    padding: calc(var(--nav-height) + var(--space-5)) 0 0;
+  }
+  .sv-hero-inner { order: 1; padding-bottom: var(--space-7); max-width: none; }
+  .sv-hero-scrim { display: none; }
+  .sv-hero-img {
+    position: static;
+    order: 2;
+    z-index: auto;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    opacity: 1;
+    object-position: 70% 30%;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 22%);
+    mask-image: linear-gradient(180deg, transparent 0, #000 22%);
+  }
+  .sv-hero-actions { gap: var(--space-3); }
+
+  /* Stats as a 2x2 block: four stacked rows wasted most of a screen height. */
+  .sv-hero-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-5) var(--space-4);
+    margin-top: var(--space-7);
+    max-width: none;
+  }
+  .sv-strip-compact .sv-strip-item { max-width: none; }
+
+  .sv-schedule-inner { display: grid; gap: var(--space-5); }
+  .sv-schedule-meta { gap: var(--space-2); }
+  .sv-schedule-meta span { flex-basis: 100%; }
+  .sv-sep { display: none; }
+
+  .sv-band .sv-strip { padding-block: var(--space-6); }
+  .sv-band .sv-strip-item { max-width: none; }
+  .sv-band .sv-ico { width: 34px; height: 34px; }
+
+  .sv-photo-grid { grid-template-columns: repeat(2, 1fr); }
+
+  /* Closing CTA gets the same photo-as-band treatment as the hero. */
+  .sv-cta { display: flex; flex-direction: column; padding-bottom: 0; }
+  .sv-cta-inner { order: 1; padding-bottom: var(--space-7); }
+  .sv-cta::before { display: none; }
+  .sv-cta-bg {
+    position: static;
+    order: 2;
+    z-index: auto;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-position: 60% center;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 22%);
+    mask-image: linear-gradient(180deg, transparent 0, #000 22%);
+  }
+  .sv-cta-actions { gap: var(--space-3); }
+}
+
+@media (max-width: 720px) {
+  .sv-container { padding-inline: var(--space-4); }
+  .sv-nav-logo { height: 32px; }
+  .sv-venue-body { padding: var(--space-5); }
+  /* Stacked cards are airier but taller; tighten the gap so five of them don't run
+     away with the scroll on a phone. */
+  .sv-feature-stack .sv-feature { gap: var(--space-3); }
+  .sv-feature-stack .sv-disc { width: 48px; height: 48px; }
+  .sv-venue, .sv-features, .sv-community, .sv-faq { padding-block: var(--space-7); }
+  .sv-faq-answer { padding-right: var(--space-5); }
+  .sv-footer-inner { grid-template-columns: 1fr; padding-block: var(--space-7); }
+}
+
+@media (max-width: 480px) {
+  /* Two columns, not one: four full-width photos turned the section into a scroll
+     marathon, and the grid reads as a contact sheet at this size anyway. */
+  .sv-photo-grid { gap: var(--space-3); }
+  .sv-hero-actions .sv-btn,
+  .sv-cta-actions .sv-btn,
+  .sv-schedule-inner .sv-btn { width: 100%; }
+  .sv-community-head { display: grid; }
+  .sv-community-head .sv-btn { justify-self: start; }
+}
+
+/* Small phones: the nav CTA, the logo and the burger stop fitting on one row. The
+   hero's "Join a Game Now" sits a thumb-length below, so the duplicate goes. */
+@media (max-width: 380px) {
+  .sv-nav-cta { display: none; }
+  .sv-hero-stats { gap: var(--space-4) var(--space-3); }
+}

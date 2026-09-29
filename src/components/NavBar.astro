@@ -1,0 +1,52 @@
+---
+/**
+ * Top navigation. The mobile menu is a checkbox-driven disclosure rather than a
+ * JS toggle — it keeps the page at zero shipped JavaScript and still gives full
+ * keyboard operation. The checkbox is visually hidden but focusable.
+ */
+import Button from './Button.astro';
+import type { IconName } from './icons';
+
+export interface NavLink {
+  label: string;
+  href: string;
+  active?: boolean;
+}
+
+interface Props {
+  logoSrc?: string;
+  homeHref?: string;
+  links: NavLink[];
+  cta?: { label: string; href: string; icon?: IconName };
+}
+
+const { logoSrc, homeHref = '/', links, cta } = Astro.props;
+---
+<nav class="sv-nav sv-root sv-night" aria-label="Main">
+  <a class="sv-nav-home" href={homeHref}>
+    {logoSrc
+      ? <img class="sv-nav-logo" src={logoSrc} alt="Smash Vibes" width="134" height="40" />
+      : <span class="sv-eyebrow sv-nav-wordmark">Smash Vibes</span>}
+  </a>
+
+  <label class="sv-nav-burger">
+    <input class="sv-nav-toggle" type="checkbox" aria-label="Menu" />
+    <span aria-hidden="true"></span>
+  </label>
+
+  <ul class="sv-nav-links">
+    {links.map((link) => (
+      <li>
+        <a class="sv-nav-link" href={link.href} aria-current={link.active ? 'page' : undefined}>
+          {link.label}
+        </a>
+      </li>
+    ))}
+  </ul>
+
+  {cta && (
+    <Button variant="primary" size="sm" icon={cta.icon ?? 'chat'} href={cta.href} class="sv-nav-cta">
+      {cta.label}
+    </Button>
+  )}
+</nav>

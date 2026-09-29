@@ -1,0 +1,33 @@
+---
+/** Day / time / venue facts plus the primary action. Cream ground. */
+import Button from './Button.astro';
+import Icon from './Icon.astro';
+
+interface Props {
+  eyebrow?: string;
+  days: string;
+  time: string;
+  venue: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+  id?: string;
+}
+
+const { eyebrow = 'Our weekly games', days, time, venue, ctaLabel, ctaHref, id } = Astro.props;
+---
+<section class="sv-schedule sv-root" id={id}>
+  <div class="sv-container sv-schedule-inner">
+    <div>
+      <p class="sv-eyebrow">{eyebrow}</p>
+      <h2 class="sv-heading-title">{days}</h2>
+      <div class="sv-schedule-meta">
+        <span><Icon name="calendar" size={22} /><time>{time}</time></span>
+        <i class="sv-sep" aria-hidden="true"></i>
+        <span><Icon name="pin" size={22} />{venue}</span>
+      </div>
+    </div>
+    {ctaLabel && (
+      <Button variant="primary" size="lg" arrow href={ctaHref}>{ctaLabel}</Button>
+    )}
+  </div>
+</section>

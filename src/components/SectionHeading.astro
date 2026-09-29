@@ -1,0 +1,17 @@
+---
+/** Eyebrow + title + optional lede. `tone="night"` flips the palette for dark grounds. */
+interface Props {
+  eyebrow?: string;
+  title: string;
+  tone?: 'light' | 'night';
+  as?: 'h1' | 'h2' | 'h3';
+  class?: string;
+}
+
+const { eyebrow, title, tone = 'light', as: Tag = 'h2', class: className } = Astro.props;
+---
+<div class:list={['sv-heading', tone === 'night' && 'sv-night', className]}>
+  {eyebrow && <p class="sv-eyebrow">{eyebrow}</p>}
+  <Tag class="sv-heading-title" set:html={title} />
+  {Astro.slots.has('default') && <p class="sv-heading-lede"><slot /></p>}
+</div>

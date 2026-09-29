@@ -1,0 +1,15 @@
+---
+/** Gold-disc check marks. Semantically a list, so it reads as one to screen readers. */
+import Icon from './Icon.astro';
+
+interface Props { items: string[] }
+const { items } = Astro.props;
+---
+<ul class="sv-checks">
+  {items.map((item) => (
+    <li>
+      <span class="sv-check"><Icon name="check" size={14} /></span>
+      {item}
+    </li>
+  ))}
+</ul>

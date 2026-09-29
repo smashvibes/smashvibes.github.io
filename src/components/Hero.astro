@@ -1,0 +1,40 @@
+---
+/**
+ * The hero. The photograph is a real <img> rather than a CSS background so it gets
+ * `fetchpriority="high"` and counts as the LCP element the browser can prioritise;
+ * the gradient scrim sits between it and the copy to hold contrast on the left.
+ */
+import Button from './Button.astro';
+import HighlightStrip from './HighlightStrip.astro';
+import { hero, JOIN_URL, WHATSAPP_GROUP } from '../data/site';
+---
+<section class="sv-hero sv-root sv-night" id="top">
+  <img
+    class="sv-hero-img"
+    src={hero.image}
+    alt={hero.imageAlt}
+    fetchpriority="high"
+    decoding="async"
+    width="1600"
+    height="900"
+  />
+  <div class="sv-hero-scrim" aria-hidden="true"></div>
+
+  <div class="sv-container sv-hero-inner">
+    <p class="sv-eyebrow">{hero.eyebrow}</p>
+    <h1 class="sv-hero-title">
+      <span>{hero.titleLines[0]}</span>
+      <span class="sv-hero-title-accent">{hero.titleLines[1]}</span>
+    </h1>
+    <p class="sv-hero-lede">{hero.lede}</p>
+
+    <div class="sv-hero-actions">
+      <Button variant="primary" arrow href={JOIN_URL}>Join a Game Now</Button>
+      <Button variant="outline-night" icon="whatsapp" href={WHATSAPP_GROUP} target="_blank">
+        Join WhatsApp Group
+      </Button>
+    </div>
+
+    <HighlightStrip items={hero.stats} compact class="sv-hero-stats" />
+  </div>
+</section>

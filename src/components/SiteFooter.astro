@@ -1,0 +1,50 @@
+---
+/**
+ * Footer. Kept on `night-900` as a continuation of the closing CTA — separated by a
+ * `night-600` hairline rather than a new ground, so the page's dark/light alternation
+ * still holds (the system forbids two dark *sections* meeting, not a CTA and its footer).
+ */
+import Icon from './Icon.astro';
+import { nav, site, venue, schedule, WHATSAPP_CHAT, WHATSAPP_GROUP, WHATSAPP_NUMBER } from '../data/site';
+
+const year = new Date().getFullYear();
+---
+<footer class="sv-footer sv-root sv-night">
+  <div class="sv-container sv-footer-inner">
+    <div class="sv-footer-brand">
+      <img src="/smash-vibes-logo.png" alt={site.name} width="134" height="40" />
+      <p>Play • Connect • Good Vibes</p>
+    </div>
+
+    <nav class="sv-footer-nav" aria-label="Footer">
+      <h2 class="sv-footer-title">Explore</h2>
+      <ul>
+        {nav.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+      </ul>
+    </nav>
+
+    <div class="sv-footer-col">
+      <h2 class="sv-footer-title">Games</h2>
+      <p>{schedule.days}<br />{schedule.time}</p>
+      <p>{venue.name}<br />{venue.address}</p>
+    </div>
+
+    <div class="sv-footer-col">
+      <h2 class="sv-footer-title">Say hello</h2>
+      <p>
+        <a class="sv-footer-wa" href={WHATSAPP_CHAT} target="_blank" rel="noopener noreferrer">
+          <Icon name="whatsapp" size={20} />WhatsApp {WHATSAPP_NUMBER}
+        </a>
+      </p>
+      <p>
+        <a class="sv-footer-wa" href={WHATSAPP_GROUP} target="_blank" rel="noopener noreferrer">
+          <Icon name="whatsapp" size={20} />Join the WhatsApp group
+        </a>
+      </p>
+    </div>
+  </div>
+
+  <div class="sv-container sv-footer-base">
+    <p>© {year} {site.name}. Singapore.</p>
+  </div>
+</footer>

@@ -1,0 +1,32 @@
+---
+/**
+ * Icon disc + title + description.
+ *
+ * `titleSub` is an additive extension of the design-system component: the mockup's
+ * "$10 / per game" card promotes the value to heading-md with the unit beneath it.
+ * Without it the component renders exactly as the system specifies.
+ */
+import Icon from './Icon.astro';
+import type { IconName } from './icons';
+
+interface Props {
+  icon: IconName;
+  title: string;
+  titleSub?: string;
+}
+
+const { icon, title, titleSub } = Astro.props;
+---
+<div class="sv-feature">
+  <span class="sv-disc"><Icon name={icon} size={26} /></span>
+  <div>
+    {titleSub
+      ? (
+        <h3 class="sv-feature-title sv-feature-title-lead">
+          {title}<span class="sv-feature-title-sub">{titleSub}</span>
+        </h3>
+      )
+      : <h3 class="sv-feature-title">{title}</h3>}
+    <p class="sv-feature-text"><slot /></p>
+  </div>
+</div>
