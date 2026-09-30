@@ -2,12 +2,16 @@
  * StarRise Cup 2026 — builds the registration Google Form and its response sheet.
  *
  * HOW TO RUN
- *   1. Go to https://script.google.com and create a new project.
- *   2. Paste this whole file in, replacing the default Code.gs contents.
- *   3. Select `createRegistrationForm` in the function dropdown and press Run.
- *   4. Approve the permissions prompt (it needs Forms + Sheets access).
- *   5. The execution log prints the public form URL and the response sheet URL.
- *   6. Put the form URL into REGISTER_URL in src/data/tournament.ts.
+ *   1. Go to https://script.google.com and press "New project".
+ *   2. Select everything in the Code.gs editor and paste this whole file over it.
+ *   3. Save (Ctrl/Cmd+S), then pick `createRegistrationForm` in the function dropdown
+ *      next to Run, and press Run.
+ *   4. Approve the permissions prompt. Google will warn that the app is unverified —
+ *      that is expected for your own script: click "Advanced", then
+ *      "Go to <project name> (unsafe)", then "Allow".
+ *   5. The Execution log at the bottom prints three URLs. The one marked
+ *      "FORM (share this one)" is the link to give entrants.
+ *   6. Put that URL into REGISTRATION_FORM_URL in src/data/tournament.ts.
  *
  * Re-running creates a SECOND form. To change an existing form, edit it in the Forms UI
  * or open it by id with FormApp.openById().
@@ -57,6 +61,16 @@ function createRegistrationForm() {
   form.setProgressBar(true);
   form.setAllowResponseEdits(true);
   form.setPublishingSummary(false);
+
+  // Workspace accounts (anything on a custom domain) default a new form to "only people
+  // in your organisation can respond" — outside entrants would hit a permission wall and
+  // you would never see the failed attempt. Consumer @gmail.com accounts have no such
+  // setting and throw here, which is why it is guarded rather than assumed.
+  try {
+    form.setRequireLogin(false);
+  } catch (err) {
+    Logger.log('setRequireLogin skipped (consumer account): ' + err.message);
+  }
   // Left off so entrants do not need a Google account. Turn on to get verified emails
   // and automatic response receipts, at the cost of forcing sign-in:
   //   form.setCollectEmail(true);
