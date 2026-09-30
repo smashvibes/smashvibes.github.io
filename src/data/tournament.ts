@@ -18,12 +18,18 @@ import guest4 from '../assets/tournament/guest-4.jpg';
 /**
  * Where every "Register Now" button points.
  *
- * Paste the Google Form's published URL here (the /viewform one, not /edit) and every
- * CTA on the page switches over — nav, hero and the closing band. Build the form by
- * running scripts/create-registration-form.gs; until a URL is set, the buttons fall
- * back to the WhatsApp chat so they are never dead.
+ * The Google Form's published URL (the /viewform one, not /edit). Every CTA on the page
+ * reads from it — nav, hero and the closing band. Rebuild the form with
+ * scripts/create-registration-form.gs; if this is ever emptied, the buttons fall back to
+ * the WhatsApp chat rather than going dead.
+ *
+ * Form edit URL, for the organiser:
+ *   https://docs.google.com/forms/d/1YNtTzgFumfKaYvcaKYQaUV1p-gbDuT8Q6vwOgKCwBS4/edit
+ * Responses:
+ *   https://docs.google.com/spreadsheets/d/1RGpG_7xmVjjLCT11hziGWlupfc2OSGPb7lOhJcAe6tg/edit
  */
-export const REGISTRATION_FORM_URL = '';
+export const REGISTRATION_FORM_URL =
+  'https://docs.google.com/forms/d/e/1FAIpQLSd1RCb3B_Uh3udfJ4rNhDTvblKMZ4sRynsKPizbVibVU-OHwA/viewform';
 
 export const REGISTER_URL = REGISTRATION_FORM_URL || WHATSAPP_CHAT;
 

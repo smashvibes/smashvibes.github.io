@@ -175,10 +175,16 @@ system's rules: 24px grid, 1.75 stroke, round caps, `currentColor`.
 and its response sheet in one run. Paste it into a new project at script.google.com, run
 `createRegistrationForm`, and the log prints the form and sheet URLs.
 
-Put the published form URL (the `/viewform` one) into `REGISTRATION_FORM_URL` in
-`src/data/tournament.ts`. Every "Register Now" button — nav, hero and closing band —
-reads from it. While it is empty they fall back to the WhatsApp chat, so no button is
-ever dead.
+The form is **live** and wired in. Every "Register Now" button — nav, hero and closing
+band, on both tournament routes — reads `REGISTRATION_FORM_URL` in
+`src/data/tournament.ts`. Emptying it falls back to the WhatsApp chat rather than going
+dead.
+
+| | |
+| --- | --- |
+| Form (share this) | <https://docs.google.com/forms/d/e/1FAIpQLSd1RCb3B_Uh3udfJ4rNhDTvblKMZ4sRynsKPizbVibVU-OHwA/viewform> |
+| Form (edit) | <https://docs.google.com/forms/d/1YNtTzgFumfKaYvcaKYQaUV1p-gbDuT8Q6vwOgKCwBS4/edit> |
+| Responses | <https://docs.google.com/spreadsheets/d/1RGpG_7xmVjjLCT11hziGWlupfc2OSGPb7lOhJcAe6tg/edit> |
 
 The script also carries `updateCategoryAvailability()`: Google Forms cannot cap
 responses, so this removes a category from the list once it hits its entry limit
@@ -234,8 +240,7 @@ deployment → Source* must be set to **GitHub Actions**.
 - [ ] Replace `public/smash-vibes-logo.png` with a vector master when one exists. It is
       currently a keyed-out raster of the supplied wordmark, and `sync:ds` deliberately
       does **not** overwrite it (the design system's own copy is a lower-res crop).
-- [ ] **StarRise Cup**: supply a real registration URL (`REGISTER_URL` currently falls
-      back to the WhatsApp chat), the StarRise wordmark as a vector, sponsor websites,
+- [ ] **StarRise Cup**: supply the StarRise wordmark as a vector, sponsor websites,
       social handles (`socials` in `src/data/tournament.ts` — the icons render as muted
       marks until each gets an `href`), and tournament-specific FAQ copy (that nav item
       currently points at the Smash Vibes FAQ).

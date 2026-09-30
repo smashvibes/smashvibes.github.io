@@ -17,7 +17,7 @@ interface Props {
   logoSrc?: string;
   homeHref?: string;
   links: NavLink[];
-  cta?: { label: string; href: string; icon?: IconName };
+  cta?: { label: string; href: string; icon?: IconName; target?: string };
   /** Trailing arrow instead of a leading icon — used by the tournament page. */
   ctaArrow?: boolean;
 }
@@ -53,6 +53,7 @@ const { logoSrc, homeHref = '/', links, cta, ctaArrow = false } = Astro.props;
       icon={ctaArrow ? undefined : (cta.icon ?? 'chat')}
       arrow={ctaArrow}
       href={cta.href}
+      target={cta.target}
       class="sv-nav-cta"
     >
       {cta.label}
