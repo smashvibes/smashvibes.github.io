@@ -40,17 +40,17 @@ export const tournament = {
   registerLabel: 'Register Now',
 };
 
-export const tournamentNav: { label: string; href: string; active?: boolean }[] = [
-  { label: 'Home', href: '#top', active: true },
-  { label: 'About', href: '#about' },
-  { label: 'Event Details', href: '#details' },
-  { label: 'Categories', href: '#categories' },
-  { label: 'Sponsors', href: '#sponsors' },
-  /**
-   * No tournament-specific FAQ copy was supplied, so this points at the Smash Vibes FAQ
-   * rather than at an invented section. Give it its own once the questions exist.
-   */
-  { label: 'FAQ', href: '/#faq' },
+/**
+ * Absolute paths, not bare anchors: the same nav renders on /tournament/ and on
+ * /tournament/draws/, and "#about" from the draws page would go nowhere.
+ */
+export const tournamentNav: { label: string; href: string }[] = [
+  { label: 'Home', href: '/tournament/' },
+  { label: 'About', href: '/tournament/#about' },
+  { label: 'Event Details', href: '/tournament/#details' },
+  { label: 'Categories', href: '/tournament/#categories' },
+  { label: 'Draws', href: '/tournament/draws/' },
+  { label: 'Sponsors', href: '/tournament/#sponsors' },
 ];
 
 export const hero = {
@@ -192,6 +192,36 @@ export const guests = {
 
 export const closing = {
   title: 'Secure Your Spot Now',
+};
+
+export type DrawKind = 'bracket' | 'groups';
+
+export interface Draw {
+  id: string;
+  label: string;
+  meta: string;
+  kind: DrawKind;
+  /** bracket: number of entries (a power of two). groups: unused. */
+  entries?: number;
+  /** groups: how many groups, and how many pairs in each. */
+  groups?: number;
+  perGroup?: number;
+}
+
+/**
+ * Draw structures. Names are deliberately absent — the draw has not been made, so every
+ * slot renders as an empty placeholder. Fill `seeds` per draw once entries close.
+ */
+export const draws = {
+  eyebrow: 'Tournament draws',
+  title: 'Draws',
+  note: 'Draws are published once entries close. Seedings and match times will appear here.',
+  items: [
+    { id: 'u17-singles', label: 'U17 Singles', meta: '16 entries', kind: 'bracket', entries: 16 },
+    { id: 'u17-doubles', label: 'U17 Doubles', meta: '16 pairs', kind: 'bracket', entries: 16 },
+    { id: 'open-md', label: "Open Men's Doubles", meta: '2 groups, 5 pairs each', kind: 'groups', groups: 2, perGroup: 5 },
+    { id: 'open-xd', label: 'Open Mixed Doubles', meta: '2 groups, 5 pairs each', kind: 'groups', groups: 2, perGroup: 5 },
+  ] satisfies Draw[],
 };
 
 /**

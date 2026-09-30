@@ -1,7 +1,7 @@
 ---
 /**
  * Closing band: the registration call, then the wordmark, navigation and socials.
- * One dark block, so the page's light/dark alternation still holds.
+ * Sits on the same gold bar as the navigation, bracketing the page.
  */
 import Button from './Button.astro';
 import Icon from './Icon.astro';
@@ -9,7 +9,7 @@ import { closing, REGISTER_URL, socials, tournament, tournamentNav } from '../da
 
 const year = new Date().getFullYear();
 ---
-<footer class="sv-tr-footer sv-root sv-night" id="register">
+<footer class="sv-tr-footer sv-root" id="register">
   <div class="sv-container sv-tr-footer-cta">
     <p class="sv-tr-secure">{closing.title}</p>
     <Button variant="primary" arrow href={REGISTER_URL}>{tournament.registerLabel}</Button>

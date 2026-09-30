@@ -8,12 +8,12 @@ import Button from './Button.astro';
 import Icon from './Icon.astro';
 import { hero, REGISTER_URL, tournament } from '../data/tournament';
 ---
-<section class="sv-hero sv-tr-hero sv-root sv-night" id="top">
+<section class="sv-hero sv-tr-hero sv-root" id="top">
   <Image
     class="sv-hero-img"
     src={hero.image}
     alt={hero.imageAlt}
-    widths={[640, 960, 1254]}
+    widths={[640, 960, 1280]}
     sizes="(max-width: 860px) 100vw, 58vw"
     format="webp"
     quality={78}
@@ -26,7 +26,7 @@ import { hero, REGISTER_URL, tournament } from '../data/tournament';
   <div class="sv-container sv-hero-inner">
     <h1 class="sv-tr-lockup">
       <img src={tournament.logo} alt={tournament.name} width="314" height="90" />
-      <span class="sv-tr-collab">{tournament.collaboration}</span>
+      <span class="sv-tr-collab">In collaboration with <a href="/">Smash Vibes</a></span>
     </h1>
 
     <p class="sv-tr-tagline">

@@ -1,0 +1,50 @@
+---
+/**
+ * Round-robin group tables, for the categories that are not knockouts.
+ * Rows are empty until the draw is made.
+ */
+interface Props {
+  groups: number;
+  perGroup: number;
+  /** Pair names per group, e.g. [["A pair", …], […]]. Gaps render as empty slots. */
+  entries?: (string | null)[][];
+}
+const { groups, perGroup, entries = [] } = Astro.props;
+const LETTERS = 'ABCDEFGH';
+---
+<div class="sv-dr-groups">
+  {Array.from({ length: groups }, (_, g) => (
+    <table class="sv-dr-table">
+      <caption>Group {LETTERS[g]}</caption>
+      <thead>
+        <tr>
+          <th scope="col" class="sv-dr-th-seed"><span class="sv-sr-only">Seed</span></th>
+          <th scope="col">Pair</th>
+          <th scope="col" class="sv-dr-th-num" title="Played">P</th>
+          <th scope="col" class="sv-dr-th-num" title="Won">W</th>
+          <th scope="col" class="sv-dr-th-num" title="Lost">L</th>
+          <th scope="col" class="sv-dr-th-num">Pts</th>
+        </tr>
+      </thead>
+      <tbody>
+        {Array.from({ length: perGroup }, (_, r) => {
+          const name = entries[g]?.[r] ?? null;
+          return (
+            <tr>
+              <td class="sv-dr-seed-cell">{r + 1}</td>
+              <td>
+                {name
+                  ? <span class="sv-dr-name">{name}</span>
+                  : <span class="sv-dr-name is-tbc"><span class="sv-sr-only">To be decided</span></span>}
+              </td>
+              <td class="sv-dr-num">—</td>
+              <td class="sv-dr-num">—</td>
+              <td class="sv-dr-num">—</td>
+              <td class="sv-dr-num">—</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  ))}
+</div>

@@ -121,12 +121,49 @@ no JavaScript at all.
 | --- | --- |
 | `/` | The Smash Vibes homepage. |
 | `/tournament/` | StarRise Cup — the event page, linked from the main nav as "Tournaments". |
+| `/tournament/draws/` | Draws: a tabbed bracket and group tables, linked from the tournament nav. |
 
 The tournament page is a separate event brand run in collaboration with Smash Vibes, so
 it keeps its own wordmark and navigation but is built entirely from the Smash Vibes
 design system: the same `Button`, `NavBar`, `SectionHeading` and `Icon` components, the
 same tokens, and the same dark/light ground alternation. Its own classes are `sv-tr-`
 prefixed.
+
+### Theming
+
+The tournament pages are light-and-gold where Smash Vibes is dark-and-gold. Rather than
+fork the design system, `tournament.css` redefines a handful of tokens (`--ink` to deep
+navy, `--line` to a gold hairline, warmer grounds) on the `.sv-tr-page` wrapper.
+
+Two things about that file are load-bearing. Astro emits it **before** `tokens.css` and
+`site.css`, so:
+
+1. The overrides hang off `.sv-tr-page`, not `:root`. A custom property redefined on a
+   descendant wins for that subtree whatever the source order; a second `:root` block
+   would simply lose to the later one.
+2. Anything overriding a design-system rule carries a `.sv-tr-page` prefix for the extra
+   specificity. Without it `site.css` wins on source order and the override silently
+   does nothing — which is exactly how the hero first rendered on a black ground.
+
+### Draws
+
+`/tournament/draws/` uses CSS-only radio tabs (**still zero JavaScript**) over two panel
+types: a knockout bracket and round-robin group tables, chosen per draw in
+`src/data/tournament.ts`.
+
+The bracket is one CSS grid shared by every round — `entries / 2` match rows plus a
+header row. A round-N match spans `2^(N-1)` rows and centres in them, which lands it
+exactly level with the midpoint of the two matches feeding it, with no measuring and no
+script. Connectors are drawn with two pseudo-elements per match. Each round is
+`display: contents` so its children join the shared grid while the markup stays grouped
+by round — which is what lets the mobile layout stack rounds by flipping one property.
+
+Below 1000px the columns stop being readable, so rounds stack vertically under their
+headers and the connectors are dropped. That beats panning a 1200px-wide bracket on a
+phone.
+
+Every slot is empty until the draw is made: pass `seeds` to `DrawBracket` or `entries`
+to `DrawGroups` to fill them.
 
 Four outline icons the system does not ship (`clock`, `bracket`, `chart`, `rules`) and
 four social marks were added to `src/design-system/site-icons.json`, drawn to the

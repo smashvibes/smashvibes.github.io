@@ -1,0 +1,79 @@
+---
+/**
+ * Single-elimination bracket.
+ *
+ * Laid out as ONE css grid shared by every round: `size / 2` match rows plus a header
+ * row. A round-N match spans 2^(N-1) rows and centres itself in that span, which puts it
+ * exactly level with the midpoint of the two matches feeding it — no measuring, no
+ * script. Each round element is `display: contents` so its children land in the shared
+ * grid while the markup stays grouped by round (which is what the mobile layout needs).
+ */
+interface Props {
+  entries: number;
+  /** Player or pair names, seed order. Gaps render as empty slots. */
+  seeds?: (string | null)[];
+}
+const { entries, seeds = [] } = Astro.props;
+
+const ROUND_NAMES: Record<number, string> = {
+  2: 'Final',
+  4: 'Semi Finals',
+  8: 'Quarter Finals',
+  16: 'Round of 16',
+  32: 'Round of 32',
+  64: 'Round of 64',
+};
+
+const totalRows = entries / 2;
+const rounds: {
+  name: string;
+  col: number;
+  span: number;
+  last: boolean;
+  matches: { row: number; slots: { seed: number | null; name: string | null }[] }[];
+}[] = [];
+
+let remaining = entries;
+let col = 1;
+while (remaining >= 2) {
+  const count = remaining / 2;
+  const span = totalRows / count;
+  rounds.push({
+    name: ROUND_NAMES[remaining] ?? `Round of ${remaining}`,
+    col,
+    span,
+    last: count === 1,
+    matches: Array.from({ length: count }, (_, m) => ({
+      row: m * span + 1,
+      slots: [0, 1].map((k) => ({
+        // Seed numbers belong to the first round only, as in the design.
+        seed: col === 1 ? m * 2 + k + 1 : null,
+        name: col === 1 ? seeds[m * 2 + k] ?? null : null,
+      })),
+    })),
+  });
+  remaining /= 2;
+  col += 1;
+}
+---
+<div class="sv-dr-bracket" style={`--dr-rows:${totalRows}`}>
+  {rounds.map((round) => (
+    <div class="sv-dr-round" style={`--col:${round.col}`} data-last={round.last ? '' : undefined}>
+      <h3 class="sv-dr-round-title">{round.name}</h3>
+      {round.matches.map((match) => (
+        <div class="sv-dr-cell" style={`--row:${match.row};--span:${round.span}`}>
+          <div class="sv-dr-match">
+            {match.slots.map((slot) => (
+              <div class="sv-dr-slot">
+                {slot.seed !== null && <span class="sv-dr-seed">{slot.seed}</span>}
+                {slot.name
+                  ? <span class="sv-dr-name">{slot.name}</span>
+                  : <span class="sv-dr-name is-tbc"><span class="sv-sr-only">To be decided</span></span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  ))}
+</div>

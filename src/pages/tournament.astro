@@ -56,6 +56,7 @@ const jsonLd = {
 <Base title={tournament.title} description={tournament.description}>
   <script type="application/ld+json" slot="head" set:html={JSON.stringify(jsonLd)} is:inline />
 
+  <div class="sv-tr-page">
   <header class="sv-header">
     <NavBar
       logoSrc={tournament.logo}
@@ -89,9 +90,9 @@ const jsonLd = {
       />
     </section>
 
-    <section class="sv-tr-categories sv-root sv-night" id="categories">
+    <section class="sv-tr-categories sv-root" id="categories">
       <div class="sv-container">
-        <SectionHeading tone="night" eyebrow={categories.eyebrow} title={categories.title} />
+        <SectionHeading eyebrow={categories.eyebrow} title={categories.title} />
         <div class="sv-tr-category-grid">
           {categories.items.map((item) => <CategoryCard {...item} />)}
         </div>
@@ -160,4 +161,5 @@ const jsonLd = {
   </main>
 
   <TournamentFooter />
+  </div>
 </Base>

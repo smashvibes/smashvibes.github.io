@@ -1,0 +1,86 @@
+---
+import '../../styles/tournament.css';
+import Base from '../../layouts/Base.astro';
+import NavBar from '../../components/NavBar.astro';
+import TournamentFooter from '../../components/TournamentFooter.astro';
+import DrawBracket from '../../components/DrawBracket.astro';
+import DrawGroups from '../../components/DrawGroups.astro';
+import { draws, REGISTER_URL, tournament, tournamentNav } from '../../data/tournament';
+
+const title = `Draws | ${tournament.name} 2026`;
+const description =
+  'Draws and group tables for the StarRise Cup 2026 badminton tournament — U17 Singles, U17 Doubles, Open Men’s Doubles and Open Mixed Doubles.';
+---
+<Base title={title} description={description}>
+  <div class="sv-tr-page">
+    <header class="sv-header sv-tr-header-solid">
+      <NavBar
+        logoSrc={tournament.logo}
+        homeHref="/tournament/"
+        links={tournamentNav.map((l) => ({ ...l, active: l.label === 'Draws' }))}
+        cta={{ label: tournament.registerLabel, href: REGISTER_URL }}
+        ctaArrow
+      />
+    </header>
+
+    <main id="main" class="sv-dr sv-root">
+      <div class="sv-container">
+        <h1 class="sv-dr-title">{draws.title}</h1>
+        <p class="sv-dr-note">{draws.note}</p>
+
+        {/* Radio-driven tabs: keyboard operable with the arrow keys, and no JavaScript.
+            `:has()` on the wrapper lets the panels live outside the radio group. */}
+        <fieldset class="sv-dr-tabs">
+          <legend class="sv-sr-only">Choose a draw</legend>
+          {draws.items.map((draw, i) => (
+            <>
+              <input
+                class="sv-sr-only sv-dr-radio"
+                type="radio"
+                name="draw"
+                id={`draw-${draw.id}`}
+                value={draw.id}
+                checked={i === 0}
+              />
+              <label class="sv-dr-tab" for={`draw-${draw.id}`}>
+                <span class="sv-dr-tab-label">{draw.label}</span>
+                <span class="sv-dr-tab-meta">{draw.meta}</span>
+              </label>
+            </>
+          ))}
+        </fieldset>
+
+        {draws.items.map((draw) => (
+          <section class="sv-dr-panel" id={`panel-${draw.id}`} aria-label={`${draw.label} draw`}>
+            {draw.kind === 'bracket'
+              ? <DrawBracket entries={draw.entries!} />
+              : <DrawGroups groups={draw.groups!} perGroup={draw.perGroup!} />}
+          </section>
+        ))}
+      </div>
+    </main>
+
+    <TournamentFooter />
+  </div>
+</Base>
+
+<style is:global>
+  /* One pair of rules per draw, generated from the ids in src/data/tournament.ts.
+     Add a draw there and add its two rules here. */
+  .sv-dr:has(#draw-u17-singles:checked) #panel-u17-singles { display: block; }
+  .sv-dr:has(#draw-u17-singles:checked) [for='draw-u17-singles'] {
+    background: var(--gold-600); border-color: var(--gold-600); color: var(--paper);
+  }
+  .sv-dr:has(#draw-u17-doubles:checked) #panel-u17-doubles { display: block; }
+  .sv-dr:has(#draw-u17-doubles:checked) [for='draw-u17-doubles'] {
+    background: var(--gold-600); border-color: var(--gold-600); color: var(--paper);
+  }
+  .sv-dr:has(#draw-open-md:checked) #panel-open-md { display: block; }
+  .sv-dr:has(#draw-open-md:checked) [for='draw-open-md'] {
+    background: var(--gold-600); border-color: var(--gold-600); color: var(--paper);
+  }
+  .sv-dr:has(#draw-open-xd:checked) #panel-open-xd { display: block; }
+  .sv-dr:has(#draw-open-xd:checked) [for='draw-open-xd'] {
+    background: var(--gold-600); border-color: var(--gold-600); color: var(--paper);
+  }
+</style>

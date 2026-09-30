@@ -1,18 +1,77 @@
-/* StarRise Cup tournament page.
+/* StarRise Cup — tournament pages.
  *
- * Composes the Smash Vibes design system exactly as site.css does — no new colours,
- * type sizes or spacing values, only arrangement. Classes are prefixed `sv-tr-` so they
- * never collide with the homepage's.
+ * Astro bundles CSS per page, so this file only ever reaches /tournament/ and
+ * /tournament/draws/, and it is emitted BEFORE tokens.css and site.css. Two consequences
+ * shape everything below:
+ *
+ *   1. The token overrides hang off `.sv-tr-page`, not `:root`. A custom property
+ *      redefined on a descendant wins for that subtree whatever the source order, while
+ *      a second `:root` block would simply lose to the later one.
+ *   2. Anything that overrides a design-system rule needs one extra class — hence the
+ *      `.sv-tr-page` prefixes. Without it site.css wins on source order alone.
+ *
+ * The event brand is light and gold where Smash Vibes is dark and gold, so the grounds
+ * invert and headings move from near-black to deep navy. Everything else — spacing,
+ * radii, type scale, the components themselves — is unchanged.
  */
+
+.sv-tr-page {
+  --ink: #11152e;        /* deep navy headings, sampled from the design */
+  --ink-muted: #30374e;  /* navy-grey body copy */
+  --line: #f3d7a2;       /* gold hairline: card and panel borders */
+  --cream-50: #fffdf7;   /* barely-warm alternate ground */
+
+  /* Page-local additions, not design-system tokens. */
+  --tr-bar: linear-gradient(105deg, #f7efdd 0%, #fbf4e6 38%, #f1e2c4 68%, #f8f1e2 100%);
+  --tr-hero: linear-gradient(115deg, #fffdf8 0%, #fdf6e9 46%, #f7ecd6 100%);
+  --dr-line: #d9c9a2;    /* bracket connectors */
+  --dr-slot: #eeeeee;    /* empty draw slot */
+  --dr-head: #f1f1ef;    /* round header pill */
+  --dr-gap: 30px;        /* horizontal space between bracket columns */
+}
+
+.sv-sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Navigation on a light ground ---------- */
+
+/* NavBar ships `sv-night`; on this brand the bar is gold and the type is navy. */
+.sv-tr-page .sv-header .sv-nav { background: transparent; }
+.sv-tr-page .sv-header.sv-tr-header-solid { position: static; background: var(--tr-bar); }
+.sv-tr-header-solid { background: var(--tr-bar); }
+.sv-tr-header-solid::after {
+  content: '';
+  display: block;
+  height: 1px;
+  background: var(--line);
+}
+.sv-tr-page .sv-nav-logo { height: 42px; }
+.sv-tr-page .sv-nav-link { color: var(--ink-muted); font-weight: 500; }
+.sv-tr-page .sv-nav-link:hover { color: var(--ink); }
+.sv-tr-page .sv-nav-link[aria-current='page'] { color: var(--gold-700); border-bottom-color: var(--gold-700); }
+.sv-tr-page .sv-nav-link:focus-visible,
+.sv-tr-page .sv-nav-home:focus-visible { outline-color: var(--gold-700); }
+.sv-tr-page .sv-nav-burger > span,
+.sv-tr-page .sv-nav-burger > span::before,
+.sv-tr-page .sv-nav-burger > span::after { background: var(--ink); }
+.sv-tr-page .sv-nav-links { border-top-color: var(--line); }
 
 /* ---------- Shared card + spec list ---------- */
 
 .sv-card {
   background: var(--paper);
-  border: 1px solid var(--gold-300);
+  border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   padding: var(--space-5);
   font-family: var(--font-body);
+  display: flex;
+  flex-direction: column;
 }
 .sv-card-title { margin: 0; font: var(--text-heading-md); color: var(--ink); }
 .sv-card-sub { margin: var(--space-1) 0 0; font: var(--text-body); color: var(--ink-muted); }
@@ -25,20 +84,43 @@
 
 /* ---------- Hero ---------- */
 
-.sv-tr-hero .sv-hero-img { width: 58%; object-position: 60% 40%; }
-.sv-tr-hero .sv-hero-scrim {
-  background:
-    linear-gradient(90deg, var(--night-900) 34%, rgba(11, 11, 12, .82) 48%, rgba(11, 11, 12, 0) 70%),
-    linear-gradient(0deg, rgba(11, 11, 12, .9), rgba(11, 11, 12, 0) 35%);
+.sv-tr-page .sv-tr-hero { background: var(--tr-hero); }
+/* The photograph is masked into the cream rather than covered by a scrim. A scrim over
+   a light ground never fully hides the image's edge — it just greys it — so the left
+   edge is faded out of the image itself. */
+.sv-tr-page .sv-tr-hero .sv-hero-img {
+  width: 62%;
+  object-position: 56% 42%;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 34%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 34%);
 }
+.sv-tr-page .sv-tr-hero .sv-hero-scrim { display: none; }
+/* Gold corner flashes, echoing the design's foil edges. */
+.sv-tr-hero::before,
+.sv-tr-hero::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  width: 150px;
+  height: 150px;
+  pointer-events: none;
+  opacity: .5;
+  background: linear-gradient(135deg, var(--gold-400), rgba(242, 188, 79, 0) 58%);
+}
+.sv-tr-hero::before { top: 0; left: 0; }
+.sv-tr-hero::after { bottom: 0; left: 0; rotate: 90deg; opacity: .3; }
 
-.sv-tr-lockup { margin: 0; display: grid; gap: var(--space-2); justify-items: start; }
-.sv-tr-lockup img { height: 90px; width: auto; }
-.sv-tr-collab { font: var(--text-body); color: var(--on-night-muted); }
+.sv-tr-lockup { margin: 0; display: grid; gap: var(--space-3); justify-items: start; }
+.sv-tr-lockup img { height: 96px; width: auto; }
+.sv-tr-collab { font: var(--text-body); color: var(--ink-muted); }
+.sv-tr-collab a { color: var(--ink); font-weight: 600; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.sv-tr-collab a:hover { color: var(--gold-700); }
+.sv-tr-collab a:focus-visible { outline: 2px solid var(--gold-700); outline-offset: 3px; border-radius: var(--radius-sm); }
 
 .sv-tr-tagline {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: var(--space-3);
   margin: var(--space-5) 0 0;
   font-family: var(--font-display);
@@ -47,11 +129,10 @@
   /* Wide tracking is what makes this read as a tagline rather than a heading. */
   letter-spacing: .22em;
   text-transform: uppercase;
-  color: var(--on-night);
-  flex-wrap: wrap;
+  color: var(--gold-700);
 }
-.sv-tr-tagline-accent { color: var(--gold-400); }
-.sv-tr-dot { font-style: normal; color: var(--gold-400); }
+.sv-tr-tagline-accent { color: var(--gold-700); }
+.sv-tr-dot { font-style: normal; color: var(--gold-500); }
 
 .sv-tr-facts {
   list-style: none;
@@ -61,9 +142,9 @@
   gap: var(--space-4);
   font-family: var(--font-body);
 }
-.sv-tr-facts li { display: flex; align-items: flex-start; gap: var(--space-4); color: var(--on-night-muted); }
-.sv-tr-facts .sv-ico { flex: none; color: var(--gold-400); margin-top: 2px; }
-.sv-tr-facts strong { display: block; font: var(--text-heading-md); font-size: 18px; color: var(--on-night); }
+.sv-tr-facts li { display: flex; align-items: flex-start; gap: var(--space-4); color: var(--ink-muted); }
+.sv-tr-facts .sv-ico { flex: none; color: var(--gold-600); margin-top: 2px; }
+.sv-tr-facts strong { display: block; font: var(--text-heading-md); font-size: 18px; color: var(--ink); }
 .sv-tr-facts li > span { font: var(--text-body); }
 .sv-tr-fact-line { display: block; font-size: 14px; line-height: 21px; }
 .sv-tr-cta { margin-top: var(--space-6); }
@@ -81,7 +162,7 @@
 .sv-tr-about-copy { margin-top: var(--space-4); max-width: 68ch; }
 .sv-tr-about-copy p { margin: 0 0 var(--space-2); font: var(--text-body-lg); color: var(--ink-muted); }
 /* The shuttle bleeds off the right edge behind the copy, its left edge masked into the
-   white ground so it reads as part of the section rather than a pasted-on picture. */
+   ground so it reads as part of the section rather than a pasted-on picture. */
 .sv-tr-about-img {
   position: absolute;
   inset: 0 0 0 auto;
@@ -95,21 +176,19 @@
 
 /* ---------- Categories ---------- */
 
-.sv-tr-categories { background: var(--night-900); padding-block: var(--space-8); }
+.sv-tr-categories { background: var(--cream-50); padding-block: var(--space-8); }
 .sv-tr-category-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: var(--space-5);
   margin-top: var(--space-6);
 }
-/* The card must fill its stretched grid cell, so both boxes end the same height. */
-.sv-card { display: flex; flex-direction: column; }
 .sv-category-head { display: flex; gap: var(--space-4); align-items: flex-start; margin-bottom: var(--space-5); }
 .sv-category-mark { flex: none; color: var(--gold-500); }
 
 /* ---------- Prizes ---------- */
 
-.sv-tr-prizes { background: var(--cream-50); padding-block: var(--space-8); }
+.sv-tr-prizes { background: var(--paper); padding-block: var(--space-8); }
 .sv-tr-prize-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -199,13 +278,12 @@
   font: var(--text-body);
   color: var(--ink-muted);
 }
-.sv-prize-runner { margin-top: auto; }
 .sv-prize-runner span { font-weight: 600; color: var(--ink); }
 .sv-prize-runner strong { font: var(--text-heading-md); color: var(--gold-700); }
 
 /* ---------- Key information ---------- */
 
-.sv-tr-details { background: var(--paper); padding-block: var(--space-8); }
+.sv-tr-details { background: var(--cream-50); padding-block: var(--space-8); }
 .sv-tr-details-inner {
   display: grid;
   grid-template-columns: 1fr 1.05fr;
@@ -226,20 +304,20 @@
   align-items: flex-start;
   max-width: 78%;
   padding: var(--space-4) var(--space-5);
-  background: rgba(11, 11, 12, .82);
+  background: rgba(17, 21, 46, .86);
   border-radius: var(--radius-lg) 0 var(--radius-lg) 0;
   font-family: var(--font-body);
-  color: var(--on-night-muted);
+  color: #d7dae6;
   font-size: 13px;
   line-height: 20px;
 }
 .sv-tr-venue figcaption .sv-ico { flex: none; color: var(--gold-400); }
-.sv-tr-venue figcaption strong { display: block; font: var(--text-heading-md); font-size: 17px; color: var(--on-night); }
+.sv-tr-venue figcaption strong { display: block; font: var(--text-heading-md); font-size: 17px; color: #fff; }
 .sv-tr-venue figcaption span span { display: block; }
 
 /* ---------- Sponsors ---------- */
 
-.sv-tr-sponsors { background: var(--cream-50); padding-block: var(--space-8); }
+.sv-tr-sponsors { background: var(--paper); padding-block: var(--space-8); }
 .sv-tr-sponsor-grid {
   list-style: none;
   margin: var(--space-6) 0 0;
@@ -261,7 +339,7 @@
 
 /* ---------- Guests ---------- */
 
-.sv-tr-guests { background: var(--paper); padding-block: var(--space-8); }
+.sv-tr-guests { background: var(--cream-50); padding-block: var(--space-8); }
 .sv-tr-guest-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -283,7 +361,7 @@
 
 /* ---------- Footer ---------- */
 
-.sv-tr-footer { background: var(--night-900); font-family: var(--font-body); }
+.sv-tr-footer { background: var(--tr-bar); font-family: var(--font-body); }
 .sv-tr-footer-cta {
   display: grid;
   justify-items: center;
@@ -298,7 +376,7 @@
   font-weight: 700;
   letter-spacing: .22em;
   text-transform: uppercase;
-  color: var(--gold-400);
+  color: var(--gold-700);
 }
 .sv-tr-footer-base {
   display: flex;
@@ -306,29 +384,221 @@
   gap: var(--space-5);
   flex-wrap: wrap;
   padding-block: var(--space-5);
-  border-top: 1px solid var(--night-600);
+  border-top: 1px solid var(--line);
 }
 .sv-tr-footer-logo img { height: 45px; width: auto; }
 .sv-tr-footer-nav { flex: 1; }
 .sv-tr-footer-nav ul { display: flex; gap: var(--space-5); flex-wrap: wrap; list-style: none; margin: 0; padding: 0; }
-.sv-tr-footer-nav a { color: var(--on-night-muted); font-size: 14px; text-decoration: none; }
-.sv-tr-footer-nav a:hover { color: var(--gold-400); }
-.sv-tr-footer-nav a:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: var(--radius-sm); }
+.sv-tr-footer-nav a { color: var(--ink-muted); font-size: 14px; text-decoration: none; }
+.sv-tr-footer-nav a:hover { color: var(--gold-700); }
+.sv-tr-footer-nav a:focus-visible { outline: 2px solid var(--gold-700); outline-offset: 3px; border-radius: var(--radius-sm); }
 
 .sv-tr-socials { display: flex; gap: var(--space-4); list-style: none; margin: 0; padding: 0; }
-.sv-tr-socials a, .sv-tr-social-pending { display: grid; place-items: center; color: var(--on-night); }
-.sv-tr-socials a:hover { color: var(--gold-400); }
-.sv-tr-socials a:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; border-radius: var(--radius-sm); }
+.sv-tr-socials a, .sv-tr-social-pending { display: grid; place-items: center; color: var(--ink); }
+.sv-tr-socials a:hover { color: var(--gold-700); }
+.sv-tr-socials a:focus-visible { outline: 2px solid var(--gold-700); outline-offset: 4px; border-radius: var(--radius-sm); }
 /* No handle supplied yet. Shown at the design's weight so the row reads correctly,
    but it is a <span>, not a link to nowhere. */
-.sv-tr-social-pending { color: var(--on-night-muted); cursor: default; }
+.sv-tr-social-pending { color: #9aa0b4; cursor: default; }
 
-.sv-tr-copy { margin: 0; font-size: 13px; color: var(--on-night-muted); }
+.sv-tr-copy { margin: 0; font-size: 13px; color: var(--ink-muted); }
+
+/* ---------- Draws page ---------- */
+
+.sv-dr { background: var(--paper); padding-block: var(--space-7) var(--space-8); font-family: var(--font-body); }
+.sv-dr-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(38px, 6vw, 64px);
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.sv-dr-title::after {
+  content: '';
+  display: block;
+  width: 72px;
+  height: 4px;
+  margin-top: var(--space-4);
+  border-radius: 2px;
+  background: var(--gold-600);
+}
+.sv-dr-note { margin: var(--space-5) 0 0; max-width: 60ch; font: var(--text-body); color: var(--ink-muted); }
+
+/* --- Tabs --- */
+
+.sv-dr-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  border: 0;
+}
+.sv-dr-tab {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: var(--space-4) var(--space-3);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  text-align: center;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+.sv-dr-tab:hover { border-color: var(--gold-500); }
+.sv-dr-tab-label {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: inherit;
+}
+.sv-dr-tab-meta {
+  font-family: var(--font-display);
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: inherit;
+  opacity: .72;
+}
+/* The checked tab's colours are set per-draw in the page's own <style> block, since the
+   selector has to name each id. Here we only handle the inherited text colour. */
+.sv-dr-tab:has(:focus-visible),
+.sv-dr-radio:focus-visible + .sv-dr-tab { outline: 2px solid var(--gold-700); outline-offset: 3px; }
+.sv-dr:has(.sv-dr-radio:checked) .sv-dr-tab[aria-hidden] { color: inherit; }
+
+/* --- Panels --- */
+
+.sv-dr-panel { display: none; margin-top: var(--space-6); }
+
+/* --- Bracket ---
+ * One grid shared by every round: `--dr-rows` match rows plus a header row. A match
+ * spans `--span` rows and centres in them, which lands it level with the midpoint of
+ * the two matches feeding it.
+ */
+.sv-dr-bracket {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(190px, 1fr));
+  grid-template-rows: auto repeat(var(--dr-rows), minmax(56px, 1fr));
+  column-gap: var(--dr-gap);
+  row-gap: var(--space-3);
+  align-items: stretch;
+}
+.sv-dr-round { display: contents; }
+.sv-dr-round-title {
+  grid-column: var(--col);
+  grid-row: 1;
+  margin: 0 0 var(--space-3);
+  padding: var(--space-3);
+  background: var(--dr-head);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--ink);
+}
+.sv-dr-cell {
+  position: relative;
+  grid-column: var(--col);
+  grid-row: calc(var(--row) + 1) / span var(--span);
+  display: grid;
+  align-content: center;
+}
+.sv-dr-match {
+  display: grid;
+  gap: 4px;
+  padding: 6px;
+  background: var(--paper);
+  border: 1px solid #e6e6e6;
+  border-radius: var(--radius-sm);
+}
+.sv-dr-slot { display: flex; align-items: center; gap: var(--space-2); min-height: 26px; }
+.sv-dr-seed {
+  flex: none;
+  width: 22px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--ink);
+}
+.sv-dr-name { flex: 1; font-size: 14px; line-height: 20px; color: var(--ink); }
+.sv-dr-name.is-tbc { min-height: 20px; border-radius: 4px; background: var(--dr-slot); }
+
+/* Connectors. Each cell sends a stub right to the middle of the column gap; each cell
+   from round two on draws the vertical join back to its two feeders, plus the short
+   horizontal into itself. The feeders sit at 25% and 75% of this cell's row span. */
+.sv-dr-round:not([data-last]) .sv-dr-cell::after {
+  content: '';
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  width: calc(var(--dr-gap) / 2);
+  height: 2px;
+  background: var(--dr-line);
+}
+.sv-dr-round:not(:first-child) .sv-dr-cell::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 25%;
+  height: 50%;
+  width: calc(var(--dr-gap) / 2);
+  border-left: 2px solid var(--dr-line);
+  background: linear-gradient(var(--dr-line), var(--dr-line)) left 50% / 100% 2px no-repeat;
+}
+
+/* --- Group tables --- */
+
+.sv-dr-groups { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-5); }
+.sv-dr-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.sv-dr-table caption {
+  margin-bottom: var(--space-3);
+  padding: var(--space-3);
+  background: var(--dr-head);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.sv-dr-table th, .sv-dr-table td { padding: var(--space-3); border-bottom: 1px solid #ececec; text-align: left; }
+.sv-dr-table thead th { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-muted); }
+.sv-dr-th-seed { width: 34px; }
+.sv-dr-th-num, .sv-dr-num { width: 44px; text-align: center; }
+.sv-dr-num { color: var(--ink-muted); }
+.sv-dr-seed-cell { font-family: var(--font-display); font-weight: 700; color: var(--ink); }
+.sv-dr-table .sv-dr-name.is-tbc { display: block; max-width: 220px; }
 
 /* ---------- Responsive ---------- */
 
 @media (max-width: 1080px) {
   .sv-tr-sponsor-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 1000px) {
+  /* Below this the four bracket columns stop being readable, so rounds stack. The
+     connectors are dropped rather than scrolled: a 1200px-wide bracket panned on a
+     phone is worse than four clearly labelled lists. */
+  .sv-dr-bracket { display: block; }
+  .sv-dr-round { display: block; margin-bottom: var(--space-6); }
+  .sv-dr-round-title { margin-bottom: var(--space-4); }
+  .sv-dr-cell { display: block; margin-bottom: var(--space-3); }
+  .sv-dr-cell::before, .sv-dr-cell::after { display: none; }
+  .sv-dr-groups { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 900px) {
@@ -351,8 +621,18 @@
 }
 
 @media (max-width: 860px) {
-  .sv-tr-hero .sv-hero-img { width: 100%; object-position: 58% 30%; }
-  .sv-tr-lockup img { height: 72px; }
+  .sv-tr-page .sv-nav-logo { height: 34px; }
+  .sv-tr-hero::before, .sv-tr-hero::after { display: none; }
+  .sv-tr-page .sv-tr-hero .sv-hero-img { width: 100%; object-position: 58% 30%; opacity: 1; }
+  /* The hero photograph becomes a band under the copy, so the scrim must not sit over
+     the page; the light gradient is replaced by a soft top fade on the image itself. */
+  .sv-tr-page .sv-tr-hero .sv-hero-scrim { display: none; }
+  .sv-tr-hero .sv-hero-img {
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 18%);
+    mask-image: linear-gradient(180deg, transparent 0, #000 18%);
+  }
+  .sv-tr-lockup img { height: 76px; }
+  .sv-dr-tabs { grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
 }
 
 @media (max-width: 720px) {
@@ -364,10 +644,15 @@
   .sv-tr-footer-nav { flex-basis: 100%; }
   .sv-tr-footer-nav ul { justify-content: center; }
   .sv-tr-venue figcaption { position: static; max-width: none; border-radius: 0; }
+  .sv-tr-page .sv-nav-logo { height: 30px; }
+  .sv-dr { padding-block: var(--space-6) var(--space-7); }
+  .sv-dr-table th, .sv-dr-table td { padding: var(--space-2); }
 }
 
 @media (max-width: 520px) {
   .sv-tr-guest-grid { grid-template-columns: 1fr; }
   .sv-tr-tagline { gap: var(--space-2); letter-spacing: .1em; }
   .sv-tr-cta, .sv-tr-footer-cta .sv-btn { width: 100%; }
+  .sv-dr-tabs { grid-template-columns: 1fr; }
+  .sv-dr-tab { grid-template-columns: auto; padding: var(--space-3); }
 }
