@@ -585,8 +585,14 @@ function updateExistingForm() {
 
   // Print the resulting order every time. Section position is what decides whether Forms
   // shows Next or Submit, so it is the one thing worth seeing after every run.
+  //
+  // CAVEAT, learned the hard way on this form: getItems() has returned page breaks in an
+  // order that did NOT match the order Forms renders them in, so the list below can look
+  // right while the live form is wrong. The respondent view is the authority — open the
+  // form and check that the waiver is the last section. If it is not, drag it to the end
+  // in the editor; no API call has reliably moved it.
   Logger.log('');
-  Logger.log('Section order and what follows each one:');
+  Logger.log('Section order as the API reports it (confirm against the live form):');
   Logger.log('  1. (category question)');
   var finalBreaks = form.getItems(FormApp.ItemType.PAGE_BREAK);
   for (var b = 0; b < finalBreaks.length; b++) {
@@ -626,6 +632,9 @@ function findMultipleChoice(form, title) {
  * sections about in the editor puts it right.
  */
 function ensureWaiverLast(form) {
+  // NOTE: this has proved unreliable on at least one form, where getItems() reported the
+  // waiver as already last while Forms rendered it fourth of five. If the live form still
+  // ends on an entry section after running this, move the waiver by hand in the editor.
   // Runnable on its own from the editor's dropdown, not just from updateExistingForm.
   form = form || FormApp.openById(FORM_ID);
   var items = form.getItems();
