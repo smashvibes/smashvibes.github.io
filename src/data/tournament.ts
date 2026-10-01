@@ -10,6 +10,7 @@ import { WHATSAPP_CHAT } from './site';
 import heroImage from '../assets/tournament/hero.jpg';
 import aboutImage from '../assets/tournament/about-shuttle.jpg';
 import venueImage from '../assets/tournament/venue.jpg';
+import posterImage from '../assets/tournament/poster.jpg';
 import guest1 from '../assets/tournament/guest-1.jpg';
 import guest2 from '../assets/tournament/guest-2.jpg';
 import guest3 from '../assets/tournament/guest-3.jpg';
@@ -70,6 +71,7 @@ export const tournamentFooterNav: { label: string; href: string }[] = [
   { label: 'Categories', href: '/tournament/#categories' },
   { label: 'Prizes', href: '/tournament/#prizes' },
   { label: 'Event Details', href: '/tournament/#details' },
+  { label: 'Poster', href: '/tournament/#poster' },
   { label: 'Draws', href: '/tournament/draws/' },
   { label: 'Sponsors', href: '/tournament/#sponsors' },
 ];
@@ -185,6 +187,25 @@ export const details = {
     image: venueImage,
     imageAlt: 'The green courts of SBH VIP Hall @ Sims under full lighting',
   },
+};
+
+/**
+ * Event poster.
+ *
+ * `file` is the full-resolution copy in public/, deliberately outside the asset pipeline:
+ * it needs a stable, un-hashed URL because the page opens it directly in a new tab and
+ * people share and print that link. `image` is the pipeline copy used for the thumbnail,
+ * so the page does not pull the full poster just to render a card.
+ */
+export const poster = {
+  eyebrow: 'Share it',
+  title: 'Event Poster',
+  body: 'Everything about the StarRise Cup on one page — dates, categories, formats and prizes. The QR code goes straight to registration.',
+  linkLabel: 'Open full poster',
+  file: '/tournament/starrise-cup-poster.jpg',
+  image: posterImage,
+  imageAlt:
+    'StarRise Cup 2026 poster: 14 November 2026, 10:00 AM to 3:00 PM at SBH VIP Hall @ Sims, with the Teens and Adults category formats, prize amounts and a registration QR code',
 };
 
 export const sponsors = {

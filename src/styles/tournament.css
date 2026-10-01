@@ -319,6 +319,43 @@
 .sv-tr-venue figcaption strong { display: block; font: var(--text-heading-md); font-size: 17px; color: #fff; }
 .sv-tr-venue figcaption span span { display: block; }
 
+/* ---------- Poster ---------- */
+
+.sv-tr-poster { background: var(--paper); padding-block: var(--space-8); font-family: var(--font-body); }
+.sv-tr-poster-inner {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-7);
+  align-items: center;
+}
+.sv-tr-poster-body { margin: var(--space-4) 0 0; max-width: 54ch; font: var(--text-body-lg); color: var(--ink-muted); }
+.sv-tr-poster-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  font: var(--text-label);
+  color: var(--gold-700);
+  text-decoration: none;
+}
+.sv-tr-poster-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+.sv-tr-poster-link:focus-visible { outline: 2px solid var(--gold-700); outline-offset: 3px; border-radius: var(--radius-sm); }
+
+.sv-tr-poster-figure {
+  display: block;
+  width: 360px;
+  max-width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  /* The design system allows a 1px lift on hover; a poster is a link, so it gets one. */
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.sv-tr-poster-figure:hover { transform: translateY(-1px); box-shadow: 0 10px 28px rgba(17, 21, 46, .14); }
+.sv-tr-poster-figure:focus-visible { outline: 2px solid var(--gold-700); outline-offset: 4px; }
+.sv-tr-poster-figure img { width: 100%; height: auto; display: block; }
+
 /* ---------- Sponsors ---------- */
 
 .sv-tr-sponsors { background: var(--paper); padding-block: var(--space-8); }
@@ -610,6 +647,8 @@
   .sv-tr-prize-grid,
   .sv-tr-details-inner { grid-template-columns: 1fr; }
   .sv-tr-guest-grid { grid-template-columns: repeat(2, 1fr); }
+  .sv-tr-poster-inner { grid-template-columns: 1fr; justify-items: start; }
+  .sv-tr-poster-figure { width: 320px; }
   /* The shuttle stops being a backdrop and gets out of the copy's way. */
   .sv-tr-about-img {
     position: static;
@@ -641,7 +680,7 @@
 
 @media (max-width: 720px) {
   .sv-tr-about, .sv-tr-categories, .sv-tr-prizes, .sv-tr-details,
-  .sv-tr-sponsors, .sv-tr-guests { padding-block: var(--space-7); }
+  .sv-tr-poster, .sv-tr-sponsors, .sv-tr-guests { padding-block: var(--space-7); }
   .sv-tr-sponsor-grid { grid-template-columns: repeat(2, 1fr); }
   .sv-tr-footer-cta { padding-block: var(--space-7); }
   .sv-tr-footer-base { justify-content: center; text-align: center; }
@@ -655,6 +694,7 @@
 
 @media (max-width: 520px) {
   .sv-tr-guest-grid { grid-template-columns: 1fr; }
+  .sv-tr-poster-figure { width: 100%; }
   .sv-tr-tagline { gap: var(--space-2); letter-spacing: .1em; }
   .sv-tr-cta, .sv-tr-footer-cta .sv-btn { width: 100%; }
   .sv-dr-tabs { grid-template-columns: 1fr; }
