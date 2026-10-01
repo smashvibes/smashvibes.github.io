@@ -249,11 +249,8 @@ deployment → Source* must be set to **GitHub Actions**.
 
 ## Before launch
 
-- [ ] Replace `WHATSAPP_GROUP` in `src/data/site.ts` with the real group invite. It
-      currently falls back to a direct chat with `WHATSAPP_NUMBER`, so the "Join WhatsApp
-      Group" buttons work but open a 1:1 chat rather than the group.
-- [ ] Replace `venue-courts.jpg` and `community-1…4.jpg` in `public/images/` — still
-      low-res crops of the mockup. The hero and CTA photographs are real.
+- [ ] Replace `community-1…4.jpg` in `src/assets/images/` — still low-res crops of the
+      mockup. The hero, CTA and venue photographs are real.
 - [ ] Replace `public/smash-vibes-logo.png` with a vector master when one exists. It is
       currently a keyed-out raster of the supplied wordmark, and `sync:ds` deliberately
       does **not** overwrite it (the design system's own copy is a lower-res crop).
@@ -261,6 +258,6 @@ deployment → Source* must be set to **GitHub Actions**.
       social handles (`socials` in `src/data/tournament.ts` — the icons render as muted
       marks until each gets an `href`), and tournament-specific FAQ copy (that nav item
       currently points at the Smash Vibes FAQ).
-- [ ] Replace the StarRise Cup photography — the hero, venue, guest portraits and every
-      sponsor logo are crops of the tournament mockup.
+- [ ] Replace the StarRise Cup guest portraits and sponsor logos — still crops of the
+      tournament mockup. The hero and venue photographs are real.
 - [ ] Confirm the `SportsActivityLocation` JSON-LD in `src/pages/index.astro` is accurate.

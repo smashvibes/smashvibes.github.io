@@ -23,12 +23,8 @@ import community4 from '../assets/images/community-4.jpg';
 export const WHATSAPP_NUMBER = '9683 4290';
 export const WHATSAPP_CHAT = `https://wa.me/65${WHATSAPP_NUMBER.replace(/\s/g, '')}`;
 
-/**
- * TODO: replace with the real group invite (https://chat.whatsapp.com/...) once it
- * exists. Until then the "Join WhatsApp Group" buttons open a direct chat, which is a
- * working contact rather than a dead link.
- */
-export const WHATSAPP_GROUP = WHATSAPP_CHAT;
+/** The community group. Every "Join WhatsApp Group" button points here. */
+export const WHATSAPP_GROUP = 'https://chat.whatsapp.com/CDLawr1pluT96IpcaQL4Ur';
 
 /** Where "Join a Game" points. Swap for a form/booking URL when one exists. */
 export const JOIN_URL = WHATSAPP_CHAT;
@@ -96,7 +92,7 @@ export const venue = {
   address: '1 Lorong 23 Geylang, Singapore 388352',
   mapUrl: 'https://maps.google.com/?q=Singapore+Badminton+Hall,+1+Lorong+23+Geylang,+Singapore+388352',
   image: venueImage,
-  imageAlt: 'The green courts of Singapore Badminton Hall, lit and empty before a session',
+  imageAlt: 'Players rallying across the grey and red courts at SBH Premier Courts',
   points: [
     'Premium badminton courts',
     'Comfortable indoor environment',

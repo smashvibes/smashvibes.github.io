@@ -9,7 +9,7 @@ holds only files that need a stable, un-hashed URL.
 | `og-cover.jpg` (here) | Open Graph / Twitter card | ✅ Generated 1200×630 |
 | `src/assets/images/hero-player.jpg` | Hero | ✅ Real — 1600×900 |
 | `src/assets/images/cta-racket.jpg` | Closing CTA | ✅ Real — 1600×900 |
-| `src/assets/images/venue-courts.jpg` | Venue card | ⚠️ **Placeholder** — mockup crop |
+| `src/assets/images/venue-courts.jpg` | Venue card | ✅ Real — SBH Premier Courts |
 | `src/assets/images/community-1…4.jpg` | Community grid | ⚠️ **Placeholder** — mockup crops |
 
 ## Replacing a photo
@@ -22,7 +22,6 @@ text lives in `src/data/site.ts`, not here.
 
 | Slot | Shoot notes | Suggested export |
 | --- | --- | --- |
-| `venue-courts.jpg` | Wide shot of the courts at SBH, lit, empty | 1600×1000, JPEG q85 |
 | `community-1…4.jpg` | Bright, candid group photos and rallies; 4:3 crop | 1200×900 each |
 
 Export generously sized JPEGs — the build downscales and converts, so there is no reason

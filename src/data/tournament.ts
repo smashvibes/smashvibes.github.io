@@ -168,7 +168,7 @@ export const details = {
     name: 'SBH VIP Hall @ Sims',
     lines: ['Singapore Badminton Hall (SBH) @ Sims,', '1 Lorong 23 Geylang, Singapore 388352'],
     image: venueImage,
-    imageAlt: 'The green courts of SBH VIP Hall, lit and empty before the tournament',
+    imageAlt: 'The green courts of SBH VIP Hall @ Sims under full lighting',
   },
 };
 
