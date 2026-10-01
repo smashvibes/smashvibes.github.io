@@ -509,12 +509,43 @@ function updateExistingForm() {
   // there regardless of what the branch navigation says.
   if (ensureWaiverLast(form)) changes.push('moved the waiver to the end of the form');
 
-  // Every branch now ends on the waiver instead of submitting.
-  singlesPage.setGoToPage(disclaimerPage);
-  u17DoublesPage.setGoToPage(disclaimerPage);
-  adultPage.setGoToPage(disclaimerPage);
+  // Re-read the page breaks AFTER any move: references captured earlier can point at
+  // stale positions, and navigation set through them silently fails to stick.
+  var ordered = form.getItems(FormApp.ItemType.PAGE_BREAK);
+  var byTitle = {};
+  for (var o = 0; o < ordered.length; o++) byTitle[ordered[o].getTitle()] = ordered[o].asPageBreakItem();
+  disclaimerPage = byTitle[PAGE.disclaimer];
+  singlesPage = byTitle[PAGE.singles];
+  u17DoublesPage = byTitle[PAGE.u17Doubles];
+  adultPage = byTitle[PAGE.adults];
+
+  var waiverIndex = -1;
+  for (var w = 0; w < ordered.length; w++) {
+    if (ordered[w].getTitle() === PAGE.disclaimer) waiverIndex = w;
+  }
+
+  /**
+   * Point one section at the waiver.
+   *
+   * When the waiver is the very next section, use CONTINUE rather than an explicit
+   * go-to. An explicit jump to the adjacent section is what Forms was storing as
+   * "Submit form" — which is why the adults branch, sitting directly before the waiver,
+   * ended the form while the two earlier branches jumped to it correctly.
+   */
+  function routeToWaiver(page, index) {
+    if (index === waiverIndex - 1) {
+      page.setGoToPage(FormApp.PageNavigationType.CONTINUE);
+    } else {
+      page.setGoToPage(disclaimerPage);
+    }
+  }
+  for (var r2 = 0; r2 < ordered.length; r2++) {
+    var pb = ordered[r2].asPageBreakItem();
+    if (pb.getTitle() === PAGE.disclaimer) continue;
+    routeToWaiver(pb, r2);
+  }
   disclaimerPage.setGoToPage(FormApp.PageNavigationType.SUBMIT);
-  changes.push('routed all three branches to the waiver');
+  changes.push('routed all entry sections to the waiver');
 
   // Three categories, with the adults pair combined.
   var categoryItem = findMultipleChoice(form, CATEGORY_QUESTION);
@@ -544,13 +575,21 @@ function updateExistingForm() {
   // Print the resulting order every time. Section position is what decides whether Forms
   // shows Next or Submit, so it is the one thing worth seeing after every run.
   Logger.log('');
-  Logger.log('Section order now:');
+  Logger.log('Section order and what follows each one:');
   Logger.log('  1. (category question)');
   var finalBreaks = form.getItems(FormApp.ItemType.PAGE_BREAK);
   for (var b = 0; b < finalBreaks.length; b++) {
     var isLast = b === finalBreaks.length - 1;
-    Logger.log('  ' + (b + 2) + '. ' + finalBreaks[b].getTitle() +
-               (isLast ? '   <- last section, shows Submit' : ''));
+    var pbf = finalBreaks[b].asPageBreakItem();
+    var goto = pbf.getGoToPage();
+    var after = goto ? ('go to "' + goto.getTitle() + '"')
+                     : String(pbf.getPageNavigationType());
+    Logger.log('  ' + (b + 2) + '. ' + pbf.getTitle());
+    Logger.log('        after this section: ' + after +
+               (isLast ? '   (last section)' : ''));
+    if (!isLast && after === 'SUBMIT') {
+      Logger.log('        ^^ WRONG: this section ends the form before the waiver.');
+    }
   }
   if (!finalBreaks.length || finalBreaks[finalBreaks.length - 1].getTitle() !== PAGE.disclaimer) {
     Logger.log('');
@@ -664,7 +703,12 @@ function verifyForm() {
     Logger.log('  ' + (b + 2) + '. ' + pb.getTitle() + '   ->  ' + nav);
 
     var isWaiver = pb.getTitle() === PAGE.disclaimer;
-    if (!isWaiver && (!target || target.getTitle() !== PAGE.disclaimer)) {
+    // CONTINUE is correct for the section sitting directly before the waiver.
+    var continuesIntoWaiver =
+      pb.getPageNavigationType() === FormApp.PageNavigationType.CONTINUE &&
+      b + 1 < breaks.length && breaks[b + 1].getTitle() === PAGE.disclaimer;
+    if (!isWaiver && !continuesIntoWaiver &&
+        (!target || target.getTitle() !== PAGE.disclaimer)) {
       problems.push('"' + pb.getTitle() + '" does not lead to the waiver');
     }
     if (isWaiver && target) {
