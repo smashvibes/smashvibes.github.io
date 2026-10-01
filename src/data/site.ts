@@ -59,10 +59,21 @@ export const site = {
 export const nav: { label: string; href: string; active?: boolean }[] = [
   { label: 'Home', href: '#top', active: true },
   { label: 'Our Games', href: '#games' },
-  { label: 'About', href: '#about' },
-  { label: 'Community', href: '#community' },
   { label: 'Tournaments', href: '/tournament/' },
+];
+
+/**
+ * Footer links. The nav is deliberately short, so the sections it no longer lists are
+ * still reachable from here rather than only by scrolling.
+ */
+export const footerNav: { label: string; href: string }[] = [
+  { label: 'Home', href: '#top' },
+  { label: 'Our Games', href: '#games' },
+  { label: 'Venue', href: '#about' },
+  { label: 'Why Smash Vibes', href: '#why' },
+  { label: 'Community', href: '#community' },
   { label: 'FAQ', href: '#faq' },
+  { label: 'Tournaments', href: '/tournament/' },
 ];
 
 export const hero = {

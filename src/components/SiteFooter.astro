@@ -5,7 +5,7 @@
  * still holds (the system forbids two dark *sections* meeting, not a CTA and its footer).
  */
 import Icon from './Icon.astro';
-import { nav, site, venue, schedule, WHATSAPP_GROUP } from '../data/site';
+import { footerNav, site, venue, schedule, WHATSAPP_GROUP } from '../data/site';
 
 const year = new Date().getFullYear();
 ---
@@ -19,7 +19,7 @@ const year = new Date().getFullYear();
     <nav class="sv-footer-nav" aria-label="Footer">
       <h2 class="sv-footer-title">Explore</h2>
       <ul>
-        {nav.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+        {footerNav.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
       </ul>
     </nav>
 

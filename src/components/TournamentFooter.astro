@@ -5,7 +5,7 @@
  */
 import Button from './Button.astro';
 import Icon from './Icon.astro';
-import { closing, REGISTER_URL, socials, tournament, tournamentNav } from '../data/tournament';
+import { backToMain, closing, REGISTER_URL, socials, tournament, tournamentFooterNav } from '../data/tournament';
 
 const year = new Date().getFullYear();
 ---
@@ -22,7 +22,8 @@ const year = new Date().getFullYear();
 
     <nav class="sv-tr-footer-nav" aria-label="Footer">
       <ul>
-        {tournamentNav.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+        {tournamentFooterNav.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+        <li><a class="sv-tr-footer-back" href={backToMain.href}>← {backToMain.label}</a></li>
       </ul>
     </nav>
 

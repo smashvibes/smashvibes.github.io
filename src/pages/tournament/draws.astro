@@ -5,7 +5,7 @@ import NavBar from '../../components/NavBar.astro';
 import TournamentFooter from '../../components/TournamentFooter.astro';
 import DrawBracket from '../../components/DrawBracket.astro';
 import DrawGroups from '../../components/DrawGroups.astro';
-import { draws, REGISTER_URL, tournament, tournamentNav } from '../../data/tournament';
+import { backToMain, draws, REGISTER_URL, tournament, tournamentNav } from '../../data/tournament';
 
 const title = `Draws | ${tournament.name} 2026`;
 const description =
@@ -20,6 +20,7 @@ const description =
         links={tournamentNav.map((l) => ({ ...l, active: l.label === 'Draws' }))}
         cta={{ label: tournament.registerLabel, href: REGISTER_URL, target: '_blank' }}
         ctaArrow
+        back={backToMain}
       />
     </header>
 

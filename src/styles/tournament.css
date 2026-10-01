@@ -28,6 +28,12 @@
   --dr-slot: #eeeeee;    /* empty draw slot */
   --dr-head: #f1f1ef;    /* round header pill */
   --dr-gap: 30px;        /* horizontal space between bracket columns */
+
+  /* The bar and the mobile drawer run light-on-gold on this brand. */
+  --nav-ink: var(--ink);
+  --nav-ink-muted: var(--ink-muted);
+  --nav-drawer-bg: var(--tr-bar);
+  --nav-drawer-line: var(--line);
 }
 
 .sv-sr-only {
@@ -57,10 +63,8 @@
 .sv-tr-page .sv-nav-link[aria-current='page'] { color: var(--gold-700); border-bottom-color: var(--gold-700); }
 .sv-tr-page .sv-nav-link:focus-visible,
 .sv-tr-page .sv-nav-home:focus-visible { outline-color: var(--gold-700); }
-.sv-tr-page .sv-nav-burger > span,
-.sv-tr-page .sv-nav-burger > span::before,
-.sv-tr-page .sv-nav-burger > span::after { background: var(--ink); }
-.sv-tr-page .sv-nav-links { border-top-color: var(--line); }
+.sv-tr-page .sv-nav-link[aria-current='page'] { color: var(--gold-700); }
+.sv-tr-page .sv-nav-back:hover { color: var(--gold-700); }
 
 /* ---------- Shared card + spec list ---------- */
 

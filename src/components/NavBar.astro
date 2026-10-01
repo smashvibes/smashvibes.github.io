@@ -5,6 +5,7 @@
  * keyboard operation. The checkbox is visually hidden but focusable.
  */
 import Button from './Button.astro';
+import Icon from './Icon.astro';
 import type { IconName } from './icons';
 
 export interface NavLink {
@@ -20,9 +21,11 @@ interface Props {
   cta?: { label: string; href: string; icon?: IconName; target?: string };
   /** Trailing arrow instead of a leading icon — used by the tournament page. */
   ctaArrow?: boolean;
+  /** Route out of a sub-site, shown first in the menu with a back arrow. */
+  back?: { label: string; href: string };
 }
 
-const { logoSrc, homeHref = '/', links, cta, ctaArrow = false } = Astro.props;
+const { logoSrc, homeHref = '/', links, cta, ctaArrow = false, back } = Astro.props;
 ---
 <nav class="sv-nav sv-root sv-night" aria-label="Main">
   <a class="sv-nav-home" href={homeHref}>
@@ -37,6 +40,14 @@ const { logoSrc, homeHref = '/', links, cta, ctaArrow = false } = Astro.props;
   </label>
 
   <ul class="sv-nav-links">
+    {back && (
+      <li class="sv-nav-back-item">
+        <a class="sv-nav-link sv-nav-back" href={back.href}>
+          <Icon name="arrow-right" size={18} class="sv-nav-back-icon" />
+          {back.label}
+        </a>
+      </li>
+    )}
     {links.map((link) => (
       <li>
         <a class="sv-nav-link" href={link.href} aria-current={link.active ? 'page' : undefined}>
@@ -44,6 +55,13 @@ const { logoSrc, homeHref = '/', links, cta, ctaArrow = false } = Astro.props;
         </a>
       </li>
     ))}
+    {cta && (
+      <li class="sv-nav-menu-cta">
+        <Button variant="primary" icon={ctaArrow ? undefined : (cta.icon ?? 'chat')} arrow={ctaArrow} href={cta.href} target={cta.target}>
+          {cta.label}
+        </Button>
+      </li>
+    )}
   </ul>
 
   {cta && (

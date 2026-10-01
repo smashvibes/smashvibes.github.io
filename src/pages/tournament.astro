@@ -13,7 +13,7 @@ import SpecRow from '../components/SpecRow.astro';
 import Icon from '../components/Icon.astro';
 import { site } from '../data/site';
 import {
-  about, categories, details, guests, prizes, REGISTER_URL, sponsors,
+  about, backToMain, categories, details, guests, prizes, REGISTER_URL, sponsors,
   tournament, tournamentNav,
 } from '../data/tournament';
 
@@ -61,9 +61,10 @@ const jsonLd = {
     <NavBar
       logoSrc={tournament.logo}
       homeHref="#top"
-      links={tournamentNav}
+      links={tournamentNav.map((l) => ({ ...l, active: l.label === 'Home' }))}
       cta={{ label: tournament.registerLabel, href: REGISTER_URL, target: '_blank' }}
       ctaArrow
+      back={backToMain}
     />
   </header>
 

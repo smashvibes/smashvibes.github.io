@@ -52,9 +52,24 @@ export const tournament = {
  */
 export const tournamentNav: { label: string; href: string }[] = [
   { label: 'Home', href: '/tournament/' },
+  { label: 'Draws', href: '/tournament/draws/' },
+  { label: 'Sponsors', href: '/tournament/#sponsors' },
+];
+
+/**
+ * The way out. StarRise Cup is a sub-site, so without this the only route back to Smash
+ * Vibes is the browser's Back button — which does not exist for someone who arrived on
+ * the tournament page from a shared link.
+ */
+export const backToMain = { label: 'Smash Vibes', href: '/' };
+
+/** Footer links, covering the sections the short nav no longer lists. */
+export const tournamentFooterNav: { label: string; href: string }[] = [
+  { label: 'Home', href: '/tournament/' },
   { label: 'About', href: '/tournament/#about' },
-  { label: 'Event Details', href: '/tournament/#details' },
   { label: 'Categories', href: '/tournament/#categories' },
+  { label: 'Prizes', href: '/tournament/#prizes' },
+  { label: 'Event Details', href: '/tournament/#details' },
   { label: 'Draws', href: '/tournament/draws/' },
   { label: 'Sponsors', href: '/tournament/#sponsors' },
 ];
