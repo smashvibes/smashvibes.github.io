@@ -22,7 +22,17 @@ const year = new Date().getFullYear();
 
     <nav class="sv-tr-footer-nav" aria-label="Footer">
       <ul>
-        {tournamentFooterNav.map((link) => <li><a href={link.href}>{link.label}</a></li>)}
+        {tournamentFooterNav.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              target={link.target}
+              rel={link.target === '_blank' ? 'noopener noreferrer' : undefined}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
         <li><a class="sv-tr-footer-back" href={backToMain.href}>← {backToMain.label}</a></li>
       </ul>
     </nav>

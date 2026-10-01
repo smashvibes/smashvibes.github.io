@@ -1,0 +1,42 @@
+---
+import '../../styles/tournament.css';
+import Base from '../../layouts/Base.astro';
+import NavBar from '../../components/NavBar.astro';
+import TournamentFooter from '../../components/TournamentFooter.astro';
+import Button from '../../components/Button.astro';
+import Icon from '../../components/Icon.astro';
+import { backToMain, live, REGISTER_URL, tournament, tournamentNav } from '../../data/tournament';
+
+const title = `Live | ${tournament.name} 2026`;
+const description =
+  'Live scores and results for the StarRise Cup 2026 badminton tournament, published on match day, 14 November 2026.';
+---
+<Base title={title} description={description}>
+  <div class="sv-tr-page">
+    <header class="sv-header sv-tr-header-solid">
+      <NavBar
+        logoSrc={tournament.logo}
+        homeHref="/tournament/"
+        links={tournamentNav.map((l) => ({ ...l, active: l.label === 'Live' }))}
+        cta={{ label: tournament.registerLabel, href: REGISTER_URL, target: '_blank' }}
+        ctaArrow
+        back={backToMain}
+      />
+    </header>
+
+    <main id="main" class="sv-tr-live sv-root">
+      <div class="sv-container sv-tr-live-inner">
+        <span class="sv-tr-live-mark"><Icon name="chart" size={34} /></span>
+        <h1 class="sv-dr-title">{live.title}</h1>
+        <p class="sv-tr-live-lede">{live.lede}</p>
+        <p class="sv-tr-live-body">{live.body}</p>
+        <div class="sv-tr-live-actions">
+          <Button variant="primary" arrow href="/tournament/draws/">View the draws</Button>
+          <Button variant="outline" href="/tournament/">Tournament details</Button>
+        </div>
+      </div>
+    </main>
+
+    <TournamentFooter />
+  </div>
+</Base>

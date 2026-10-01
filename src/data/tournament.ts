@@ -10,7 +10,6 @@ import { WHATSAPP_CHAT } from './site';
 import heroImage from '../assets/tournament/hero.jpg';
 import aboutImage from '../assets/tournament/about-shuttle.jpg';
 import venueImage from '../assets/tournament/venue.jpg';
-import posterImage from '../assets/tournament/poster.jpg';
 import guest1 from '../assets/tournament/guest-1.jpg';
 import guest2 from '../assets/tournament/guest-2.jpg';
 import guest3 from '../assets/tournament/guest-3.jpg';
@@ -54,7 +53,7 @@ export const tournament = {
 export const tournamentNav: { label: string; href: string }[] = [
   { label: 'Home', href: '/tournament/' },
   { label: 'Draws', href: '/tournament/draws/' },
-  { label: 'Sponsors', href: '/tournament/#sponsors' },
+  { label: 'Live', href: '/tournament/live/' },
 ];
 
 /**
@@ -65,15 +64,17 @@ export const tournamentNav: { label: string; href: string }[] = [
 export const backToMain = { label: 'Smash Vibes', href: '/' };
 
 /** Footer links, covering the sections the short nav no longer lists. */
-export const tournamentFooterNav: { label: string; href: string }[] = [
+export const tournamentFooterNav: { label: string; href: string; target?: string }[] = [
   { label: 'Home', href: '/tournament/' },
   { label: 'About', href: '/tournament/#about' },
   { label: 'Categories', href: '/tournament/#categories' },
   { label: 'Prizes', href: '/tournament/#prizes' },
   { label: 'Event Details', href: '/tournament/#details' },
-  { label: 'Poster', href: '/tournament/#poster' },
   { label: 'Draws', href: '/tournament/draws/' },
+  { label: 'Live', href: '/tournament/live/' },
   { label: 'Sponsors', href: '/tournament/#sponsors' },
+  // Straight to the image: there is no poster section on the page to link to.
+  { label: 'Event Poster', href: '/tournament/starrise-cup-poster.jpg', target: '_blank' },
 ];
 
 export const hero = {
@@ -190,22 +191,21 @@ export const details = {
 };
 
 /**
- * Event poster.
+ * Event poster, reached from the footer only.
  *
- * `file` is the full-resolution copy in public/, deliberately outside the asset pipeline:
- * it needs a stable, un-hashed URL because the page opens it directly in a new tab and
- * people share and print that link. `image` is the pipeline copy used for the thumbnail,
- * so the page does not pull the full poster just to render a card.
+ * It lives in public/ rather than going through the asset pipeline because the link is
+ * opened directly and shared around; a hashed URL would change on every re-export and
+ * break anything already sent out.
  */
 export const poster = {
-  eyebrow: 'Share it',
-  title: 'Event Poster',
-  body: 'Everything about the StarRise Cup on one page — dates, categories, formats and prizes. The QR code goes straight to registration.',
-  linkLabel: 'Open full poster',
   file: '/tournament/starrise-cup-poster.jpg',
-  image: posterImage,
-  imageAlt:
-    'StarRise Cup 2026 poster: 14 November 2026, 10:00 AM to 3:00 PM at SBH VIP Hall @ Sims, with the Teens and Adults category formats, prize amounts and a registration QR code',
+};
+
+/** Live scoring, published on match day. */
+export const live = {
+  title: 'Live',
+  lede: 'To be updated.',
+  body: 'Scores and results will be published here on match day. Until then, the draws and group tables are the place to look.',
 };
 
 export const sponsors = {
