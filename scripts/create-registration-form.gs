@@ -540,6 +540,23 @@ function updateExistingForm() {
 
   Logger.log('Updated ' + form.getPublishedUrl());
   for (var k = 0; k < changes.length; k++) Logger.log('  - ' + changes[k]);
+
+  // Print the resulting order every time. Section position is what decides whether Forms
+  // shows Next or Submit, so it is the one thing worth seeing after every run.
+  Logger.log('');
+  Logger.log('Section order now:');
+  Logger.log('  1. (category question)');
+  var finalBreaks = form.getItems(FormApp.ItemType.PAGE_BREAK);
+  for (var b = 0; b < finalBreaks.length; b++) {
+    var isLast = b === finalBreaks.length - 1;
+    Logger.log('  ' + (b + 2) + '. ' + finalBreaks[b].getTitle() +
+               (isLast ? '   <- last section, shows Submit' : ''));
+  }
+  if (!finalBreaks.length || finalBreaks[finalBreaks.length - 1].getTitle() !== PAGE.disclaimer) {
+    Logger.log('');
+    Logger.log('WARNING: the waiver is not last. Entrants finishing on the last section');
+    Logger.log('will never see it. Run verifyForm() for detail.');
+  }
 }
 
 function findMultipleChoice(form, title) {
