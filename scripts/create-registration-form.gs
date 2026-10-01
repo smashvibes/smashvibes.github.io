@@ -505,6 +505,10 @@ function updateExistingForm() {
     changes.push('waiver page already present, left as is');
   }
 
+  // Forms puts Submit on whichever section is physically last, so the waiver has to be
+  // there regardless of what the branch navigation says.
+  if (ensureWaiverLast(form)) changes.push('moved the waiver to the end of the form');
+
   // Every branch now ends on the waiver instead of submitting.
   singlesPage.setGoToPage(disclaimerPage);
   u17DoublesPage.setGoToPage(disclaimerPage);
@@ -544,6 +548,80 @@ function findMultipleChoice(form, title) {
     if (items[i].getTitle() === title) return items[i].asMultipleChoiceItem();
   }
   return null;
+}
+
+/**
+ * Moves the waiver page and its clauses to the end of the form.
+ *
+ * Branch navigation alone is not enough: Forms shows "Submit" rather than "Next" on
+ * whichever section is physically last, so a waiver sitting mid-form leaves an entry
+ * section able to finish the form. Re-running the updater after someone has dragged
+ * sections about in the editor puts it right.
+ */
+function ensureWaiverLast(form) {
+  var items = form.getItems();
+  var start = -1;
+  for (var i = 0; i < items.length; i++) {
+    if (items[i].getType() === FormApp.ItemType.PAGE_BREAK &&
+        items[i].getTitle() === PAGE.disclaimer) {
+      start = i;
+      break;
+    }
+  }
+  if (start === -1) return false;
+
+  // The block runs to the next page break, or to the end of the form.
+  var end = items.length - 1;
+  for (var j = start + 1; j < items.length; j++) {
+    if (items[j].getType() === FormApp.ItemType.PAGE_BREAK) {
+      end = j - 1;
+      break;
+    }
+  }
+  if (end === items.length - 1) return false; // already last
+
+  // Taking the block's first item to the end, repeatedly, preserves its internal order.
+  var count = end - start + 1;
+  for (var k = 0; k < count; k++) {
+    form.moveItem(start, form.getItems().length - 1);
+  }
+  return true;
+}
+
+/**
+ * Lists every StarRise form on this account, so it is obvious which one the website
+ * points at and which are leftovers from an earlier run.
+ */
+function listRegistrationForms() {
+  var files = DriveApp.getFilesByType(MimeType.GOOGLE_FORMS);
+  var found = 0;
+  Logger.log('Forms on this account matching "StarRise":');
+  while (files.hasNext()) {
+    var file = files.next();
+    if (file.getName().indexOf('StarRise') === -1) continue;
+    found += 1;
+    var f = FormApp.openById(file.getId());
+    var breaks = f.getItems(FormApp.ItemType.PAGE_BREAK);
+    var hasWaiver = false;
+    var waiverLast = false;
+    for (var i = 0; i < breaks.length; i++) {
+      if (breaks[i].getTitle() === PAGE.disclaimer) {
+        hasWaiver = true;
+        waiverLast = (i === breaks.length - 1);
+      }
+    }
+    var cat = findMultipleChoice(f, CATEGORY_QUESTION);
+    Logger.log('');
+    Logger.log('  ' + file.getName());
+    Logger.log('    id        : ' + file.getId() + (file.getId() === FORM_ID ? '   <-- FORM_ID, the one the website uses' : ''));
+    Logger.log('    link      : ' + f.getPublishedUrl());
+    Logger.log('    sections  : ' + (breaks.length + 1));
+    Logger.log('    categories: ' + (cat ? cat.getChoices().length : 'n/a'));
+    Logger.log('    waiver    : ' + (!hasWaiver ? 'MISSING' : (waiverLast ? 'present, last' : 'present but NOT last — entrants can skip it')));
+  }
+  if (found === 0) Logger.log('  (none found)');
+  Logger.log('');
+  Logger.log('Delete or rename the ones you are not using, so nobody tests the wrong link.');
 }
 
 /**
@@ -596,6 +674,12 @@ function verifyForm() {
   for (var k = 0; k < boxes.length; k++) {
     if (boxes[k].getTitle() === 'Agreement') agreement = boxes[k].asCheckboxItem();
   }
+  var lastBreak = breaks.length ? breaks[breaks.length - 1] : null;
+  if (lastBreak && lastBreak.getTitle() !== PAGE.disclaimer) {
+    problems.push('the waiver is not the last section — Forms shows Submit on "' +
+                  lastBreak.getTitle() + '" instead of Next');
+  }
+
   Logger.log('');
   if (!agreement) {
     problems.push('the waiver has no "Agreement" tick box');
