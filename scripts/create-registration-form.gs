@@ -1,6 +1,13 @@
 /**
  * StarRise Cup 2026 — builds the registration Google Form and its response sheet.
  *
+ * RUN THESE (the others are internal helpers):
+ *
+ *   updateExistingForm()       the one to run after any change
+ *   verifyForm()               checks every path reaches the waiver
+ *   listRegistrationForms()    finds duplicate forms on the account
+ *   ensureWaiverLast()         moves the waiver to the end, on its own
+ *
  * TWO ENTRY POINTS
  *
  *   updateExistingForm()      Applies this file's structure to the form already live at
@@ -436,6 +443,10 @@ function addSharedDeclarations(form, isMinor) {
  * finishes on it.
  */
 function addDisclaimerPage(form) {
+  // Appends — running it on its own would add a SECOND waiver page.
+  if (!form) {
+    throw new Error('addDisclaimerPage is an internal helper. Run updateExistingForm() instead.');
+  }
   var page = form.addPageBreakItem()
     .setTitle(PAGE.disclaimer)
     .setHelpText(DISCLAIMER_INTRO);
@@ -615,6 +626,8 @@ function findMultipleChoice(form, title) {
  * sections about in the editor puts it right.
  */
 function ensureWaiverLast(form) {
+  // Runnable on its own from the editor's dropdown, not just from updateExistingForm.
+  form = form || FormApp.openById(FORM_ID);
   var items = form.getItems();
   var start = -1;
   for (var i = 0; i < items.length; i++) {
@@ -641,6 +654,7 @@ function ensureWaiverLast(form) {
   for (var k = 0; k < count; k++) {
     form.moveItem(start, form.getItems().length - 1);
   }
+  Logger.log('Moved the waiver block (' + count + ' items) to the end of the form.');
   return true;
 }
 
@@ -775,7 +789,7 @@ function verifyForm() {
  * To install, run installCapTrigger() ONCE with the form id.
  */
 function updateCategoryAvailability(formId) {
-  var form = FormApp.openById(formId);
+  var form = FormApp.openById(formId || FORM_ID);
   var counts = {};
 
   var categoryItem = findMultipleChoice(form, CATEGORY_QUESTION);
