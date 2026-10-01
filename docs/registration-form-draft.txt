@@ -40,10 +40,13 @@ Q1. Which category are you entering?   [REQUIRED - pick one]
       players are not eligible.
 
     Options:
-      ( ) Under-17 Singles            -> goes to SECTION 2
-      ( ) Under-17 Doubles            -> goes to SECTION 3
-      ( ) Adults - Men's Doubles      -> goes to SECTION 4
-      ( ) Adults - Mixed Doubles      -> goes to SECTION 4
+      ( ) Under-17 Singles                     -> goes to SECTION 2
+      ( ) Under-17 Doubles                     -> goes to SECTION 3
+      ( ) Adults Open - Men's / Mixed Doubles  -> goes to SECTION 4
+
+    NOTE: Men's and Mixed Doubles are ONE option. Which of the two a pair is
+    playing follows from the two players' genders, which we already collect -
+    two men is Men's Doubles, a man and a woman is Mixed.
 
     NOTE: the answer decides which section the entrant sees next. Nobody fills
     in questions that do not apply to them.
@@ -139,11 +142,11 @@ Section help: Submit once per pair. Both players must meet the age cut-off.
 
 
 ===============================================================================
-SECTION 4 - ADULTS DOUBLES (Men's and Mixed)
+SECTION 4 - ADULTS OPEN (Men's / Mixed Doubles)
 ===============================================================================
 
-Section help: Submit once per pair. Mixed Doubles pairs must be one man and one
-woman.
+Section help: Submit once per pair. Men's and Mixed Doubles are entered
+together; a Mixed pair is one man and one woman.
 
 --- Player 1 ---
      Full name / gender / date of birth / mobile number / email /
@@ -168,6 +171,40 @@ woman.
      Rules and accuracy / Photo and video consent /
      Anything we should know?                              (same as Q12-Q14)
 
+     --> goes to SECTION 5
+
+
+===============================================================================
+SECTION 5 - DISCLAIMER, ASSUMPTION OF RISK AND WAIVER (everyone sees this)
+===============================================================================
+
+Every entrant finishes here, whichever category they chose. One copy of the
+legal text, shown last, with one box that must be ticked to submit.
+
+Intro:
+  By registering for and/or participating in the badminton tournament
+  ("Tournament"), each participant acknowledges and agrees to the following
+  terms.
+
+Then seven numbered clauses, reproduced verbatim from the organiser:
+
+  1. Injury or Death
+  2. Loss or Damage to Property
+  3. Medical Assistance
+  4. Compliance with Rules
+  5. Responsibility for Minors
+  6. Release and Waiver
+  7. No Exclusion of Non-Excludable Liability
+
+Closing line:
+  By registering for or participating in the Tournament, the participant
+  confirms that he or she has read, understood and agreed to the above terms.
+
+AGREEMENT   [REQUIRED - must tick]
+  [ ] I have read, understood and agree to the Disclaimer, Assumption of Risk
+      and Waiver above. Where the participant is under 18, I confirm I am the
+      parent or legal guardian and agree on the participant's behalf.
+
      --> SUBMIT
 
 
@@ -183,10 +220,9 @@ event. If your plans change, tell us early so the slot can go to another player.
 ENTRY CAPS
 ===============================================================================
 
-    Under-17 Singles           16 entries
-    Under-17 Doubles           16 pairs
-    Adults - Men's Doubles      5 pairs
-    Adults - Mixed Doubles      5 pairs
+    Under-17 Singles                      16 entries
+    Under-17 Doubles                      16 pairs
+    Adults Open - Men's / Mixed Doubles   10 pairs (2 groups of 5)
 
 Google Forms cannot limit responses by itself. A script removes a category from
 the list the moment it fills, so we never take an entry we cannot honour.
@@ -207,7 +243,12 @@ THREE THINGS WE CHANGED FROM THE ORIGINAL FIELD LIST
    player only, so for a pair we would have had no partner name, age or contact
    - we could not have verified eligibility or built the draw.
 
-3. PHOTO / VIDEO CONSENT IS OPTIONAL, NOT A REQUIRED TICK.
+3. EVERY DECLARATION BOX MUST NOW BE TICKED.
+   A "required" checkbox question in Google Forms only demands ONE tick, not
+   all of them - so our declaration lists could have been submitted with a
+   single box checked. They now carry validation that requires every box.
+
+4. PHOTO / VIDEO CONSENT IS OPTIONAL, NOT A REQUIRED TICK.
    We record matches and share clips. Consent that cannot be refused is not
    consent, so it is a clear yes/no and does not block entry. Anyone who says no
    stays out of published footage - someone needs to own that on the day.
@@ -225,9 +266,9 @@ FIVE OPEN QUESTIONS - WE NEED DECISIONS
    form needs a payment step and a "payment made" question, and the flow
    changes. Is entry free?
 
-3. MEN'S vs MIXED DOUBLES. The page says "Men's Doubles & Mixed Doubles
-   combined", "2 groups of 5 pairs". We have made them two separate choices of
-   5 pairs each. Is that right, or is it 10 pairs across one combined draw?
+3. (DECIDED) Men's and Mixed Doubles are one combined entry category of 10
+   pairs. NOTE: the website's Draws page still shows them as two separate
+   draws - someone needs to say whether the DRAW is also combined.
 
 4. U17 SINGLES - ONE DRAW OR TWO? The prize list shows a single "Singles
    Under 17" prize, but we collect gender. Is it one open draw of 16, or

@@ -171,9 +171,17 @@ system's rules: 24px grid, 1.75 stroke, round caps, `currentColor`.
 
 ## Tournament registration
 
-`scripts/create-registration-form.gs` builds the StarRise Cup registration Google Form
-and its response sheet in one run. Paste it into a new project at script.google.com, run
-`createRegistrationForm`, and the log prints the form and sheet URLs.
+`scripts/create-registration-form.gs` holds the whole form definition and has two entry
+points. Paste the file into the Apps Script project, then run one of:
+
+| Function | What it does |
+| --- | --- |
+| `updateExistingForm()` | Applies the file to the form already live at `FORM_ID`, **keeping its URL**. Use this for every change. Safe to re-run. |
+| `createRegistrationForm()` | Builds a brand new form. Only for starting over — it produces a different URL the site is not pointing at. |
+
+`updateExistingForm` finds pages by title and only adds the waiver page if it is missing,
+so re-running it does not duplicate anything. It deliberately does not rewrite the
+per-player questions — editing those in place would orphan existing responses.
 
 The form is **live** and wired in. Every "Register Now" button — nav, hero and closing
 band, on both tournament routes — reads `REGISTRATION_FORM_URL` in
