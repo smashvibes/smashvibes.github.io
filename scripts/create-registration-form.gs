@@ -546,6 +546,78 @@ function findMultipleChoice(form, title) {
   return null;
 }
 
+/**
+ * Prints the live form's branching so you can confirm it without clicking through.
+ *
+ * Every entry section must end at the waiver, and the waiver must submit. Anything else
+ * means a respondent can finish without accepting the terms.
+ */
+function verifyForm() {
+  var form = FormApp.openById(FORM_ID);
+  var problems = [];
+
+  var breaks = form.getItems(FormApp.ItemType.PAGE_BREAK);
+  var names = {};
+  for (var i = 0; i < breaks.length; i++) names[breaks[i].getId()] = breaks[i].getTitle();
+
+  Logger.log('SECTIONS (' + (breaks.length + 1) + ' including the first):');
+  Logger.log('  1. (category question)');
+  for (var b = 0; b < breaks.length; b++) {
+    var pb = breaks[b].asPageBreakItem();
+    var target = pb.getGoToPage();
+    var nav = target ? target.getTitle() : String(pb.getPageNavigationType());
+    Logger.log('  ' + (b + 2) + '. ' + pb.getTitle() + '   ->  ' + nav);
+
+    var isWaiver = pb.getTitle() === PAGE.disclaimer;
+    if (!isWaiver && (!target || target.getTitle() !== PAGE.disclaimer)) {
+      problems.push('"' + pb.getTitle() + '" does not lead to the waiver');
+    }
+    if (isWaiver && target) {
+      problems.push('the waiver should submit, not continue to "' + target.getTitle() + '"');
+    }
+  }
+
+  var categoryItem = findMultipleChoice(form, CATEGORY_QUESTION);
+  Logger.log('');
+  Logger.log('CATEGORY OPTIONS:');
+  var choices = categoryItem ? categoryItem.getChoices() : [];
+  for (var c = 0; c < choices.length; c++) {
+    var page = choices[c].getGotoPage();
+    Logger.log('  ' + choices[c].getValue() + '  ->  ' + (page ? page.getTitle() : 'NO BRANCH'));
+    if (!page) problems.push('"' + choices[c].getValue() + '" has no branch set');
+  }
+  if (choices.length !== CATEGORIES.length) {
+    problems.push('expected ' + CATEGORIES.length + ' categories, found ' + choices.length);
+  }
+
+  // The waiver is worthless if its tick is optional or can be skipped.
+  var agreement = null;
+  var boxes = form.getItems(FormApp.ItemType.CHECKBOX);
+  for (var k = 0; k < boxes.length; k++) {
+    if (boxes[k].getTitle() === 'Agreement') agreement = boxes[k].asCheckboxItem();
+  }
+  Logger.log('');
+  if (!agreement) {
+    problems.push('the waiver has no "Agreement" tick box');
+  } else if (!agreement.isRequired()) {
+    problems.push('the waiver tick box is not required');
+  } else {
+    Logger.log('WAIVER: "Agreement" tick box present and required.');
+  }
+
+  Logger.log('');
+  if (problems.length === 0) {
+    Logger.log('OK — every path ends at the waiver.');
+  } else {
+    Logger.log('PROBLEMS (' + problems.length + '):');
+    for (var q = 0; q < problems.length; q++) Logger.log('  - ' + problems[q]);
+  }
+  Logger.log('');
+  Logger.log('Test it at: ' + form.getPublishedUrl());
+  Logger.log('Open that in a private window — Forms caches an open tab, so a tab you had');
+  Logger.log('up before the update will still show the old flow until it is reloaded.');
+}
+
 // ---------------------------------------------------------------------------
 // Optional: close categories as they fill
 // ---------------------------------------------------------------------------

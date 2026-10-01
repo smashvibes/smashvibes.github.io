@@ -177,7 +177,11 @@ points. Paste the file into the Apps Script project, then run one of:
 | Function | What it does |
 | --- | --- |
 | `updateExistingForm()` | Applies the file to the form already live at `FORM_ID`, **keeping its URL**. Use this for every change. Safe to re-run. |
+| `verifyForm()` | Prints the live form's branching and flags any path that can finish without the waiver. Run it after any change. |
 | `createRegistrationForm()` | Builds a brand new form. Only for starting over — it produces a different URL the site is not pointing at. |
+
+Google Forms caches an open tab, so a tab that was up before an update keeps showing the
+old flow until it is reloaded. Always retest in a private window.
 
 `updateExistingForm` finds pages by title and only adds the waiver page if it is missing,
 so re-running it does not duplicate anything. It deliberately does not rewrite the
