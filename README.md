@@ -128,7 +128,7 @@ no JavaScript at all.
 | `/` | The Smash Vibes homepage. |
 | `/tournament/` | StarRise Cup — the event page, linked from the main nav as "Tournaments". |
 | `/tournament/draws/` | Draws: one tab per category, each with a round-robin fixture list and a knockout bracket. |
-| `/tournament/live/` | Live scoreboard: per category, matches in progress, up next and latest results. Same data as the draws. |
+| `/tournament/live/` | **Hidden for now.** Live scoreboard: per category, matches in progress, up next and latest results. The page is `src/pages/tournament/_live.astro`; rename it to `live.astro` and restore the "Live" links in `src/data/tournament.ts` to publish it. |
 
 The tournament page is a separate event brand run in collaboration with Smash Vibes, so
 it keeps its own wordmark and navigation but is built entirely from the Smash Vibes

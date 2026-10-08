@@ -50,7 +50,8 @@ export const tournament = {
 export const tournamentNav: { label: string; href: string }[] = [
   { label: 'Home', href: '/tournament/' },
   { label: 'Draws', href: '/tournament/draws/' },
-  { label: 'Live', href: '/tournament/live/' },
+  // Live is built but hidden for now: src/pages/tournament/_live.astro. Rename it back
+  // to live.astro and add { label: 'Live', href: '/tournament/live/' } here and in the footer.
 ];
 
 /**
@@ -68,7 +69,6 @@ export const tournamentFooterNav: { label: string; href: string; target?: string
   { label: 'Prizes', href: '/tournament/#prizes' },
   { label: 'Event Details', href: '/tournament/#details' },
   { label: 'Draws', href: '/tournament/draws/' },
-  { label: 'Live', href: '/tournament/live/' },
   { label: 'Sponsors', href: '/tournament/#sponsors' },
   // Straight to the image: there is no poster section on the page to link to.
   { label: 'Event Poster', href: '/tournament/starrise-cup-poster.jpg', target: '_blank' },
