@@ -79,7 +79,7 @@ export const hero = {
   imageAlt: 'A badminton player reaching for a return at full stretch under the hall lights',
   facts: [
     { icon: 'calendar' as IconName, value: '14 November 2026', note: '(Saturday)' },
-    { icon: 'clock' as IconName, value: '10:00 AM – 5:00 PM', note: '(7 Hours)' },
+    { icon: 'clock' as IconName, value: '10:00 AM – 5:00 PM' },
   ],
   venue: {
     icon: 'pin' as IconName,
@@ -92,8 +92,7 @@ export const about = {
   eyebrow: 'About the tournament',
   title: 'More Than Just a Game',
   body: [
-    'The StarRise Cup brings together competitive youth players and social / recreational adult players for a well-organised badminton experience at SBH VIP Hall @ Sims.',
-    'Expect quality matches, a welcoming atmosphere, and a chance to compete, connect, and grow.',
+    'StarRise Cup brings together competitive youth and adult players for a well-organised badminton event at SBH VIP Hall @ Sims. Expect quality matches and a welcoming atmosphere.',
   ],
   image: aboutImage,
   imageAlt: 'Close-up of a feather shuttlecock resting on a court',
@@ -108,45 +107,57 @@ export interface SpecRow {
 
 export const categories = {
   eyebrow: 'Competition categories',
-  title: 'Two Categories, One Great Event',
+  title: 'Three Categories, One Great Event',
   items: [
     {
-      title: 'Teens Category',
-      subtitle: 'For players under 17 years old',
+      title: 'U-17 Singles Category',
       rows: [
-        { icon: 'users', label: 'Events:', text: 'Singles & Doubles' },
-        { icon: 'bracket', text: 'Round-robin groups, then knockout' },
-        { icon: 'shuttlecock', label: 'Matches:', text: 'first to 30 points' },
-        { icon: 'chart', label: 'Semi Finals:', text: 'Best of 3 sets, 21 points' },
-        { icon: 'trophy', label: 'Finals:', text: 'Best of 3 sets, 21 points' },
-        {
-          icon: 'rules',
-          text: 'Current Junior National or any form of representation to their own respective country is not allowed.',
-        },
+        { icon: 'shuttlecock', label: 'Events:', text: 'Singles' },
+        { icon: 'users', label: 'Matches:', text: '' },
+        { icon: 'cap', text: 'Qualifiers – Group Round Robin Match 1st to 15 points' },
+        { icon: 'chart', text: 'Quarterfinals – 1st to 15 points' },
+        { icon: 'community', text: 'Semifinals – Best of 3 sets, 21 points' },
+        { icon: 'trophy', text: 'Finals – Best of 3 sets, 21 points' },
       ] satisfies SpecRow[],
     },
     {
-      title: 'Adults Category',
-      subtitle: 'Targeted towards the social / recreational badminton community',
+      title: 'U-17 Doubles Category',
       rows: [
-        { icon: 'users', text: 'National-level / state-level players are not eligible' },
-        { icon: 'shuttlecock', label: 'Events:', text: "Men's Doubles & Mixed Doubles combined" },
-        { icon: 'bracket', text: 'Round-robin groups, then knockout' },
-        { icon: 'chart', label: 'Semi Finals:', text: '3 sets of 21 points' },
-        { icon: 'trophy', label: 'Finals:', text: '3 sets of 21 points' },
+        { icon: 'shuttlecock', label: 'Events:', text: 'Doubles' },
+        { icon: 'users', label: 'Matches:', text: '' },
+        { icon: 'cap', text: 'Qualifiers – Group Round Robin Match 1st to 15 points' },
+        { icon: 'chart', text: 'Quarterfinals – 1st to 15 points' },
+        { icon: 'community', text: 'Semifinals – Best of 3 sets, 21 points' },
+        { icon: 'trophy', text: 'Finals – Best of 3 sets, 21 points' },
+      ] satisfies SpecRow[],
+    },
+    {
+      title: 'Adult Open Category',
+      rows: [
+        { icon: 'users', label: 'Matches:', text: 'Round robin Qualifiers' },
+        { icon: 'cap', text: 'First to 15 points' },
+        { icon: 'chart', text: 'Quarterfinals – first to 15 points' },
+        { icon: 'community', text: 'Semifinals – best of 3 sets 21 points' },
+        { icon: 'trophy', text: 'Finals – best of 3 sets 21 points' },
       ] satisfies SpecRow[],
     },
   ],
 };
 
+/**
+ * Prize cards. `total` is the card's hero figure; `first` lists how the first prize is
+ * split (student and coach for the junior events, one line for the adults); `second`
+ * is pinned to the foot of the card.
+ */
 export const prizes = {
   eyebrow: 'Prizes',
   title: 'Attractive Prizes',
   items: [
     {
       title: 'Singles Under 17',
+      total: { label: 'Total Prize:', value: '$1,250' },
+      firstLabel: '1st Prize:',
       first: [
-        { label: '1st Prize:', value: '$500' },
         { label: 'Student:', value: '$500' },
         { label: 'Coach:', value: '$500' },
       ],
@@ -154,16 +165,19 @@ export const prizes = {
     },
     {
       title: 'Doubles Under 17',
+      total: { label: 'Total Prize:', value: '$1,550' },
+      firstLabel: '1st Prize:',
       first: [
-        { label: '1st Prize:', value: '$600' },
-        { label: 'Student:', value: '$600' },
+        { label: 'Student:', value: '$700' },
         { label: 'Coach:', value: '$500' },
       ],
       second: { label: '2nd Prize:', value: '$350' },
     },
     {
       title: 'Adults Doubles',
-      first: [{ label: '1st Prize:', value: '$600' }],
+      total: { label: 'Total Prize:', value: '$1,050' },
+      firstLabel: '1st Prize:',
+      first: [{ label: '1st Prize:', value: '$700' }],
       second: { label: '2nd Prize:', value: '$350' },
     },
   ],
@@ -175,9 +189,9 @@ export const details = {
   rows: [
     { icon: 'users', label: 'Under 17 Singles:', text: '16 entries' },
     { icon: 'users', label: 'Under 17 Doubles:', text: '16 pairs' },
-    { icon: 'users', label: 'Open Adult Category:', text: '16 pairs' },
-    { icon: 'calendar', text: 'Event held twice a year' },
-    { icon: 'calendar', label: 'Next event planned:', text: 'June at SBH Expo' },
+    { icon: 'users', label: 'Adult Open Category:', text: '16 pairs' },
+    { icon: 'calendar', text: 'Event held once a year' },
+    { icon: 'calendar', label: 'Next planned event:', text: 'Tentative' },
   ] satisfies SpecRow[],
   venue: {
     name: 'SBH VIP Hall @ Sims',
@@ -207,19 +221,29 @@ export const live = {
 export const sponsors = {
   eyebrow: 'Sponsors',
   title: 'Supported By',
-  /** TODO: add each sponsor's website as `href` so the logos link out. */
+  /**
+   * In the mockup's order: a row of three, then a row of four. Logos are the sponsors'
+   * own files, taken from their websites on 8 Oct 2026; a card with an `href` links out.
+   *
+   * Still unresolved — no website found, so the logo is a crop of the mockup and the
+   * card does not link: 3W Logistics Pte Ltd (registered Dec 2025, no web presence) and
+   * Athens (no company identified). T.E Engineering & Trading shows its name as text, by
+   * the organiser's choice: no logo, no link.
+   */
   items: [
-    { name: 'Global Barrels', logo: '/tournament/sponsor-global-barrels.png' },
-    { name: 'Fresh Cars', logo: '/tournament/sponsor-fresh-cars.png' },
+    { name: 'Global Barrels', logo: '/tournament/sponsor-global-barrels.png', href: 'https://globalbarrels.com.sg/' },
+    { name: 'Fresh Cars', logo: '/tournament/sponsor-fresh-cars.png', href: 'https://www.freshcars.sg/' },
+    { name: 'T.E Engineering & Trading' },
+    { name: 'Li-Ning Sports Singapore', logo: '/tournament/sponsor-li-ning.svg', href: 'https://sg.lining.studio/' },
+    { name: 'Symphony Music School', logo: '/tournament/sponsor-symphony.png', href: 'https://symphonymusic888.com/' },
+    { name: '3W Logistics Pte Ltd', logo: '/tournament/sponsor-3w-logistics.png' },
     { name: 'Athens', logo: '/tournament/sponsor-athens.png' },
-    { name: 'Li-Ning Sports Singapore', logo: '/tournament/sponsor-li-ning.png' },
-    { name: 'Smphony Music School', logo: '/tournament/sponsor-smphony.png' },
-  ],
+  ] as { name: string; logo?: string; href?: string }[],
 };
 
 export const guests = {
-  eyebrow: 'Special guest',
-  title: 'Meet Our Featured Guest',
+  eyebrow: 'Special guests',
+  title: 'Meet Our Featured Guests',
   items: [{ name: 'Jin Yujia', role: 'Award Presenter', photo: guest4 }],
 };
 

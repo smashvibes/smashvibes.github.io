@@ -145,7 +145,17 @@ const jsonLd = {
         <SectionHeading eyebrow={sponsors.eyebrow} title={sponsors.title} />
         <ul class="sv-tr-sponsor-grid">
           {sponsors.items.map((s) => (
-            <li><img src={s.logo} alt={s.name} loading="lazy" decoding="async" /></li>
+            <li>
+              {!s.logo ? (
+                <span class="sv-tr-sponsor-name">{s.name}</span>
+              ) : s.href ? (
+                <a href={s.href} target="_blank" rel="noopener sponsored" title={s.name}>
+                  <img src={s.logo} alt={s.name} loading="lazy" decoding="async" />
+                </a>
+              ) : (
+                <img src={s.logo} alt={s.name} loading="lazy" decoding="async" />
+              )}
+            </li>
           ))}
         </ul>
       </div>

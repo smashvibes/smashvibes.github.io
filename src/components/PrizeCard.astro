@@ -1,19 +1,22 @@
 ---
 /**
- * Prize card. The first-prize amount is the card's hero — set large in gold on a tinted
- * panel — with the supporting awards beneath and the runner-up pinned to the bottom so
- * cards of different lengths still line up across the row.
+ * Prize card. The total prize is the card's hero — set large in gold on a tinted panel —
+ * with the first-prize split beneath (student and coach for the junior events, a single
+ * line for the adults) and the runner-up pinned to the bottom so cards of different
+ * lengths still line up across the row.
  */
 import Icon from './Icon.astro';
 
 interface Props {
   title: string;
+  total: { label: string; value: string };
+  /** Heading over the split, shown only when the split has more than one line. */
+  firstLabel: string;
   first: { label: string; value: string }[];
   second: { label: string; value: string };
 }
-const { title, first, second } = Astro.props;
-
-const [champion, ...extras] = first;
+const { title, total, firstLabel, first, second } = Astro.props;
+const strip = (s: string) => s.replace(/:$/, '');
 ---
 <article class="sv-prize">
   <header class="sv-prize-head">
@@ -22,23 +25,22 @@ const [champion, ...extras] = first;
   </header>
 
   <div class="sv-prize-champion">
-    <p class="sv-prize-rank">{champion.label.replace(/:$/, '')}</p>
-    <p class="sv-prize-amount">{champion.value}</p>
+    <p class="sv-prize-rank">{strip(total.label)}</p>
+    <p class="sv-prize-amount">{total.value}</p>
   </div>
 
-  {extras.length > 0 && (
-    <ul class="sv-prize-extras">
-      {extras.map((row) => (
-        <li>
-          <span>{row.label.replace(/:$/, '')}</span>
-          <strong>{row.value}</strong>
-        </li>
-      ))}
-    </ul>
-  )}
+  <ul class="sv-prize-extras">
+    {first.length > 1 && <li class="sv-prize-extras-head"><span>{strip(firstLabel)}</span></li>}
+    {first.map((row) => (
+      <li class={first.length > 1 ? 'is-split' : ''}>
+        <span>{strip(row.label)}</span>
+        <strong>{row.value}</strong>
+      </li>
+    ))}
+  </ul>
 
   <footer class="sv-prize-runner">
-    <span>{second.label.replace(/:$/, '')}</span>
+    <span>{strip(second.label)}</span>
     <strong>{second.value}</strong>
   </footer>
 </article>

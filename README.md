@@ -331,10 +331,11 @@ deployment → Source* must be set to **GitHub Actions**.
 - [ ] Replace `public/smash-vibes-logo.png` with a vector master when one exists. It is
       currently a keyed-out raster of the supplied wordmark, and `sync:ds` deliberately
       does **not** overwrite it (the design system's own copy is a lower-res crop).
-- [ ] **StarRise Cup**: supply the StarRise wordmark as a vector, sponsor websites,
-      social handles (`socials` in `src/data/tournament.ts` — the icons render as muted
+- [ ] **StarRise Cup**: supply the StarRise wordmark as a vector, the websites of 3W
+      Logistics and Athens (their cards do not link and their logos are crops of the
+      mockup; the other five are the sponsors' own files and link out), social handles (`socials` in `src/data/tournament.ts` — the icons render as muted
       marks until each gets an `href`), and tournament-specific FAQ copy (that nav item
       currently points at the Smash Vibes FAQ).
-- [ ] Replace the StarRise Cup guest portraits and sponsor logos — still crops of the
-      tournament mockup. The hero and venue photographs are real.
+- [ ] Replace the StarRise Cup guest portrait — still a crop of the tournament mockup.
+      The hero and venue photographs are real.
 - [ ] Confirm the `SportsActivityLocation` JSON-LD in `src/pages/index.astro` is accurate.

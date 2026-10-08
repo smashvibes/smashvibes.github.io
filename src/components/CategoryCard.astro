@@ -6,7 +6,7 @@ import type { SpecRow as SpecRowData } from '../data/tournament';
 
 interface Props {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   rows: SpecRowData[];
 }
 const { title, subtitle, rows } = Astro.props;
@@ -16,7 +16,7 @@ const { title, subtitle, rows } = Astro.props;
     <Icon name="shuttlecock" size={44} class="sv-category-mark" />
     <div>
       <h3 class="sv-card-title">{title}</h3>
-      <p class="sv-card-sub">{subtitle}</p>
+      {subtitle && <p class="sv-card-sub">{subtitle}</p>}
     </div>
   </header>
   <ul class="sv-spec-list">
