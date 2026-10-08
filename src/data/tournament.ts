@@ -10,9 +10,6 @@ import { WHATSAPP_CHAT } from './site';
 import heroImage from '../assets/tournament/hero.jpg';
 import aboutImage from '../assets/tournament/about-shuttle.jpg';
 import venueImage from '../assets/tournament/venue.jpg';
-import guest1 from '../assets/tournament/guest-1.jpg';
-import guest2 from '../assets/tournament/guest-2.jpg';
-import guest3 from '../assets/tournament/guest-3.jpg';
 import guest4 from '../assets/tournament/guest-4.jpg';
 
 /**
@@ -82,7 +79,7 @@ export const hero = {
   imageAlt: 'A badminton player reaching for a return at full stretch under the hall lights',
   facts: [
     { icon: 'calendar' as IconName, value: '14 November 2026', note: '(Saturday)' },
-    { icon: 'clock' as IconName, value: '10:00 AM – 3:00 PM', note: '(5 Hours)' },
+    { icon: 'clock' as IconName, value: '10:00 AM – 5:00 PM', note: '(7 Hours)' },
   ],
   venue: {
     icon: 'pin' as IconName,
@@ -118,7 +115,7 @@ export const categories = {
       subtitle: 'For players under 17 years old',
       rows: [
         { icon: 'users', label: 'Events:', text: 'Singles & Doubles' },
-        { icon: 'bracket', text: 'Knockout stage' },
+        { icon: 'bracket', text: 'Round-robin groups, then knockout' },
         { icon: 'shuttlecock', label: 'Matches:', text: 'first to 30 points' },
         { icon: 'chart', label: 'Semi Finals:', text: 'Best of 3 sets, 21 points' },
         { icon: 'trophy', label: 'Finals:', text: 'Best of 3 sets, 21 points' },
@@ -134,7 +131,7 @@ export const categories = {
       rows: [
         { icon: 'users', text: 'National-level / state-level players are not eligible' },
         { icon: 'shuttlecock', label: 'Events:', text: "Men's Doubles & Mixed Doubles combined" },
-        { icon: 'bracket', text: 'Round-robin stage' },
+        { icon: 'bracket', text: 'Round-robin groups, then knockout' },
         { icon: 'chart', label: 'Semi Finals:', text: '3 sets of 21 points' },
         { icon: 'trophy', label: 'Finals:', text: '3 sets of 21 points' },
       ] satisfies SpecRow[],
@@ -178,7 +175,7 @@ export const details = {
   rows: [
     { icon: 'users', label: 'Under 17 Singles:', text: '16 entries' },
     { icon: 'users', label: 'Under 17 Doubles:', text: '16 pairs' },
-    { icon: 'users', label: 'Open Adult Category:', text: '2 groups of 5 pairs' },
+    { icon: 'users', label: 'Open Adult Category:', text: '16 pairs' },
     { icon: 'calendar', text: 'Event held twice a year' },
     { icon: 'calendar', label: 'Next event planned:', text: 'June at SBH Expo' },
   ] satisfies SpecRow[],
@@ -201,11 +198,10 @@ export const poster = {
   file: '/tournament/starrise-cup-poster.jpg',
 };
 
-/** Live scoring, published on match day. */
+/** Live scoreboard. The matches come from the same sheet as the draws. */
 export const live = {
   title: 'Live',
-  lede: 'To be updated.',
-  body: 'Scores and results will be published here on match day. Until then, the draws and group tables are the place to look.',
+  note: 'Matches in progress, what is up next and the latest results, straight from the match desk. Scores update automatically on match day.',
 };
 
 export const sponsors = {
@@ -222,48 +218,57 @@ export const sponsors = {
 };
 
 export const guests = {
-  eyebrow: 'Special guests',
-  title: 'Meet Our Featured Guests',
-  items: [
-    { name: 'Alison Tan', role: 'World Ranking Player', photo: guest1 },
-    { name: 'Chloe Lim', role: 'Former National Player', photo: guest2 },
-    { name: 'Marcus Ong', role: 'National Coach', photo: guest3 },
-    { name: 'Jin Yujia', role: 'Award Presenter', photo: guest4 },
-  ],
+  eyebrow: 'Special guest',
+  title: 'Meet Our Featured Guest',
+  items: [{ name: 'Jin Yujia', role: 'Award Presenter', photo: guest4 }],
 };
 
 export const closing = {
   title: 'Secure Your Spot Now',
 };
 
-export type DrawKind = 'bracket' | 'groups';
-
 export interface Draw {
   id: string;
   label: string;
   meta: string;
-  kind: DrawKind;
-  /** bracket: number of entries (a power of two). groups: unused. */
-  entries?: number;
-  /** groups: how many groups, and how many pairs in each. */
-  groups?: number;
-  perGroup?: number;
+  icon: IconName;
 }
 
 /**
- * Draw structures. Names are deliberately absent — the draw has not been made, so every
- * slot renders as an empty placeholder. Fill `seeds` per draw once entries close.
+ * The three draws. Which categories exist, in tab order, with their labels — the content
+ * of each (names, courts, times, scores) comes from the organiser's sheet via
+ * src/data/draws.json; see src/data/draws.ts. The `id` is the key into that file and
+ * must match EVENTS in scripts/draws-sheet.gs.
+ *
+ * Every category runs four groups of four, and the top two of each group go into the
+ * quarter finals.
  */
-export const draws = {
+export const draws: {
+  eyebrow: string;
+  title: string;
+  note: string;
+  formatNote: string;
+  updatedLabel: string;
+  /** The state pills, explained once at the top of the page. */
+  legend: { live: string; done: string; upcoming: string };
+  /** Full-screen mode for the hall TV: chrome hidden, everything scaled up. */
+  tv: { enter: string; exit: string; hint: string };
+  stages: { groups: string; knockout: string };
+  items: Draw[];
+} = {
   eyebrow: 'Tournament draws',
   title: 'Draws',
-  note: 'Draws are published once entries close. Seedings and match times will appear here.',
+  note: 'Every category plays four round-robin groups of four, with the top two in each group going through to the quarter finals. Names appear here once the draw is made, and scores update automatically on match day.',
+  formatNote: 'Scores and the knockout line-up are kept by the match desk; what they record is what you see here.',
+  updatedLabel: 'Last updated',
+  legend: { live: 'Live', done: 'Done', upcoming: 'Upcoming' },
+  tv: { enter: 'TV mode', exit: 'Exit TV mode', hint: 'Press Esc to exit' },
+  stages: { groups: 'Round Robin', knockout: 'Knockout Draw' },
   items: [
-    { id: 'u17-singles', label: 'U17 Singles', meta: '16 entries', kind: 'bracket', entries: 16 },
-    { id: 'u17-doubles', label: 'U17 Doubles', meta: '16 pairs', kind: 'bracket', entries: 16 },
-    { id: 'open-md', label: "Open Men's Doubles", meta: '2 groups, 5 pairs each', kind: 'groups', groups: 2, perGroup: 5 },
-    { id: 'open-xd', label: 'Open Mixed Doubles', meta: '2 groups, 5 pairs each', kind: 'groups', groups: 2, perGroup: 5 },
-  ] satisfies Draw[],
+    { id: 'u17-singles', label: 'U17 Singles', meta: '16 entries', icon: 'user' },
+    { id: 'u17-doubles', label: 'U17 Doubles', meta: '16 pairs', icon: 'users' },
+    { id: 'open-doubles', label: 'Open Doubles', meta: '16 pairs', icon: 'users-plus' },
+  ],
 };
 
 /**

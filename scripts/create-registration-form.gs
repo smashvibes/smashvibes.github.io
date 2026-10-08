@@ -4,9 +4,11 @@
  * RUN THESE (the others are internal helpers):
  *
  *   updateExistingForm()       the one to run after any change
- *   verifyForm()               checks every path reaches the waiver
+ *   verifyForm()               checks every path reaches the rules and waiver page
  *   listRegistrationForms()    finds duplicate forms on the account
  *   ensureWaiverLast()         moves the waiver to the end, on its own
+ *   installCloseTrigger()      run ONCE: stops responses after the closing date
+ *   installSheetTriggers()     run ONCE: caps each category from the response sheet
  *
  * TWO ENTRY POINTS
  *
@@ -37,30 +39,64 @@
 /** The live form. Its /viewform url is wired into src/data/tournament.ts. */
 var FORM_ID = '1YNtTzgFumfKaYvcaKYQaUV1p-gbDuT8Q6vwOgKCwBS4';
 
+/**
+ * FORM_ID must be the id from the EDIT link (.../forms/d/<ID>/edit). The share link
+ * (.../forms/d/e/1FAIpQL.../viewform) carries a different id that openById rejects.
+ */
+function openLiveForm() {
+  try {
+    return FormApp.openById(FORM_ID);
+  } catch (err) {
+    throw new Error(
+      'Cannot open the form with FORM_ID "' + FORM_ID + '". Use the id from the form\'s ' +
+      'EDIT link (between /forms/d/ and /edit), not the share link, and run this from the ' +
+      'Google account that owns the form. (' + err.message + ')'
+    );
+  }
+}
+
 var EVENT = {
   name: 'StarRise Cup 2026',
   date: '14 November 2026 (Saturday)',
-  time: '10:00 AM – 3:00 PM',
+  time: '10:00 AM – 5:00 PM',
   venue: 'SBH VIP Hall @ Sims, 1 Lorong 23 Geylang, Singapore 388352',
-  // Under-17 eligibility is judged on the day of play. Born on or after this date = eligible.
-  // CONFIRM THIS WITH THE ORGANISER — "under 17" as at the event date vs. as at 1 Jan is
-  // the single most common source of eligibility disputes.
-  u17CutoffText: 'born on or after 15 November 2009 (i.e. under 17 on the event date)',
+  // From the Rules & Regulations (as of 6 Oct 26), clause 5.1: the teen categories are
+  // "17yrs old and below as of 14 Nov 26". A player born on 15 Nov 2008 is still 17 on
+  // the day, so that is the cut-off. Keep this in step with RULES below — entrants tick
+  // both, and the two must not disagree.
+  u17CutoffText: '17 years old or below on 14 November 2026 (born on or after 15 November 2008)',
   contact: 'WhatsApp 9683 4290',
+  closingDate: '7 November 2026 (Saturday)',
+  // Midnight at the end of the closing date, Singapore time. Used by installCloseTrigger().
+  closesAt: new Date('2026-11-08T00:00:00+08:00'),
 };
 
 /**
- * Entry caps from the tournament page. Used by updateCategoryAvailability().
+ * PayNow shows the payer a masked name before they confirm, so both are given: the masked
+ * one to match against what the app displays, the full one in brackets.
+ */
+var PAYMENT = {
+  paynow: '8088 6684',
+  maskedName: 'MUHAMXXX DANXXX BIX MOHAXXX AIZXX',
+  fullName: 'Muhammad Danial bin Mohamed Aizam',
+};
+
+/**
+ * Entry caps. Enforced against the response sheet's Status column — see "Category caps"
+ * near the end of this file.
  *
- * Men's and Mixed Doubles are ONE entry category: the tournament page runs them combined
- * across 2 groups of 5 pairs, so the cap is the 10 pairs those groups hold. Which of the
- * two a pair is playing follows from the two players' genders, already collected — no
- * extra question needed.
+ * Men's and Mixed Doubles are ONE entry category: the tournament runs them combined as a
+ * single Open Doubles draw of 16 pairs (four groups of four, then a knockout — organiser's
+ * draws of 6 Oct 26), so that is the cap. Which of the two a pair is playing follows from
+ * the two players' genders, already collected — no extra question needed.
+ *
+ * Labels are matched against past responses to count entries, so renaming one resets its
+ * count to zero. `fee` is display text only.
  */
 var CATEGORIES = [
-  { key: 'U17_SINGLES', label: 'Under-17 Singles', cap: 16, unit: 'entries' },
-  { key: 'U17_DOUBLES', label: 'Under-17 Doubles', cap: 16, unit: 'pairs' },
-  { key: 'ADULT_OPEN', label: "Adults Open — Men's / Mixed Doubles", cap: 10, unit: 'pairs' },
+  { key: 'U17_SINGLES', label: 'Under-17 Singles', cap: 16, unit: 'entries', fee: '$50 per player' },
+  { key: 'U17_DOUBLES', label: 'Under-17 Doubles', cap: 16, unit: 'pairs', fee: '$80 per pair' },
+  { key: 'ADULT_OPEN', label: "Adults Open — Men's / Mixed Doubles", cap: 16, unit: 'pairs', fee: '$80 per pair' },
 ];
 
 var CATEGORY_QUESTION = 'Which category are you entering?';
@@ -70,25 +106,120 @@ var PAGE = {
   singles: 'Under-17 Singles — player details',
   u17Doubles: 'Under-17 Doubles — pair details',
   adults: "Adults Open — Men's / Mixed Doubles — pair details",
-  disclaimer: 'Disclaimer, Assumption of Risk and Waiver',
+  disclaimer: 'Rules & Regulations, Disclaimer and Waiver',
 };
 
-/** Shown above the waiver clauses. */
-var DISCLAIMER_INTRO =
-  'By registering for and/or participating in the badminton tournament ("Tournament"), ' +
-  'each participant acknowledges and agrees to the following terms.';
+/** What the final page was called before the full rules were added. Renamed on update. */
+var LEGACY_DISCLAIMER_TITLE = 'Disclaimer, Assumption of Risk and Waiver';
+
+function isWaiverTitle(title) {
+  return title === PAGE.disclaimer || title === LEGACY_DISCLAIMER_TITLE;
+}
+
+var RULES_AS_OF = '6 Oct 26';
+
+/** Shown at the top of the final page. */
+var RULES_PAGE_INTRO =
+  'Please read the Star Rise Cup 2026 Rules & Regulations (as of ' + RULES_AS_OF + ') ' +
+  'below. Both boxes at the bottom must be ticked to submit your entry.';
 
 /**
- * Supplied by the organiser. Reproduced verbatim — this is legal text, so the wording is
- * not ours to tidy. (It carries a few typographic slips: a space before the full stop in
- * "equipment .", and two clauses with no closing full stop. Fix them in this array if the
- * organiser wants them fixed.)
+ * The organiser's Rules & Regulations (as of 6 Oct 26), clauses 1–8 and 10. Clause 9 is
+ * the waiver, kept in DISCLAIMER_CLAUSES. Reproduced verbatim, with one exception: the
+ * PDF numbers the first sub-clause of 10 as "8.1", corrected here to 10.1.
+ */
+var RULES_BEFORE_WAIVER = [
+  { title: '1. Title', body: 'Star Rise Cup 2026' },
+  { title: '2. Organisers', body: 'Global Barrels\nFresh Cars Pte Ltd\nDanial' },
+  { title: '3. Venue', body: 'SBH@Geylang VIP Hall' },
+  {
+    title: '4. Tournament Rules',
+    body:
+      'The Tournament shall be conducted in accordance with the existing Rules approved by ' +
+      'the Badminton World Federation unless stated otherwise.',
+  },
+  {
+    title: '5. Official Registration',
+    body:
+      '5.1 There will be 3 categories for this tournament, namely:\n' +
+      'i) Teen Singles – TS (17yrs old and below as of 14 Nov 26)\n' +
+      'ii) Teen Doubles – TD (17yrs old and below as of 14 Nov 26)\n' +
+      'iii) Open Doubles – OD (no age restrictions)',
+  },
+  {
+    title: '6. Tournament System',
+    body: [
+      '6.1 The 16 individuals/pairs in each category will be placed in 4 separate groups of ' +
+        '4 individuals/pairs each and they will play a Round Robin format where the 4 ' +
+        'individuals/pairs in each group will play one another once. The Top Two ' +
+        'individuals/pairs from each group will qualify for the quarter-finals round.',
+      '6.2 The winner of each tie will be awarded 1 league point. No points for losing ' +
+        'individual/pair or walkover. The individual/pair with the greatest number of points ' +
+        'after all the round robin matches had been completed will be declared the top of ' +
+        'the group.',
+      '6.3 Should there be a tie in league points between two or more individuals/pairs, the ' +
+        'position shall be established by considering the difference of the points for and ' +
+        'against, in the matches among the individuals/pairs having equal points, The ' +
+        'individual/pair with better points difference will be awarded the higher position.',
+      '6.4 If a tie persists, classification shall be made taking into consideration all ' +
+        'the matches played.',
+      '6.5 If a tie persists, classification shall be made by a toss of coin.',
+      '6.6 Fixtures will only be made known one week before tournament day.',
+      '6.7 The scoring system for all round robin and quarter-finals matches will be one ' +
+        'game, race to 15 points with no setting when the score reaches 14-all.',
+      '6.8 The scoring system for semi-finals rounds onwards would be decided after the ' +
+        'completion of the all round robin and quarter-finals matches.',
+      '6.9 All matches will be played according to the Schedule of Play.',
+      '6.10 Players will be given a grace period of 5 minutes for their presence on court ' +
+        'for their respective matches. Players who report later than the grace period will ' +
+        'concede a walkover for that match.',
+    ].join('\n\n'),
+  },
+  {
+    title: '7. Prizes',
+    body:
+      '7.1 Medals & Prizes will be awarded to only the 1st and 2nd placings of all 3 ' +
+      'categories.\n\n' +
+      '7.2 The Coach of the respective winner of each category will be awarded with a cash ' +
+      'prize of S$500.00.',
+  },
+  {
+    title: '8. First Aid & Medical Coverage',
+    body:
+      'All participants shall be responsible for their own medical coverage and accident ' +
+      'insurance.',
+  },
+];
+
+var RULES_AFTER_WAIVER = [
+  {
+    title: '10. Interpretation Clause',
+    body:
+      '10.1 Any arising matters, which are not covered in this Tournament Rules & ' +
+      'Regulations, shall be decided by the Organiser, whose decision shall be final.\n\n' +
+      '10.2 The Rules & Regulations as depicted above are current at the time of printing. ' +
+      'The Organising Committee reserves the right to add, delete and/or vary the said Rules ' +
+      'and Regulations at any time as it deems fits.\n\n' +
+      '10.3 The decision of the Organising Committee on all matters shall be final.',
+  },
+];
+
+var WAIVER_HEADING = '9. Badminton Tournament Disclaimer, Assumption of Risk and Waiver';
+
+/** Shown under the waiver heading. */
+var DISCLAIMER_INTRO =
+  'By registering for and/or participating in the badminton tournament ("Tournament"), ' +
+  'each participant acknowledges and agrees to the following terms:';
+
+/**
+ * Clause 9 of the Rules & Regulations (as of 6 Oct 26). Reproduced verbatim — this is
+ * legal text, so the wording is not ours to tidy.
  */
 var DISCLAIMER_CLAUSES = [
   {
     title: 'Injury or Death',
     body:
-      'The organiser, its organisers, committee members, volunteers, officials, referees, ' +
+      'The Organiser, its Organisers, committee members, volunteers, officials, referees, ' +
       'coaches, venue owners, sponsors and their respective employees, agents and ' +
       'representatives shall not be liable for any injury, illness, disability or death ' +
       'suffered by a participant arising out of or in connection with participation in the ' +
@@ -98,14 +229,14 @@ var DISCLAIMER_CLAUSES = [
   {
     title: 'Loss or Damage to Property',
     body:
-      'Participants are responsible for their own personal belongings and equipment . The ' +
-      'organiser shall not be responsible or liable for any loss, theft, damage or ' +
-      'destruction of any personal property',
+      'Participants are responsible for their own personal belongings and equipment. The ' +
+      'Organiser shall not be responsible or liable for any loss, theft, damage or ' +
+      'destruction of any personal property.',
   },
   {
     title: 'Medical Assistance',
     body:
-      'In the event of an injury or medical emergency, the organiser may arrange or ' +
+      'In the event of an injury or medical emergency, the Organiser may arrange or ' +
       'facilitate appropriate medical assistance or emergency services. Participants ' +
       'acknowledge that they may be responsible for any medical, ambulance, hospital or ' +
       'other expenses incurred.',
@@ -114,7 +245,7 @@ var DISCLAIMER_CLAUSES = [
     title: 'Compliance with Rules',
     body:
       'Participants agree to comply with the Tournament rules, venue rules and reasonable ' +
-      'instructions given by the organiser, officials and venue staff. The organiser ' +
+      'instructions given by the Organiser, officials and venue staff. The Organiser ' +
       "reserves the right to refuse or terminate participation where a participant's " +
       'conduct presents a risk to himself/herself or others.',
   },
@@ -129,10 +260,10 @@ var DISCLAIMER_CLAUSES = [
     title: 'Release and Waiver',
     body:
       'To the fullest extent permitted by law, each participant releases and holds ' +
-      'harmless the organiser and the persons and entities referred to above from claims, ' +
+      'harmless the Organiser and the persons and entities referred to above from claims, ' +
       'demands, losses, damages, costs and expenses arising from or connected with the ' +
       "participant's participation in the Tournament, including claims relating to " +
-      'personal injury, illness, death or loss or damage to property',
+      'personal injury, illness, death or loss or damage to property.',
   },
   {
     title: 'No Exclusion of Non-Excludable Liability',
@@ -142,10 +273,84 @@ var DISCLAIMER_CLAUSES = [
   },
 ];
 
+/**
+ * Every section header on the final page, in order: clauses 1–8, the waiver (9), then 10.
+ * Headers carry no responses, so the updater can safely delete and rebuild them.
+ */
+function rulesPageHeaders() {
+  var headers = RULES_BEFORE_WAIVER.slice();
+  headers.push({ title: WAIVER_HEADING, body: DISCLAIMER_INTRO });
+  for (var i = 0; i < DISCLAIMER_CLAUSES.length; i++) {
+    headers.push({
+      title: '9.' + (i + 1) + ' ' + DISCLAIMER_CLAUSES[i].title,
+      body: DISCLAIMER_CLAUSES[i].body,
+    });
+  }
+  return headers.concat(RULES_AFTER_WAIVER);
+}
+
+/** A separate tick from the waiver's, so the sheet records each acceptance on its own. */
+var RULES_TICK_TITLE = 'Rules & Regulations';
+var RULES_TICK =
+  'I have read, understood and agree to the Star Rise Cup 2026 Rules & Regulations ' +
+  '(as of ' + RULES_AS_OF + ') above.';
+
 var DISCLAIMER_TICK =
   'I have read, understood and agree to the Disclaimer, Assumption of Risk and Waiver ' +
   'above. Where the participant is under 18, I confirm I am the parent or legal guardian ' +
-  'and agree on the participant\u2019s behalf.';
+  'and agree on the participant’s behalf.';
+
+/** Opening text of the under-17 eligibility tick; the rest is EVENT.u17CutoffText. */
+var U17_ELIGIBILITY_PREFIX = 'I confirm every player listed is ';
+
+// ---------------------------------------------------------------------------
+// Page 1 text. Rewritten on every update, so edit it here rather than in the Forms UI.
+// ---------------------------------------------------------------------------
+
+function feeLines() {
+  var lines = [];
+  for (var i = 0; i < CATEGORIES.length; i++) {
+    lines.push('• ' + CATEGORIES[i].label + ': ' + CATEGORIES[i].fee);
+  }
+  return lines.join('\n');
+}
+
+function formDescription() {
+  return (
+    EVENT.name + '\n' +
+    EVENT.date + ', ' + EVENT.time + '\n' +
+    EVENT.venue + '\n\n' +
+    'Registration closes: ' + EVENT.closingDate + '\n\n' +
+    'REGISTRATION FEE\n' +
+    feeLines() + '\n\n' +
+    'PAYMENT: PayNow to ' + PAYMENT.paynow + '\n' +
+    PAYMENT.maskedName + ' (' + PAYMENT.fullName + ')\n\n' +
+    'One submission per entry. Doubles pairs submit ONCE, with both players listed — the ' +
+    'pair fee covers both.\n' +
+    'Questions: ' + EVENT.contact
+  );
+}
+
+/** `fullLabels`: categories currently closed, named so entrants know why one is missing. */
+function categoryHelpText(fullLabels) {
+  var full = fullLabels && fullLabels.length
+    ? '\n\nFULL — no longer taking entries: ' + fullLabels.join(', ') + '.'
+    : '';
+  return (
+    'Under-17: ' + EVENT.u17CutoffText + '.\n' +
+    'Adults: open to social and recreational players. National- and state-level players ' +
+    'are not eligible.\n\n' +
+    'Fee: Singles $50 per player · Doubles $80 per pair.' +
+    full
+  );
+}
+
+/** Entrants cannot see their sheet status, so the message covers the waitlist case. */
+var CONFIRMATION_MESSAGE =
+  'Thanks — your entry is in. We will confirm your slot by WhatsApp before the event. ' +
+  'If your category filled up while you were registering, you will be placed on the ' +
+  'waitlist and we will tell you. If your plans change, tell us early so the slot can go ' +
+  'to another player.';
 
 // ---------------------------------------------------------------------------
 // Builders
@@ -154,13 +359,7 @@ var DISCLAIMER_TICK =
 function createRegistrationForm() {
   var form = FormApp.create(EVENT.name + ' — Player Registration');
 
-  form.setDescription(
-    EVENT.name + '\n' +
-    EVENT.date + ', ' + EVENT.time + '\n' +
-    EVENT.venue + '\n\n' +
-    'One submission per entry. Doubles pairs submit ONCE, with both players listed.\n' +
-    'Questions: ' + EVENT.contact
-  );
+  form.setDescription(formDescription());
 
   form.setProgressBar(true);
   form.setAllowResponseEdits(true);
@@ -179,19 +378,12 @@ function createRegistrationForm() {
   // and automatic response receipts, at the cost of forcing sign-in:
   //   form.setCollectEmail(true);
   form.setCollectEmail(false);
-  form.setConfirmationMessage(
-    'Thanks — your entry is in. We will confirm your slot by WhatsApp before the event. ' +
-    'If your plans change, tell us early so the slot can go to another player.'
-  );
+  form.setConfirmationMessage(CONFIRMATION_MESSAGE);
 
   // --- Page 1: category ---------------------------------------------------
   var categoryItem = form.addMultipleChoiceItem()
     .setTitle(CATEGORY_QUESTION)
-    .setHelpText(
-      'Under-17: ' + EVENT.u17CutoffText + '.\n' +
-      'Adults: open to social and recreational players. National- and state-level players ' +
-      'are not eligible.'
-    )
+    .setHelpText(categoryHelpText())
     .setRequired(true);
 
   // --- The three entry pages ----------------------------------------------
@@ -222,10 +414,12 @@ function createRegistrationForm() {
   // --- Shared final page: the waiver everyone must accept -------------------
   var disclaimerPage = addDisclaimerPage(form);
 
-  // Every branch ends at the disclaimer, which then submits.
+  // Every branch ends at the disclaimer, which then submits. The adults page sits directly
+  // before it, so it CONTINUEs: an explicit jump to the adjacent section is stored by
+  // Forms as "Submit form", which would let adults skip the waiver.
   singlesPage.setGoToPage(disclaimerPage);
   u17DoublesPage.setGoToPage(disclaimerPage);
-  adultPage.setGoToPage(disclaimerPage);
+  adultPage.setGoToPage(FormApp.PageNavigationType.CONTINUE);
   disclaimerPage.setGoToPage(FormApp.PageNavigationType.SUBMIT);
 
   // Wire the branching now that the target pages exist.
@@ -367,7 +561,7 @@ function addTeenDeclarations(form) {
     form.addCheckboxItem()
       .setTitle('Eligibility')
       .setChoiceValues([
-        'I confirm every player listed is ' + EVENT.u17CutoffText + '.',
+        U17_ELIGIBILITY_PREFIX + EVENT.u17CutoffText + '.',
         'I confirm no player listed is a current Junior National player, or represents any ' +
           'country in any form.',
       ])
@@ -449,14 +643,14 @@ function addDisclaimerPage(form) {
   }
   var page = form.addPageBreakItem()
     .setTitle(PAGE.disclaimer)
-    .setHelpText(DISCLAIMER_INTRO);
+    .setHelpText(RULES_PAGE_INTRO);
 
-  for (var i = 0; i < DISCLAIMER_CLAUSES.length; i++) {
-    form.addSectionHeaderItem()
-      .setTitle((i + 1) + '. ' + DISCLAIMER_CLAUSES[i].title)
-      .setHelpText(DISCLAIMER_CLAUSES[i].body);
+  var headers = rulesPageHeaders();
+  for (var i = 0; i < headers.length; i++) {
+    form.addSectionHeaderItem().setTitle(headers[i].title).setHelpText(headers[i].body);
   }
 
+  addRulesTick(form);
   requireAll(
     form.addCheckboxItem()
       .setTitle('Agreement')
@@ -471,6 +665,64 @@ function addDisclaimerPage(form) {
   return page;
 }
 
+function addRulesTick(form) {
+  return requireAll(
+    form.addCheckboxItem()
+      .setTitle(RULES_TICK_TITLE)
+      .setChoiceValues([RULES_TICK])
+      .setRequired(true)
+  );
+}
+
+/**
+ * Brings the text on an existing final page in line with this file.
+ *
+ * Section headers hold no answers, so they are deleted and rebuilt rather than diffed.
+ * The two tick boxes DO hold answers and are never deleted: the rules tick is added once
+ * if missing, and the waiver's "Agreement" tick is left exactly as it is. Expects the
+ * page to be last (run ensureWaiverLast first), because new items append to the end.
+ */
+function syncRulesPage(form) {
+  var items = form.getItems();
+  var start = -1;
+  for (var i = 0; i < items.length; i++) {
+    if (items[i].getType() === FormApp.ItemType.PAGE_BREAK && isWaiverTitle(items[i].getTitle())) {
+      start = i;
+      break;
+    }
+  }
+  if (start === -1) throw new Error('Final rules / waiver page not found.');
+
+  var page = items[start].asPageBreakItem();
+  page.setTitle(PAGE.disclaimer).setHelpText(RULES_PAGE_INTRO);
+
+  var rulesTick = null;
+  for (var j = items.length - 1; j > start; j--) {
+    var type = items[j].getType();
+    if (type === FormApp.ItemType.PAGE_BREAK) throw new Error('The rules page is not last.');
+    if (type === FormApp.ItemType.SECTION_HEADER) form.deleteItem(items[j]);
+    if (type === FormApp.ItemType.CHECKBOX && items[j].getTitle() === RULES_TICK_TITLE) {
+      rulesTick = items[j];
+    }
+  }
+  if (!rulesTick) rulesTick = addRulesTick(form);
+
+  // Appended items land after the ticks; move each into place directly under the page
+  // break, then the rules tick after them, which leaves "Agreement" last.
+  //
+  // Moved by index: moveItem(item, index) only accepts a plain Item, and throws a
+  // signature error when handed a typed one such as SectionHeaderItem.
+  var headers = rulesPageHeaders();
+  for (var h = 0; h < headers.length; h++) {
+    var header = form.addSectionHeaderItem()
+      .setTitle(headers[h].title)
+      .setHelpText(headers[h].body);
+    form.moveItem(header.getIndex(), start + 1 + h);
+  }
+  form.moveItem(rulesTick.getIndex(), start + 1 + headers.length);
+  return headers.length;
+}
+
 // ---------------------------------------------------------------------------
 // Updating the live form
 // ---------------------------------------------------------------------------
@@ -483,8 +735,13 @@ function addDisclaimerPage(form) {
  * orphan existing responses. If you change a question, do it in the Forms UI.
  */
 function updateExistingForm() {
-  var form = FormApp.openById(FORM_ID);
+  var form = openLiveForm();
   var changes = [];
+
+  // Page 1: event details, registration fee and eligibility.
+  form.setDescription(formDescription());
+  form.setConfirmationMessage(CONFIRMATION_MESSAGE);
+  changes.push('set the form description, including the registration fee');
 
   var pages = {};
   var breaks = form.getItems(FormApp.ItemType.PAGE_BREAK);
@@ -507,18 +764,23 @@ function updateExistingForm() {
   var u17DoublesPage = pages[PAGE.u17Doubles];
   if (!singlesPage || !u17DoublesPage) throw new Error('Under-17 pages not found.');
 
-  // Waiver page: add it only once.
-  var disclaimerPage = pages[PAGE.disclaimer];
+  // Rules and waiver page: add it only once, otherwise refresh its text in place.
+  var disclaimerPage = pages[PAGE.disclaimer] || pages[LEGACY_DISCLAIMER_TITLE];
+  var added = false;
   if (!disclaimerPage) {
     disclaimerPage = addDisclaimerPage(form);
-    changes.push('added the waiver page with ' + DISCLAIMER_CLAUSES.length + ' clauses');
-  } else {
-    changes.push('waiver page already present, left as is');
+    added = true;
+    changes.push('added the rules and waiver page');
   }
 
   // Forms puts Submit on whichever section is physically last, so the waiver has to be
   // there regardless of what the branch navigation says.
   if (ensureWaiverLast(form)) changes.push('moved the waiver to the end of the form');
+
+  if (!added) {
+    var count = syncRulesPage(form);
+    changes.push('rebuilt the rules page text (' + count + ' clauses) and its two ticks');
+  }
 
   // Re-read the page breaks AFTER any move: references captured earlier can point at
   // stale positions, and navigation set through them silently fails to stick.
@@ -561,6 +823,7 @@ function updateExistingForm() {
   // Three categories, with the adults pair combined.
   var categoryItem = findMultipleChoice(form, CATEGORY_QUESTION);
   if (!categoryItem) throw new Error('Category question not found — was it renamed?');
+  categoryItem.setHelpText(categoryHelpText());
   categoryItem.setChoices([
     categoryItem.createChoice(CATEGORIES[0].label, singlesPage),
     categoryItem.createChoice(CATEGORIES[1].label, u17DoublesPage),
@@ -568,8 +831,27 @@ function updateExistingForm() {
   ]);
   changes.push('category question now offers ' + CATEGORIES.length + ' options');
 
-  // Retro-fix: every declaration list should demand all of its boxes, not just one.
+  // The under-17 eligibility tick quotes the age cut-off; keep it matching the rules.
+  // Older responses keep the wording they ticked — the sheet stores the text, not an index.
   var checkboxes = form.getItems(FormApp.ItemType.CHECKBOX);
+  var retexted = 0;
+  for (var e = 0; e < checkboxes.length; e++) {
+    if (checkboxes[e].getTitle() !== 'Eligibility') continue;
+    var eligibility = checkboxes[e].asCheckboxItem();
+    var values = eligibility.getChoices().map(function (choice) { return choice.getValue(); });
+    var updated = values.map(function (value) {
+      return value.indexOf(U17_ELIGIBILITY_PREFIX) === 0
+        ? U17_ELIGIBILITY_PREFIX + EVENT.u17CutoffText + '.'
+        : value;
+    });
+    if (updated.join('\n') !== values.join('\n')) {
+      eligibility.setChoiceValues(updated);
+      retexted += 1;
+    }
+  }
+  if (retexted) changes.push('updated the age cut-off on ' + retexted + ' eligibility ticks');
+
+  // Retro-fix: every declaration list should demand all of its boxes, not just one.
   var fixed = 0;
   for (var c = 0; c < checkboxes.length; c++) {
     var box = checkboxes[c].asCheckboxItem();
@@ -579,6 +861,14 @@ function updateExistingForm() {
     }
   }
   changes.push('tightened ' + fixed + ' declaration lists to require every box');
+
+  // The block above re-offers all three categories; take the full ones back out.
+  try {
+    updateCategoryAvailability(form);
+    changes.push('re-applied the category caps from the response sheet');
+  } catch (err) {
+    changes.push('category caps NOT applied: ' + err.message);
+  }
 
   Logger.log('Updated ' + form.getPublishedUrl());
   for (var k = 0; k < changes.length; k++) Logger.log('  - ' + changes[k]);
@@ -636,12 +926,12 @@ function ensureWaiverLast(form) {
   // waiver as already last while Forms rendered it fourth of five. If the live form still
   // ends on an entry section after running this, move the waiver by hand in the editor.
   // Runnable on its own from the editor's dropdown, not just from updateExistingForm.
-  form = form || FormApp.openById(FORM_ID);
+  form = form || openLiveForm();
   var items = form.getItems();
   var start = -1;
   for (var i = 0; i < items.length; i++) {
     if (items[i].getType() === FormApp.ItemType.PAGE_BREAK &&
-        items[i].getTitle() === PAGE.disclaimer) {
+        isWaiverTitle(items[i].getTitle())) {
       start = i;
       break;
     }
@@ -684,7 +974,7 @@ function listRegistrationForms() {
     var hasWaiver = false;
     var waiverLast = false;
     for (var i = 0; i < breaks.length; i++) {
-      if (breaks[i].getTitle() === PAGE.disclaimer) {
+      if (isWaiverTitle(breaks[i].getTitle())) {
         hasWaiver = true;
         waiverLast = (i === breaks.length - 1);
       }
@@ -710,7 +1000,7 @@ function listRegistrationForms() {
  * means a respondent can finish without accepting the terms.
  */
 function verifyForm() {
-  var form = FormApp.openById(FORM_ID);
+  var form = openLiveForm();
   var problems = [];
 
   var breaks = form.getItems(FormApp.ItemType.PAGE_BREAK);
@@ -754,9 +1044,11 @@ function verifyForm() {
 
   // The waiver is worthless if its tick is optional or can be skipped.
   var agreement = null;
+  var rulesTick = null;
   var boxes = form.getItems(FormApp.ItemType.CHECKBOX);
   for (var k = 0; k < boxes.length; k++) {
     if (boxes[k].getTitle() === 'Agreement') agreement = boxes[k].asCheckboxItem();
+    if (boxes[k].getTitle() === RULES_TICK_TITLE) rulesTick = boxes[k].asCheckboxItem();
   }
   var lastBreak = breaks.length ? breaks[breaks.length - 1] : null;
   if (lastBreak && lastBreak.getTitle() !== PAGE.disclaimer) {
@@ -771,6 +1063,13 @@ function verifyForm() {
     problems.push('the waiver tick box is not required');
   } else {
     Logger.log('WAIVER: "Agreement" tick box present and required.');
+  }
+  if (!rulesTick) {
+    problems.push('the final page has no "' + RULES_TICK_TITLE + '" tick box');
+  } else if (!rulesTick.isRequired()) {
+    problems.push('the "' + RULES_TICK_TITLE + '" tick box is not required');
+  } else {
+    Logger.log('RULES: "' + RULES_TICK_TITLE + '" tick box present and required.');
   }
 
   Logger.log('');
@@ -787,77 +1086,283 @@ function verifyForm() {
 }
 
 // ---------------------------------------------------------------------------
-// Optional: close categories as they fill
+// Closing date
 // ---------------------------------------------------------------------------
 
 /**
- * Google Forms cannot cap responses on its own. Run this from a form-submit trigger and
- * a category disappears from the list once it is full, instead of taking entries you
- * cannot honour.
- *
- * To install, run installCapTrigger() ONCE with the form id.
+ * Forms has no built-in closing date. Run installCloseTrigger() ONCE and the form stops
+ * accepting responses at EVENT.closesAt. Re-running replaces the earlier trigger rather
+ * than stacking a second one.
  */
-function updateCategoryAvailability(formId) {
-  var form = FormApp.openById(formId || FORM_ID);
-  var counts = {};
+function installCloseTrigger() {
+  var triggers = ScriptApp.getProjectTriggers();
+  for (var i = 0; i < triggers.length; i++) {
+    if (triggers[i].getHandlerFunction() === 'closeRegistration') {
+      ScriptApp.deleteTrigger(triggers[i]);
+    }
+  }
+  ScriptApp.newTrigger('closeRegistration').timeBased().at(EVENT.closesAt).create();
+  Logger.log('Registration will close at ' + EVENT.closesAt.toString());
+}
 
+function closeRegistration() {
+  var form = openLiveForm();
+  form.setCustomClosedFormMessage(
+    'Registration for ' + EVENT.name + ' closed on ' + EVENT.closingDate + '. ' +
+    'Questions: ' + EVENT.contact
+  );
+  form.setAcceptingResponses(false);
+  Logger.log('Registration closed.');
+}
+
+// ---------------------------------------------------------------------------
+// Category caps, enforced against the response sheet
+// ---------------------------------------------------------------------------
+
+/**
+ * HOW IT WORKS
+ *
+ * The response sheet gets two columns the script manages, found by header so it does not
+ * matter where they sit or what Forms inserts beside them:
+ *
+ *   Status              Entered | Waitlist | Withdrawn
+ *   Status category     the category the Status was given for
+ *
+ * Every new submission is stamped Entered if its category has room, Waitlist if not. A
+ * category is offered on the form only while it has room AND nobody is waiting for it —
+ * a freed slot goes to the waitlist first, not to whoever opens the form next.
+ *
+ * WHAT THE ORGANISER DOES IN THE SHEET
+ *
+ *   Someone drops out or never pays   set their Status to Withdrawn
+ *   Promote someone off the waitlist  set their Status to Entered (earliest row first)
+ *   Change a cap                      edit CATEGORIES, paste, run updateExistingForm()
+ *
+ * Editing a Status cell re-checks the caps straight away, so a category reopens on its
+ * own once its slots are free and its waitlist is empty.
+ *
+ * Why a waitlist and not a hard stop: a respondent who loaded the form before the last
+ * slot went can still submit into it. Forms cannot reject that, so the overflow is
+ * caught here instead of silently taking an entry that cannot be honoured.
+ *
+ * SETUP: run installSheetTriggers() ONCE. It also stamps any existing responses.
+ */
+
+var STATUS = { entered: 'Entered', waitlist: 'Waitlist', withdrawn: 'Withdrawn' };
+var STATUS_HEADER = 'Status';
+var STATUS_CATEGORY_HEADER = 'Status category';
+
+function installSheetTriggers() {
+  var form = openLiveForm();
+  var sheet = responseSheet(form);
+  var spreadsheet = sheet.getParent();
+
+  // Replace, never stack: two submit triggers would stamp every entry twice.
+  var handlers = ['onEntrySubmitted', 'onStatusEdited'];
+  var triggers = ScriptApp.getProjectTriggers();
+  for (var i = 0; i < triggers.length; i++) {
+    if (handlers.indexOf(triggers[i].getHandlerFunction()) !== -1) {
+      ScriptApp.deleteTrigger(triggers[i]);
+    }
+  }
+  ScriptApp.newTrigger('onEntrySubmitted').forSpreadsheet(spreadsheet).onFormSubmit().create();
+  ScriptApp.newTrigger('onStatusEdited').forSpreadsheet(spreadsheet).onEdit().create();
+
+  var cols = statusColumns(sheet);
+  var lastRow = sheet.getLastRow();
+  for (var row = 2; row <= lastRow; row++) allocateRow(sheet, cols, row);
+
+  updateCategoryAvailability(form);
+  Logger.log('Triggers installed on ' + spreadsheet.getUrl());
+}
+
+/** Spreadsheet form-submit trigger. Also fires when a respondent edits their entry. */
+function onEntrySubmitted(e) {
+  withLock(function () {
+    var form = openLiveForm();
+    var sheet = e.range.getSheet();
+    allocateRow(sheet, statusColumns(sheet), e.range.getRow());
+    updateCategoryAvailability(form);
+  });
+}
+
+/** Spreadsheet edit trigger. Only a Status change can free or take a slot. */
+function onStatusEdited(e) {
+  var sheet = e.range.getSheet();
+  if (e.range.getRow() === 1 || sheet.getFormUrl() === null) return;
+  var cols = statusColumns(sheet);
+  if (e.range.getColumn() > cols.status || e.range.getLastColumn() < cols.status) return;
+  withLock(function () {
+    updateCategoryAvailability(openLiveForm());
+  });
+}
+
+/**
+ * Two entries landing in the same second would otherwise both count the same free slot,
+ * and the category would end one over its cap.
+ */
+function withLock(fn) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    fn();
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** The tab Forms writes to, inside the spreadsheet the form is linked to. */
+function responseSheet(form) {
+  var id;
+  try {
+    id = form.getDestinationId();
+  } catch (err) {
+    throw new Error('The form has no response sheet. In the form: Responses → Link to Sheets.');
+  }
+  var linked = SpreadsheetApp.openById(id).getSheets().filter(function (sheet) {
+    return sheet.getFormUrl() !== null;
+  });
+  if (linked.length === 1) return linked[0];
+  for (var i = 0; i < linked.length; i++) {
+    if (linked[i].getFormUrl().indexOf(form.getId()) !== -1) return linked[i];
+  }
+  throw new Error('Could not tell which tab holds this form’s responses.');
+}
+
+/** 1-based column numbers, adding the two managed columns on first use. */
+function statusColumns(sheet) {
+  var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  function find(header, create, note) {
+    var index = headers.indexOf(header);
+    if (index !== -1) return index + 1;
+    if (!create) throw new Error('Column "' + header + '" not found in the response sheet.');
+    headers.push(header);
+    sheet.getRange(1, headers.length).setValue(header).setNote(note);
+    return headers.length;
+  }
+  var cols = {
+    category: find(CATEGORY_QUESTION, false),
+    status: find(STATUS_HEADER, true,
+      'Entered = has a place. Waitlist = category was full when they submitted. ' +
+      'Withdrawn = set by hand when someone drops out or does not pay; frees the place.'),
+    statusCategory: find(STATUS_CATEGORY_HEADER, true,
+      'Managed by the script — do not edit. The category the Status was given for, so an ' +
+      'entrant who edits their response into another category is re-queued.'),
+  };
+  // Bookkeeping only; hidden so nobody mistakes it for something to fill in.
+  sheet.hideColumns(cols.statusCategory);
+  var validation = SpreadsheetApp.newDataValidation()
+    .requireValueInList([STATUS.entered, STATUS.waitlist, STATUS.withdrawn], true)
+    .build();
+  sheet.getRange(2, cols.status, sheet.getMaxRows() - 1, 1).setDataValidation(validation);
+  return cols;
+}
+
+/**
+ * Gives one row its Status. Rows already stamped keep it, unless the respondent edited
+ * their entry into a different category — then they queue for the new one like anyone.
+ */
+function allocateRow(sheet, cols, row) {
+  var values = sheet.getDataRange().getValues();
+  var current = values[row - 1];
+  var category = current[cols.category - 1];
+  var status = current[cols.status - 1];
+  if (!category || status === STATUS.withdrawn) return;
+  if (status && current[cols.statusCategory - 1] === category) return;
+
+  var cap = capFor(category);
+  var taken = 0;
+  for (var r = 1; r < values.length; r++) {
+    if (r === row - 1) continue;
+    if (values[r][cols.category - 1] === category &&
+        values[r][cols.status - 1] === STATUS.entered) taken += 1;
+  }
+  var result = cap === null || taken < cap ? STATUS.entered : STATUS.waitlist;
+  sheet.getRange(row, cols.status).setValue(result);
+  sheet.getRange(row, cols.statusCategory).setValue(category);
+}
+
+function capFor(label) {
+  for (var i = 0; i < CATEGORIES.length; i++) {
+    if (CATEGORIES[i].label === label) return CATEGORIES[i].cap;
+  }
+  return null; // A label from an older version of the form — not capped.
+}
+
+/**
+ * Offers each category only while it has room and no waitlist. Closes the form when all
+ * three are full, and reopens it if a slot frees before the closing date.
+ */
+function updateCategoryAvailability(form) {
+  form = form || openLiveForm();
   var categoryItem = findMultipleChoice(form, CATEGORY_QUESTION);
   if (!categoryItem) throw new Error('Category question not found — was it renamed?');
 
-  var responses = form.getResponses();
-  for (var r = 0; r < responses.length; r++) {
-    var answers = responses[r].getItemResponses();
-    for (var a = 0; a < answers.length; a++) {
-      if (answers[a].getItem().getTitle() === CATEGORY_QUESTION) {
-        var label = answers[a].getResponse();
-        counts[label] = (counts[label] || 0) + 1;
-      }
+  var sheet = responseSheet(form);
+  var cols = statusColumns(sheet);
+
+  // Stamp any row still without a Status — entries from before installSheetTriggers(), or
+  // one a trigger missed. Unstamped rows would otherwise not count against the cap.
+  var values = sheet.getDataRange().getValues();
+  var stamped = 0;
+  for (var u = 1; u < values.length; u++) {
+    if (values[u][cols.category - 1] && !values[u][cols.status - 1]) {
+      allocateRow(sheet, cols, u + 1);
+      stamped += 1;
     }
+  }
+  if (stamped) {
+    Logger.log('Gave a Status to ' + stamped + ' entries that had none.');
+    values = sheet.getDataRange().getValues();
+  }
+
+  var tally = {};
+  for (var r = 1; r < values.length; r++) {
+    var label = values[r][cols.category - 1];
+    var status = values[r][cols.status - 1];
+    tally[label] = tally[label] || { entered: 0, waitlist: 0 };
+    if (status === STATUS.entered) tally[label].entered += 1;
+    if (status === STATUS.waitlist) tally[label].waitlist += 1;
   }
 
   // Page breaks are matched by title so the navigation survives a rebuild.
-  var pages = form.getItems(FormApp.ItemType.PAGE_BREAK);
-  function pageByTitlePrefix(prefix) {
-    for (var p = 0; p < pages.length; p++) {
-      if (pages[p].getTitle().indexOf(prefix) === 0) return pages[p].asPageBreakItem();
-    }
-    return null;
-  }
   var targets = {
-    'U17_SINGLES': pageByTitlePrefix('Under-17 Singles'),
-    'U17_DOUBLES': pageByTitlePrefix('Under-17 Doubles'),
-    'ADULT_OPEN': pageByTitlePrefix('Adults Open'),
+    'U17_SINGLES': PAGE.singles,
+    'U17_DOUBLES': PAGE.u17Doubles,
+    'ADULT_OPEN': PAGE.adults,
   };
+  var pages = {};
+  var breaks = form.getItems(FormApp.ItemType.PAGE_BREAK);
+  for (var p = 0; p < breaks.length; p++) pages[breaks[p].getTitle()] = breaks[p].asPageBreakItem();
 
   var choices = [];
-  var closed = [];
+  var full = [];
+  var report = [];
   for (var c = 0; c < CATEGORIES.length; c++) {
     var cat = CATEGORIES[c];
-    var used = counts[cat.label] || 0;
-    if (used >= cat.cap) {
-      closed.push(cat.label + ' (' + used + '/' + cat.cap + ' ' + cat.unit + ')');
+    var count = tally[cat.label] || { entered: 0, waitlist: 0 };
+    report.push(cat.label + ': ' + count.entered + '/' + cat.cap + ' ' + cat.unit +
+                (count.waitlist ? ', ' + count.waitlist + ' waiting' : ''));
+    if (count.entered >= cat.cap || count.waitlist > 0) {
+      full.push(cat.label);
       continue;
     }
-    choices.push(categoryItem.createChoice(cat.label, targets[cat.key]));
+    choices.push(categoryItem.createChoice(cat.label, pages[targets[cat.key]]));
   }
 
+  categoryItem.setHelpText(categoryHelpText(full));
   if (choices.length === 0) {
+    form.setCustomClosedFormMessage(
+      'Every category of ' + EVENT.name + ' is full. Questions: ' + EVENT.contact
+    );
     form.setAcceptingResponses(false);
-    Logger.log('Every category is full — the form is now closed.');
-    return;
+  } else {
+    // setChoices rejects an empty list, which is why the all-full case leaves them be.
+    categoryItem.setChoices(choices);
+    if (!form.isAcceptingResponses() && new Date() < EVENT.closesAt) {
+      form.setAcceptingResponses(true);
+    }
   }
-
-  categoryItem.setChoices(choices);
-  Logger.log('Open: ' + choices.length + ' categories. Closed: ' + (closed.join(', ') || 'none'));
-}
-
-/** Run once. Paste the form id from its edit URL (.../forms/d/<ID>/edit). */
-function installCapTrigger() {
-  var FORM_ID = 'PASTE_FORM_ID_HERE';
-  ScriptApp.newTrigger('onEntrySubmitted').forForm(FORM_ID).onFormSubmit().create();
-  Logger.log('Trigger installed for form ' + FORM_ID);
-}
-
-function onEntrySubmitted(e) {
-  updateCategoryAvailability(e.source.getId());
+  for (var k = 0; k < report.length; k++) Logger.log('  ' + report[k]);
+  Logger.log(choices.length + ' of ' + CATEGORIES.length + ' categories open.');
 }

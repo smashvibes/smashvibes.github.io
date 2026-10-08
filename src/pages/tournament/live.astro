@@ -3,13 +3,24 @@ import '../../styles/tournament.css';
 import Base from '../../layouts/Base.astro';
 import NavBar from '../../components/NavBar.astro';
 import TournamentFooter from '../../components/TournamentFooter.astro';
-import Button from '../../components/Button.astro';
-import Icon from '../../components/Icon.astro';
-import { backToMain, live, REGISTER_URL, tournament, tournamentNav } from '../../data/tournament';
+import DrawToolbar from '../../components/DrawToolbar.astro';
+import { backToMain, draws, live, REGISTER_URL, tournament, tournamentNav } from '../../data/tournament';
+import { DRAWS_FEED_URL, drawsData, eventView } from '../../data/draws';
+import { formatUpdated } from '../../data/draws-engine';
+import { renderLive } from '../../data/draws-render';
 
 const title = `Live | ${tournament.name} 2026`;
 const description =
   'Live scores and results for the StarRise Cup 2026 badminton tournament, published on match day, 14 November 2026.';
+
+const DRAWS_HREF = '/tournament/draws/';
+
+/** One board per category, from the same snapshot and feed as the draws page. */
+const boards = draws.items.map((draw) => {
+  const view = eventView(draw.id);
+  return { ...draw, html: view ? renderLive(view, draw.label, DRAWS_HREF) : '' };
+});
+const updated = formatUpdated(drawsData.updatedAt);
 ---
 <Base title={title} description={description}>
   <div class="sv-tr-page">
@@ -24,19 +35,27 @@ const description =
       />
     </header>
 
-    <main id="main" class="sv-tr-live sv-root">
-      <div class="sv-container sv-tr-live-inner">
-        <span class="sv-tr-live-mark"><Icon name="chart" size={34} /></span>
+    <main id="main" class="sv-dr sv-lv sv-root" data-draws-feed={DRAWS_FEED_URL}>
+      <div class="sv-container">
         <h1 class="sv-dr-title">{live.title}</h1>
-        <p class="sv-tr-live-lede">{live.lede}</p>
-        <p class="sv-tr-live-body">{live.body}</p>
-        <div class="sv-tr-live-actions">
-          <Button variant="primary" arrow href="/tournament/draws/">View the draws</Button>
-          <Button variant="outline" href="/tournament/">Tournament details</Button>
-        </div>
+        <p class="sv-dr-note">{live.note}</p>
+        <DrawToolbar updated={updated} />
+
+        {boards.map((board) => (
+          <div
+            data-dr-view="live"
+            data-dr-event={board.id}
+            data-dr-label={board.label}
+            data-dr-href={DRAWS_HREF}
+            set:html={board.html}
+          />
+        ))}
       </div>
     </main>
 
     <TournamentFooter />
   </div>
 </Base>
+
+<script src="../../scripts/draws-live.ts"></script>
+<script src="../../scripts/tv-mode.ts"></script>

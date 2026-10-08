@@ -1,0 +1,992 @@
+{
+  "updatedAt": "2026-10-08T01:55:06.614Z",
+  "events": {
+    "u17-singles": {
+      "groups": [
+        {
+          "name": "A",
+          "players": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "matches": [
+            {
+              "no": 1,
+              "court": "1",
+              "time": "10:30 AM",
+              "a": 1,
+              "b": 2,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 2,
+              "court": "1",
+              "time": "10:45 AM",
+              "a": 3,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 3,
+              "court": "1",
+              "time": "11:00 AM",
+              "a": 1,
+              "b": 3,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 4,
+              "court": "1",
+              "time": "11:15 AM",
+              "a": 2,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 5,
+              "court": "1",
+              "time": "11:30 AM",
+              "a": 1,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 6,
+              "court": "1",
+              "time": "11:45 AM",
+              "a": 2,
+              "b": 3,
+              "score": "",
+              "status": ""
+            }
+          ]
+        },
+        {
+          "name": "B",
+          "players": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "matches": [
+            {
+              "no": 1,
+              "court": "2",
+              "time": "10:30 AM",
+              "a": 1,
+              "b": 2,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 2,
+              "court": "2",
+              "time": "10:45 AM",
+              "a": 3,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 3,
+              "court": "2",
+              "time": "11:00 AM",
+              "a": 1,
+              "b": 3,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 4,
+              "court": "2",
+              "time": "11:15 AM",
+              "a": 2,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 5,
+              "court": "2",
+              "time": "11:30 AM",
+              "a": 1,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 6,
+              "court": "2",
+              "time": "11:45 AM",
+              "a": 2,
+              "b": 3,
+              "score": "",
+              "status": ""
+            }
+          ]
+        },
+        {
+          "name": "C",
+          "players": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "matches": [
+            {
+              "no": 1,
+              "court": "3",
+              "time": "10:30 AM",
+              "a": 1,
+              "b": 2,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 2,
+              "court": "3",
+              "time": "10:45 AM",
+              "a": 3,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 3,
+              "court": "3",
+              "time": "11:00 AM",
+              "a": 1,
+              "b": 3,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 4,
+              "court": "3",
+              "time": "11:15 AM",
+              "a": 2,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 5,
+              "court": "3",
+              "time": "11:30 AM",
+              "a": 1,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 6,
+              "court": "3",
+              "time": "11:45 AM",
+              "a": 2,
+              "b": 3,
+              "score": "",
+              "status": ""
+            }
+          ]
+        },
+        {
+          "name": "D",
+          "players": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "matches": [
+            {
+              "no": 1,
+              "court": "4",
+              "time": "10:30 AM",
+              "a": 1,
+              "b": 2,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 2,
+              "court": "4",
+              "time": "10:45 AM",
+              "a": 3,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 3,
+              "court": "4",
+              "time": "11:00 AM",
+              "a": 1,
+              "b": 3,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 4,
+              "court": "4",
+              "time": "11:15 AM",
+              "a": 2,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 5,
+              "court": "4",
+              "time": "11:30 AM",
+              "a": 1,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 6,
+              "court": "4",
+              "time": "11:45 AM",
+              "a": 2,
+              "b": 3,
+              "score": "",
+              "status": ""
+            }
+          ]
+        }
+      ],
+      "knockout": [
+        {
+          "id": "QF1",
+          "court": "1",
+          "time": "3:00 PM",
+          "a": "1st Group A",
+          "b": "2nd Group B",
+          "score": "",
+          "status": ""
+        },
+        {
+          "id": "QF2",
+          "court": "2",
+          "time": "3:00 PM",
+          "a": "1st Group C",
+          "b": "2nd Group D",
+          "score": "",
+          "status": ""
+        },
+        {
+          "id": "QF3",
+          "court": "3",
+          "time": "3:00 PM",
+          "a": "1st Group B",
+          "b": "2nd Group A",
+          "score": "",
+          "status": ""
+        },
+        {
+          "id": "QF4",
+          "court": "4",
+          "time": "3:00 PM",
+          "a": "1st Group D",
+          "b": "2nd Group C",
+          "score": "",
+          "status": ""
+        },
+        {
+          "id": "SF1",
+          "court": "1",
+          "time": "3:45 PM",
+          "a": "Winner QF 1",
+          "b": "Winner QF 2",
+          "score": "",
+          "status": ""
+        },
+        {
+          "id": "SF2",
+          "court": "2",
+          "time": "3:45 PM",
+          "a": "Winner QF 3",
+          "b": "Winner QF 4",
+          "score": "",
+          "status": ""
+        },
+        {
+          "id": "F",
+          "court": "3",
+          "time": "4:15 PM",
+          "a": "Winner SF 1",
+          "b": "Winner SF 2",
+          "score": "",
+          "status": ""
+        }
+      ]
+    },
+    "u17-doubles": {
+      "groups": [
+        {
+          "name": "A",
+          "players": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "matches": [
+            {
+              "no": 1,
+              "court": "1",
+              "time": "12:00 PM",
+              "a": 1,
+              "b": 2,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 2,
+              "court": "1",
+              "time": "12:15 PM",
+              "a": 3,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 3,
+              "court": "1",
+              "time": "12:30 PM",
+              "a": 1,
+              "b": 3,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 4,
+              "court": "1",
+              "time": "12:45 PM",
+              "a": 2,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 5,
+              "court": "1",
+              "time": "1:00 PM",
+              "a": 1,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 6,
+              "court": "1",
+              "time": "1:15 PM",
+              "a": 2,
+              "b": 3,
+              "score": "",
+              "status": ""
+            }
+          ]
+        },
+        {
+          "name": "B",
+          "players": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "matches": [
+            {
+              "no": 1,
+              "court": "2",
+              "time": "12:00 PM",
+              "a": 1,
+              "b": 2,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 2,
+              "court": "2",
+              "time": "12:15 PM",
+              "a": 3,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 3,
+              "court": "2",
+              "time": "12:30 PM",
+              "a": 1,
+              "b": 3,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 4,
+              "court": "2",
+              "time": "12:45 PM",
+              "a": 2,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 5,
+              "court": "2",
+              "time": "1:00 PM",
+              "a": 1,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 6,
+              "court": "2",
+              "time": "1:15 PM",
+              "a": 2,
+              "b": 3,
+              "score": "",
+              "status": ""
+            }
+          ]
+        },
+        {
+          "name": "C",
+          "players": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "matches": [
+            {
+              "no": 1,
+              "court": "3",
+              "time": "12:00 PM",
+              "a": 1,
+              "b": 2,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 2,
+              "court": "3",
+              "time": "12:15 PM",
+              "a": 3,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 3,
+              "court": "3",
+              "time": "12:30 PM",
+              "a": 1,
+              "b": 3,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 4,
+              "court": "3",
+              "time": "12:45 PM",
+              "a": 2,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 5,
+              "court": "3",
+              "time": "1:00 PM",
+              "a": 1,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 6,
+              "court": "3",
+              "time": "1:15 PM",
+              "a": 2,
+              "b": 3,
+              "score": "",
+              "status": ""
+            }
+          ]
+        },
+        {
+          "name": "D",
+          "players": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "matches": [
+            {
+              "no": 1,
+              "court": "4",
+              "time": "12:00 PM",
+              "a": 1,
+              "b": 2,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 2,
+              "court": "4",
+              "time": "12:15 PM",
+              "a": 3,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 3,
+              "court": "4",
+              "time": "12:30 PM",
+              "a": 1,
+              "b": 3,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 4,
+              "court": "4",
+              "time": "12:45 PM",
+              "a": 2,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 5,
+              "court": "4",
+              "time": "1:00 PM",
+              "a": 1,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 6,
+              "court": "4",
+              "time": "1:15 PM",
+              "a": 2,
+              "b": 3,
+              "score": "",
+              "status": ""
+            }
+          ]
+        }
+      ],
+      "knockout": [
+        {
+          "id": "QF1",
+          "court": "1",
+          "time": "3:15 PM",
+          "a": "1st Group A",
+          "b": "2nd Group B",
+          "score": "",
+          "status": ""
+        },
+        {
+          "id": "QF2",
+          "court": "2",
+          "time": "3:15 PM",
+          "a": "1st Group C",
+          "b": "2nd Group D",
+          "score": "",
+          "status": ""
+        },
+        {
+          "id": "QF3",
+          "court": "3",
+          "time": "3:15 PM",
+          "a": "1st Group B",
+          "b": "2nd Group A",
+          "score": "",
+          "status": ""
+        },
+        {
+          "id": "QF4",
+          "court": "4",
+          "time": "3:15 PM",
+          "a": "1st Group D",
+          "b": "2nd Group C",
+          "score": "",
+          "status": ""
+        },
+        {
+          "id": "SF1",
+          "court": "3",
+          "time": "3:45 PM",
+          "a": "Winner QF 1",
+          "b": "Winner QF 2",
+          "score": "",
+          "status": ""
+        },
+        {
+          "id": "SF2",
+          "court": "4",
+          "time": "3:45 PM",
+          "a": "Winner QF 3",
+          "b": "Winner QF 4",
+          "score": "",
+          "status": ""
+        },
+        {
+          "id": "F",
+          "court": "4",
+          "time": "4:15 PM",
+          "a": "Winner SF 1",
+          "b": "Winner SF 2",
+          "score": "",
+          "status": ""
+        }
+      ]
+    },
+    "open-doubles": {
+      "groups": [
+        {
+          "name": "A",
+          "players": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "matches": [
+            {
+              "no": 1,
+              "court": "1",
+              "time": "1:30 PM",
+              "a": 1,
+              "b": 2,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 2,
+              "court": "1",
+              "time": "1:45 PM",
+              "a": 3,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 3,
+              "court": "1",
+              "time": "2:00 PM",
+              "a": 1,
+              "b": 3,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 4,
+              "court": "1",
+              "time": "2:15 PM",
+              "a": 2,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 5,
+              "court": "1",
+              "time": "2:30 PM",
+              "a": 1,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 6,
+              "court": "1",
+              "time": "2:45 PM",
+              "a": 2,
+              "b": 3,
+              "score": "",
+              "status": ""
+            }
+          ]
+        },
+        {
+          "name": "B",
+          "players": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "matches": [
+            {
+              "no": 1,
+              "court": "2",
+              "time": "1:30 PM",
+              "a": 1,
+              "b": 2,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 2,
+              "court": "2",
+              "time": "1:45 PM",
+              "a": 3,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 3,
+              "court": "2",
+              "time": "2:00 PM",
+              "a": 1,
+              "b": 3,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 4,
+              "court": "2",
+              "time": "2:15 PM",
+              "a": 2,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 5,
+              "court": "2",
+              "time": "2:30 PM",
+              "a": 1,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 6,
+              "court": "2",
+              "time": "2:45 PM",
+              "a": 2,
+              "b": 3,
+              "score": "",
+              "status": ""
+            }
+          ]
+        },
+        {
+          "name": "C",
+          "players": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "matches": [
+            {
+              "no": 1,
+              "court": "3",
+              "time": "1:30 PM",
+              "a": 1,
+              "b": 2,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 2,
+              "court": "3",
+              "time": "1:45 PM",
+              "a": 3,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 3,
+              "court": "3",
+              "time": "2:00 PM",
+              "a": 1,
+              "b": 3,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 4,
+              "court": "3",
+              "time": "2:15 PM",
+              "a": 2,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 5,
+              "court": "3",
+              "time": "2:30 PM",
+              "a": 1,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 6,
+              "court": "3",
+              "time": "2:45 PM",
+              "a": 2,
+              "b": 3,
+              "score": "",
+              "status": ""
+            }
+          ]
+        },
+        {
+          "name": "D",
+          "players": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "matches": [
+            {
+              "no": 1,
+              "court": "4",
+              "time": "1:30 PM",
+              "a": 1,
+              "b": 2,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 2,
+              "court": "4",
+              "time": "1:45 PM",
+              "a": 3,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 3,
+              "court": "4",
+              "time": "2:00 PM",
+              "a": 1,
+              "b": 3,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 4,
+              "court": "4",
+              "time": "2:15 PM",
+              "a": 2,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 5,
+              "court": "4",
+              "time": "2:30 PM",
+              "a": 1,
+              "b": 4,
+              "score": "",
+              "status": ""
+            },
+            {
+              "no": 6,
+              "court": "4",
+              "time": "2:45 PM",
+              "a": 2,
+              "b": 3,
+              "score": "",
+              "status": ""
+            }
+          ]
+        }
+      ],
+      "knockout": [
+        {
+          "id": "QF1",
+          "court": "1",
+          "time": "3:30 PM",
+          "a": "1st Group A",
+          "b": "2nd Group B",
+          "score": "",
+          "status": ""
+        },
+        {
+          "id": "QF2",
+          "court": "2",
+          "time": "3:30 PM",
+          "a": "1st Group C",
+          "b": "2nd Group D",
+          "score": "",
+          "status": ""
+        },
+        {
+          "id": "QF3",
+          "court": "3",
+          "time": "3:30 PM",
+          "a": "1st Group B",
+          "b": "2nd Group A",
+          "score": "",
+          "status": ""
+        },
+        {
+          "id": "QF4",
+          "court": "4",
+          "time": "3:30 PM",
+          "a": "1st Group D",
+          "b": "2nd Group C",
+          "score": "",
+          "status": ""
+        },
+        {
+          "id": "SF1",
+          "court": "1",
+          "time": "4:15 PM",
+          "a": "Winner QF 1",
+          "b": "Winner QF 2",
+          "score": "",
+          "status": ""
+        },
+        {
+          "id": "SF2",
+          "court": "2",
+          "time": "4:15 PM",
+          "a": "Winner QF 3",
+          "b": "Winner QF 4",
+          "score": "",
+          "status": ""
+        },
+        {
+          "id": "F",
+          "court": "1",
+          "time": "4:45 PM",
+          "a": "Winner SF 1",
+          "b": "Winner SF 2",
+          "score": "",
+          "status": ""
+        }
+      ]
+    }
+  }
+}

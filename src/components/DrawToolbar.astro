@@ -1,0 +1,33 @@
+---
+/**
+ * The line under the page title on the draws and live pages: a note, the "last updated"
+ * stamp the match-day script keeps current, the legend for the state pills, and the TV
+ * mode button (src/scripts/tv-mode.ts). In TV mode the note is hidden and the rest stays
+ * as a compact status bar.
+ */
+import { draws } from '../data/tournament';
+
+interface Props {
+  note?: string;
+  updated: string;
+}
+const { note, updated } = Astro.props;
+---
+<div class="sv-dr-toolbar">
+  {note && <p class="sv-dr-toolbar-note">{note}</p>}
+  <p class="sv-dr-stamp" hidden={!updated}>{draws.updatedLabel} <span data-dr-updated>{updated}</span></p>
+  <ul class="sv-dr-legend" aria-label="Match states">
+    <li><span class="sv-dr-status is-live">{draws.legend.live}</span></li>
+    <li><span class="sv-dr-status is-done">{draws.legend.done}</span></li>
+    <li><span class="sv-dr-status is-upcoming">{draws.legend.upcoming}</span></li>
+  </ul>
+  <button
+    type="button"
+    class="sv-dr-tv"
+    data-tv-toggle
+    data-tv-enter={draws.tv.enter}
+    data-tv-exit={draws.tv.exit}
+    title={draws.tv.hint}
+    aria-pressed="false"
+  >{draws.tv.enter}</button>
+</div>

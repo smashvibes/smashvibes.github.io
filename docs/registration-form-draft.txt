@@ -20,10 +20,21 @@ FORM DESCRIPTION (shown at the top)
 -------------------------------------------------------------------------------
 
 StarRise Cup 2026
-14 November 2026 (Saturday), 10:00 AM - 3:00 PM
+14 November 2026 (Saturday), 10:00 AM - 5:00 PM
 SBH VIP Hall @ Sims, 1 Lorong 23 Geylang, Singapore 388352
 
-One submission per entry. Doubles pairs submit ONCE, with both players listed.
+Registration closes: 7 November 2026 (Saturday)
+
+REGISTRATION FEE
+- Under-17 Singles: $50 per player
+- Under-17 Doubles: $80 per pair
+- Adults Open - Men's / Mixed Doubles: $80 per pair
+
+PAYMENT: PayNow to 8088 6684
+MUHAMXXX DANXXX BIX MOHAXXX AIZXX (Muhammad Danial bin Mohamed Aizam)
+
+One submission per entry. Doubles pairs submit ONCE, with both players listed -
+the pair fee covers both.
 Questions: WhatsApp 9683 4290
 
 
@@ -34,10 +45,12 @@ SECTION 1 - CATEGORY (everyone sees this)
 Q1. Which category are you entering?   [REQUIRED - pick one]
 
     Help text:
-      Under-17: born on or after 15 November 2009 (i.e. under 17 on the event
-      date).
+      Under-17: 17 years old or below on 14 November 2026 (born on or after
+      15 November 2008).
       Adults: open to social and recreational players. National- and state-level
       players are not eligible.
+
+      Fee: Singles $50 per player - Doubles $80 per pair.
 
     Options:
       ( ) Under-17 Singles                     -> goes to SECTION 2
@@ -89,8 +102,8 @@ Q10. Parent / guardian - relationship to player                  [REQUIRED]
 --- Declarations ---
 
 Q11. Eligibility   [REQUIRED - must tick both]
-     [ ] I confirm every player listed is born on or after 15 November 2009
-         (i.e. under 17 on the event date).
+     [ ] I confirm every player listed is 17 years old or below on
+         14 November 2026 (born on or after 15 November 2008).
      [ ] I confirm no player listed is a current Junior National player, or
          represents any country in any form.
 
@@ -175,32 +188,35 @@ together; a Mixed pair is one man and one woman.
 
 
 ===============================================================================
-SECTION 5 - DISCLAIMER, ASSUMPTION OF RISK AND WAIVER (everyone sees this)
+SECTION 5 - RULES & REGULATIONS, DISCLAIMER AND WAIVER (everyone sees this)
 ===============================================================================
 
 Every entrant finishes here, whichever category they chose. One copy of the
-legal text, shown last, with one box that must be ticked to submit.
+organiser's Rules & Regulations (as of 6 Oct 26), shown last, with two boxes
+that must both be ticked to submit.
 
 Intro:
-  By registering for and/or participating in the badminton tournament
-  ("Tournament"), each participant acknowledges and agrees to the following
-  terms.
+  Please read the Star Rise Cup 2026 Rules & Regulations (as of 6 Oct 26)
+  below. Both boxes at the bottom must be ticked to submit your entry.
 
-Then seven numbered clauses, reproduced verbatim from the organiser:
+Then the full Rules & Regulations, reproduced verbatim from the organiser:
 
-  1. Injury or Death
-  2. Loss or Damage to Property
-  3. Medical Assistance
-  4. Compliance with Rules
-  5. Responsibility for Minors
-  6. Release and Waiver
-  7. No Exclusion of Non-Excludable Liability
+  1. Title                      6. Tournament System (6.1 - 6.10)
+  2. Organisers                 7. Prizes
+  3. Venue                      8. First Aid & Medical Coverage
+  4. Tournament Rules           9. Disclaimer, Assumption of Risk and Waiver
+  5. Official Registration         (9.1 - 9.7)
+                               10. Interpretation Clause
 
-Closing line:
-  By registering for or participating in the Tournament, the participant
-  confirms that he or she has read, understood and agreed to the above terms.
+  (The PDF numbers the first sub-clause of 10 as "8.1"; the form shows 10.1.)
+
+RULES & REGULATIONS   [REQUIRED - must tick]
+  [ ] I have read, understood and agree to the Star Rise Cup 2026 Rules &
+      Regulations (as of 6 Oct 26) above.
 
 AGREEMENT   [REQUIRED - must tick]
+  Help: By registering for or participating in the Tournament, the participant
+  confirms that he or she has read, understood and agreed to the above terms.
   [ ] I have read, understood and agree to the Disclaimer, Assumption of Risk
       and Waiver above. Where the participant is under 18, I confirm I am the
       parent or legal guardian and agree on the participant's behalf.
@@ -209,11 +225,24 @@ AGREEMENT   [REQUIRED - must tick]
 
 
 ===============================================================================
+CATEGORY CAPS AND WAITLIST (response sheet)
+===============================================================================
+
+The response sheet has a Status column: Entered / Waitlist / Withdrawn.
+- Each new entry is Entered if its category has room, otherwise Waitlist.
+- A full category disappears from Q1 and is listed as FULL in its help text.
+- Someone drops out or does not pay: set them to Withdrawn.
+- Promote from the waitlist: set them to Entered (earliest first).
+- A category reopens on the form only when it has room AND nobody is waiting.
+
+===============================================================================
 CONFIRMATION MESSAGE (shown after submitting)
 ===============================================================================
 
 Thanks - your entry is in. We will confirm your slot by WhatsApp before the
-event. If your plans change, tell us early so the slot can go to another player.
+event. If your category filled up while you were registering, you will be
+placed on the waitlist and we will tell you. If your plans change, tell us
+early so the slot can go to another player.
 
 
 ===============================================================================
@@ -222,7 +251,7 @@ ENTRY CAPS
 
     Under-17 Singles                      16 entries
     Under-17 Doubles                      16 pairs
-    Adults Open - Men's / Mixed Doubles   10 pairs (2 groups of 5)
+    Adults Open - Men's / Mixed Doubles   16 pairs (4 groups of 4)
 
 Google Forms cannot limit responses by itself. A script removes a category from
 the list the moment it fills, so we never take an entry we cannot honour.
@@ -258,17 +287,16 @@ THREE THINGS WE CHANGED FROM THE ORIGINAL FIELD LIST
 FIVE OPEN QUESTIONS - WE NEED DECISIONS
 ===============================================================================
 
-1. AGE CUT-OFF. We have set "under 17 on the event date" = born on or after
-   15 November 2009. The other common rule is "under 17 as at 1 January 2026".
-   These give different eligibility lists. Which one?
+1. (DECIDED) AGE CUT-OFF. Rules & Regulations clause 5.1: 17 years old and
+   below as of 14 Nov 26 = born on or after 15 November 2008.
 
-2. ENTRY FEE. The tournament page does not mention one. If there is a fee, the
-   form needs a payment step and a "payment made" question, and the flow
-   changes. Is entry free?
+2. (PARTLY DECIDED) ENTRY FEE. Singles $50 per player, Doubles $80 per pair,
+   PayNow to 8088 6684, all shown on page 1. Registration closes 7 Nov 2026.
+   STILL OPEN: should the form collect a payment reference or screenshot?
 
-3. (DECIDED) Men's and Mixed Doubles are one combined entry category of 10
-   pairs. NOTE: the website's Draws page still shows them as two separate
-   draws - someone needs to say whether the DRAW is also combined.
+3. (DECIDED) Men's and Mixed Doubles are one combined entry category of 16
+   pairs, and the DRAW is combined too: one "Open Doubles" draw of four
+   groups of four, then a knockout (organiser's draws, 6 Oct 26).
 
 4. U17 SINGLES - ONE DRAW OR TWO? The prize list shows a single "Singles
    Under 17" prize, but we collect gender. Is it one open draw of 16, or

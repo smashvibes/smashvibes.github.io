@@ -3,8 +3,10 @@
 Published at **https://www.smashvibes.sg** (custom domain, see `public/CNAME`).
 
 The Smash Vibes one-pager — a static site built with [Astro](https://astro.build) and
-deployed to GitHub Pages. **The build ships zero JavaScript**: every component renders
-to HTML at build time, and the mobile menu is a CSS-only disclosure.
+deployed to GitHub Pages. **The build ships zero JavaScript** on every page except the
+two tournament scoreboards: every component renders to HTML at build time, and the
+mobile menu is a CSS-only disclosure. The draws and live pages carry one small script
+that re-fetches the organiser's sheet on match day (see [Draws](#draws)).
 
 ## Quick start
 
@@ -23,6 +25,10 @@ npm run preview  # serve dist/ locally
 | `src/pages/index.astro` | Section order for the homepage, plus its JSON-LD. |
 | `src/pages/tournament.astro` | The StarRise Cup event page (`/tournament/`), plus `SportsEvent` JSON-LD. |
 | `src/data/tournament.ts` | **All StarRise Cup copy, links and imagery.** |
+| `src/data/draws.json` | **Snapshot of the draws sheet** — names, courts, times, scores. Written by `npm run draws:pull`; do not hand-edit. |
+| `src/data/draws-engine.ts` | Reshapes the snapshot for rendering. Computes nothing: the desk types scores, statuses and the knockout line-up. Runs at build and in the browser. |
+| `src/data/draws-render.ts` | HTML for the groups, bracket and live board, from the engine's view. |
+| `scripts/draws-sheet.gs` | Apps Script that builds the organiser's Google Sheet and serves it as JSON. |
 | `src/styles/tournament.css` | Tournament layout. `sv-tr-` prefixed so it cannot collide with the homepage. |
 | `src/components/` | Design-system components ported to `.astro`, plus page-specific compositions. |
 | `src/design-system/site-icons.json` | Marks the design system does not ship — currently the WhatsApp logo. |
@@ -121,8 +127,8 @@ no JavaScript at all.
 | --- | --- |
 | `/` | The Smash Vibes homepage. |
 | `/tournament/` | StarRise Cup — the event page, linked from the main nav as "Tournaments". |
-| `/tournament/draws/` | Draws: a tabbed bracket and group tables, linked from the tournament nav. |
-| `/tournament/live/` | Live scores — a placeholder until match day. Fill it in from `live` in `src/data/tournament.ts`. |
+| `/tournament/draws/` | Draws: one tab per category, each with a round-robin fixture list and a knockout bracket. |
+| `/tournament/live/` | Live scoreboard: per category, matches in progress, up next and latest results. Same data as the draws. |
 
 The tournament page is a separate event brand run in collaboration with Smash Vibes, so
 it keeps its own wordmark and navigation but is built entirely from the Smash Vibes
@@ -148,9 +154,82 @@ Two things about that file are load-bearing. Astro emits it **before** `tokens.c
 
 ### Draws
 
-`/tournament/draws/` uses CSS-only radio tabs (**still zero JavaScript**) over two panel
-types: a knockout bracket and round-robin group tables, chosen per draw in
-`src/data/tournament.ts`.
+`/tournament/draws/` uses CSS-only radio tabs: one tab per draw, and inside each draw a
+second pair of tabs for its two stages, **Round Robin** and **Knockout Draw**. Every
+category runs the same shape — four groups of four, top two through to the quarter
+finals. Which draws exist is declared in `draws` in `src/data/tournament.ts`; what is in
+them comes from the organiser's Google Sheet.
+
+#### The sheet is the admin panel
+
+There is no login to build. The match desk types names, courts, times, scores and the
+knockout line-up into a Google Sheet; whoever can edit the
+sheet is the admin, and nobody else can change anything. `scripts/draws-sheet.gs` creates that sheet and, deployed as a web app, serves
+it as JSON. The site reads it in two ways:
+
+1. **At build time**, from `src/data/draws.json`. `npm run draws:pull` fetches the feed
+   and overwrites the snapshot; commit it and the deploy carries the latest names and
+   times as static HTML. `npm run draws:template` writes the empty structure instead.
+2. **In the browser**, on match day. `src/scripts/draws-live.ts` re-fetches the feed
+   every 45 seconds while the tab is visible and re-renders the groups, bracket and live
+   board in place. It only runs when `src/data/draws-feed.json` has a URL, and a failed
+   fetch leaves the last good render up.
+
+Both paths go through the same engine and renderer (`draws-engine.ts`,
+`draws-render.ts`), so a live refresh cannot disagree with the page as built.
+
+#### On the hall TV
+
+The draws page is shown on a TV on the day, so match state has to read from across a
+hall: a live match is a warm row with a gold edge and a pulsing **LIVE** pill, a
+finished one a green **DONE** tick with its score set white on navy, an upcoming one
+plain. The legend sits in the toolbar under the title.
+
+**TV mode** (the toolbar button, or open the page with `?tv`) hides the site chrome,
+folds the title, draw tabs and toolbar into one header row, and scales the board up
+with `zoom: 1.3`, so a 1920×1080 screen lays out as 1477×831 and all four groups of a
+draw fit without scrolling. Fixture rows there keep names on one line, sharing the
+space by length. Esc leaves it. The
+mode and the selected draw and stage tabs are remembered per browser
+(`src/scripts/tv-mode.ts`), so a reload on the TV lands back where it was.
+
+**The site computes nothing.** What the desk keys in is what the page shows: the
+referees decide results and who goes through. There is no standings table, by choice:
+the fixture list with scores says what happened, and the knockout rows say who went
+through. The sheet has a Read Me, an Entries tab and one tab per event:
+
+- *Entries*: one row per player or pair — event, group, seat, name.
+- *U17 Singles*, *U17 Doubles*, *Open Doubles*: one row per match in playing order, the
+  24 group matches then QF 1–4, SF 1–2 and the Final. Columns are Stage, Match, Court,
+  Time, Player A, Player B, Score and Status. Group rows look their players up on
+  Entries; knockout rows say "1st Group A" or "Winner QF 1" until the desk types the
+  name over it. Score is free text — `21-15`, or `21-15, 18-21, 21-19` for best of
+  three — which the site splits into the per-side boxes; anything else, such as `W/O`,
+  is shown as written. Status is Live or Done, and the Live page's three columns come
+  straight from it.
+
+Setting it up, once:
+
+| Step | Where |
+| --- | --- |
+| Paste `scripts/draws-sheet.gs` into a new Apps Script project and run `createDrawsSheet()` | script.google.com |
+| Copy the logged ID into `SHEET_ID`, then Deploy → Web app, execute as Me, access Anyone | same project |
+| Paste the `/exec` URL into `src/data/draws-feed.json`, run `npm run draws:pull`, commit | this repo |
+| Share the sheet with the match desk as Editor | Google Sheets |
+
+After editing `draws-sheet.gs`, paste it over the project again and publish a new
+version of the deployment (the URL stays). If the columns changed, run
+`upgradeDrawsSheet()` too: it adds what is missing to the existing sheet in place.
+
+The structure (events, fixture order, knockout references, draft timetable) lives in
+both `draws-sheet.gs` and `scripts/pull-draws.mjs`, because Apps Script cannot import
+from the repo. Change them together. **The timetable after the U17 Singles groups is a
+draft** on four courts with 15-minute group slots; the organiser adjusts it in the sheet.
+
+#### Layout
+
+The round-robin stage is a fixture list per group, M1 onwards (1v2, 3v4, 1v3, 2v4, 1v4,
+2v3, so nobody plays twice in a row and the last round decides).
 
 The bracket is one CSS grid shared by every round — `entries / 2` match rows plus a
 header row. A round-N match spans `2^(N-1)` rows and centres in them, which lands it
@@ -163,11 +242,8 @@ Below 1000px the columns stop being readable, so rounds stack vertically under t
 headers and the connectors are dropped. That beats panning a 1200px-wide bracket on a
 phone.
 
-Every slot is empty until the draw is made: pass `seeds` to `DrawBracket` or `entries`
-to `DrawGroups` to fill them.
-
-Four outline icons the system does not ship (`clock`, `bracket`, `chart`, `rules`) and
-four social marks were added to `src/design-system/site-icons.json`, drawn to the
+Six outline icons the system does not ship (`clock`, `bracket`, `chart`, `rules`, `user`,
+`users-plus`) and four social marks were added to `src/design-system/site-icons.json`, drawn to the
 system's rules: 24px grid, 1.75 stroke, round caps, `currentColor`.
 
 ## Tournament registration

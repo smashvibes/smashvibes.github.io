@@ -8,7 +8,9 @@
     "build": "node scripts/build-tokens.mjs && astro build",
     "preview": "astro preview",
     "sync:ds": "node scripts/sync-design-system.mjs",
-    "tokens": "node scripts/build-tokens.mjs"
+    "tokens": "node scripts/build-tokens.mjs",
+    "draws:pull": "node scripts/pull-draws.mjs",
+    "draws:template": "node scripts/pull-draws.mjs --template"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",

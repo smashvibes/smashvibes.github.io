@@ -3,13 +3,42 @@ import '../../styles/tournament.css';
 import Base from '../../layouts/Base.astro';
 import NavBar from '../../components/NavBar.astro';
 import TournamentFooter from '../../components/TournamentFooter.astro';
-import DrawBracket from '../../components/DrawBracket.astro';
-import DrawGroups from '../../components/DrawGroups.astro';
+import Icon from '../../components/Icon.astro';
+import DrawToolbar from '../../components/DrawToolbar.astro';
 import { backToMain, draws, REGISTER_URL, tournament, tournamentNav } from '../../data/tournament';
+import { DRAWS_FEED_URL, drawsData, eventView } from '../../data/draws';
+import { formatUpdated } from '../../data/draws-engine';
+import { renderBracket, renderGroups } from '../../data/draws-render';
 
 const title = `Draws | ${tournament.name} 2026`;
 const description =
-  'Draws and group tables for the StarRise Cup 2026 badminton tournament — U17 Singles, U17 Doubles, Open Men’s Doubles and Open Mixed Doubles.';
+  'Draws, group fixtures and knockout brackets for the StarRise Cup 2026 badminton tournament — U17 Singles, U17 Doubles and Open Doubles.';
+
+/**
+ * Which draw is showing is a radio group, and which stage of it is showing is another,
+ * so the tabs need no JavaScript. The stage tabs sit next to their panels and are
+ * handled by a generic selector in tournament.css; the draw tabs live in a fieldset
+ * above all the panels, so the pairing of each radio to its panel has to name the ids.
+ * Generated here from the same list the markup comes from, so they cannot drift.
+ */
+const panelCss = draws.items
+  .map((d) => `.sv-dr:has(#draw-${d.id}:checked) #panel-${d.id}{display:block}`)
+  .join('');
+
+/**
+ * The groups and brackets are rendered from the committed snapshot. The only script on
+ * the page re-fetches the sheet's feed on match day and re-renders the same containers
+ * with the same renderer; without a feed URL it does nothing.
+ */
+const panels = draws.items.map((draw) => {
+  const view = eventView(draw.id);
+  return {
+    ...draw,
+    groups: view ? renderGroups(view, draw.id) : '',
+    bracket: view ? renderBracket(view) : '',
+  };
+});
+const updated = formatUpdated(drawsData.updatedAt);
 ---
 <Base title={title} description={description}>
   <div class="sv-tr-page">
@@ -24,16 +53,15 @@ const description =
       />
     </header>
 
-    <main id="main" class="sv-dr sv-root">
+    <main id="main" class="sv-dr sv-root" data-draws-feed={DRAWS_FEED_URL}>
       <div class="sv-container">
         <h1 class="sv-dr-title">{draws.title}</h1>
         <p class="sv-dr-note">{draws.note}</p>
+        <DrawToolbar note={draws.formatNote} updated={updated} />
 
-        {/* Radio-driven tabs: keyboard operable with the arrow keys, and no JavaScript.
-            `:has()` on the wrapper lets the panels live outside the radio group. */}
         <fieldset class="sv-dr-tabs">
           <legend class="sv-sr-only">Choose a draw</legend>
-          {draws.items.map((draw, i) => (
+          {panels.map((draw, i) => (
             <>
               <input
                 class="sv-sr-only sv-dr-radio"
@@ -44,18 +72,41 @@ const description =
                 checked={i === 0}
               />
               <label class="sv-dr-tab" for={`draw-${draw.id}`}>
-                <span class="sv-dr-tab-label">{draw.label}</span>
-                <span class="sv-dr-tab-meta">{draw.meta}</span>
+                <Icon name={draw.icon} size={30} class="sv-dr-tab-icon" />
+                <span class="sv-dr-tab-text">
+                  <span class="sv-dr-tab-label">{draw.label}</span>
+                  <span class="sv-dr-tab-meta">{draw.meta}</span>
+                </span>
               </label>
             </>
           ))}
         </fieldset>
 
-        {draws.items.map((draw) => (
+        {panels.map((draw) => (
           <section class="sv-dr-panel" id={`panel-${draw.id}`} aria-label={`${draw.label} draw`}>
-            {draw.kind === 'bracket'
-              ? <DrawBracket entries={draw.entries!} />
-              : <DrawGroups groups={draw.groups!} perGroup={draw.perGroup!} />}
+            <fieldset class="sv-dr-stages">
+              <legend class="sv-sr-only">Choose a stage</legend>
+              <input
+                class="sv-sr-only sv-dr-stage-radio"
+                type="radio"
+                name={`stage-${draw.id}`}
+                id={`stage-${draw.id}-groups`}
+                value="groups"
+                checked
+              />
+              <label class="sv-dr-stage-tab" for={`stage-${draw.id}-groups`}>{draws.stages.groups}</label>
+              <input
+                class="sv-sr-only sv-dr-stage-radio"
+                type="radio"
+                name={`stage-${draw.id}`}
+                id={`stage-${draw.id}-knockout`}
+                value="knockout"
+              />
+              <label class="sv-dr-stage-tab" for={`stage-${draw.id}-knockout`}>{draws.stages.knockout}</label>
+            </fieldset>
+
+            <div class="sv-dr-stage" data-stage="groups" data-dr-view="groups" data-dr-event={draw.id} set:html={draw.groups} />
+            <div class="sv-dr-stage" data-stage="knockout" data-dr-view="bracket" data-dr-event={draw.id} set:html={draw.bracket} />
           </section>
         ))}
       </div>
@@ -65,23 +116,6 @@ const description =
   </div>
 </Base>
 
-<style is:global>
-  /* One pair of rules per draw, generated from the ids in src/data/tournament.ts.
-     Add a draw there and add its two rules here. */
-  .sv-dr:has(#draw-u17-singles:checked) #panel-u17-singles { display: block; }
-  .sv-dr:has(#draw-u17-singles:checked) [for='draw-u17-singles'] {
-    background: var(--gold-600); border-color: var(--gold-600); color: var(--paper);
-  }
-  .sv-dr:has(#draw-u17-doubles:checked) #panel-u17-doubles { display: block; }
-  .sv-dr:has(#draw-u17-doubles:checked) [for='draw-u17-doubles'] {
-    background: var(--gold-600); border-color: var(--gold-600); color: var(--paper);
-  }
-  .sv-dr:has(#draw-open-md:checked) #panel-open-md { display: block; }
-  .sv-dr:has(#draw-open-md:checked) [for='draw-open-md'] {
-    background: var(--gold-600); border-color: var(--gold-600); color: var(--paper);
-  }
-  .sv-dr:has(#draw-open-xd:checked) #panel-open-xd { display: block; }
-  .sv-dr:has(#draw-open-xd:checked) [for='draw-open-xd'] {
-    background: var(--gold-600); border-color: var(--gold-600); color: var(--paper);
-  }
-</style>
+<style is:inline set:html={panelCss}></style>
+<script src="../../scripts/draws-live.ts"></script>
+<script src="../../scripts/tv-mode.ts"></script>

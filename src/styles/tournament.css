@@ -28,6 +28,10 @@
   --dr-slot: #eeeeee;    /* empty draw slot */
   --dr-head: #f1f1ef;    /* round header pill */
   --dr-gap: 30px;        /* horizontal space between bracket columns */
+  --dr-live: var(--gold-500);   /* a match on court: the pill and the row's edge */
+  --dr-live-bg: #fff4d6;        /* its row */
+  --dr-done: #1f7a4d;           /* a finished match: the pill */
+  --dr-done-bg: #eef6f0;        /* its row */
 
   /* The bar and the mobile drawer run light-on-gold on this brand. */
   --nav-ink: var(--ink);
@@ -319,31 +323,6 @@
 .sv-tr-venue figcaption strong { display: block; font: var(--text-heading-md); font-size: 17px; color: #fff; }
 .sv-tr-venue figcaption span span { display: block; }
 
-/* ---------- Live (placeholder until match day) ---------- */
-
-.sv-tr-live { background: var(--paper); padding-block: var(--space-9) var(--space-8); font-family: var(--font-body); }
-.sv-tr-live-inner { display: grid; justify-items: center; text-align: center; max-width: 640px; }
-.sv-tr-live-mark {
-  display: grid;
-  place-items: center;
-  width: 76px;
-  height: 76px;
-  margin-bottom: var(--space-5);
-  border-radius: 50%;
-  background: var(--gold-100);
-  color: var(--gold-600);
-}
-.sv-tr-live .sv-dr-title::after { margin-inline: auto; }
-.sv-tr-live-lede {
-  margin: var(--space-5) 0 0;
-  font: var(--text-eyebrow);
-  letter-spacing: var(--tracking-eyebrow);
-  text-transform: uppercase;
-  color: var(--gold-700);
-}
-.sv-tr-live-body { margin: var(--space-4) 0 0; font: var(--text-body-lg); color: var(--ink-muted); }
-.sv-tr-live-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-4); margin-top: var(--space-7); }
-
 /* ---------- Sponsors ---------- */
 
 .sv-tr-sponsors { background: var(--paper); padding-block: var(--space-8); }
@@ -456,30 +435,34 @@
 }
 .sv-dr-note { margin: var(--space-5) 0 0; max-width: 60ch; font: var(--text-body); color: var(--ink-muted); }
 
-/* --- Tabs --- */
+/* --- Draw tabs --- */
 
 .sv-dr-tabs {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--space-4);
   margin: var(--space-6) 0 0;
   padding: 0;
   border: 0;
 }
 .sv-dr-tab {
-  display: grid;
-  justify-items: center;
-  gap: 2px;
-  padding: var(--space-4) var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  min-height: 64px;
+  padding: var(--space-3) var(--space-4);
   background: var(--paper);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  text-align: center;
+  text-align: left;
   color: var(--ink);
   cursor: pointer;
   transition: background-color .15s ease, border-color .15s ease, color .15s ease;
 }
 .sv-dr-tab:hover { border-color: var(--gold-500); }
+.sv-dr-tab-icon { flex: none; color: var(--gold-600); transition: color .15s ease; }
+.sv-dr-tab-text { display: grid; gap: 1px; }
 .sv-dr-tab-label {
   font-family: var(--font-display);
   font-size: 15px;
@@ -498,25 +481,240 @@
   color: inherit;
   opacity: .72;
 }
-/* The checked tab's colours are set per-draw in the page's own <style> block, since the
-   selector has to name each id. Here we only handle the inherited text colour. */
-.sv-dr-tab:has(:focus-visible),
-.sv-dr-radio:focus-visible + .sv-dr-tab { outline: 2px solid var(--gold-700); outline-offset: 3px; }
-.sv-dr:has(.sv-dr-radio:checked) .sv-dr-tab[aria-hidden] { color: inherit; }
+/* The radio sits immediately before its label, so the selected state needs no ids. */
+.sv-dr-radio:checked + .sv-dr-tab {
+  background: var(--gold-600);
+  border-color: var(--gold-600);
+  color: var(--paper);
+}
+.sv-dr-radio:checked + .sv-dr-tab .sv-dr-tab-icon { color: inherit; }
+.sv-dr-radio:focus-visible + .sv-dr-tab,
+.sv-dr-stage-radio:focus-visible + .sv-dr-stage-tab { outline: 2px solid var(--gold-700); outline-offset: 3px; }
 
-/* --- Panels --- */
+/* --- Panels and stage tabs --- */
 
+/* Which draw panel shows is paired to its radio by id in the page's own <style>. */
 .sv-dr-panel { display: none; margin-top: var(--space-6); }
 
-/* --- Bracket ---
+.sv-dr-stages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-5);
+  padding: 0;
+  border: 0;
+}
+.sv-dr-stage-tab {
+  min-width: 200px;
+  padding: var(--space-3) var(--space-5);
+  background: var(--dr-head);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
+}
+.sv-dr-stage-tab:hover { border-color: var(--gold-500); }
+.sv-dr-stage-radio:checked + .sv-dr-stage-tab { background: var(--gold-600); color: var(--paper); }
+.sv-dr-stage { display: none; }
+.sv-dr-panel:has(.sv-dr-stage-radio[value='groups']:checked) .sv-dr-stage[data-stage='groups'],
+.sv-dr-panel:has(.sv-dr-stage-radio[value='knockout']:checked) .sv-dr-stage[data-stage='knockout'] { display: block; }
+
+/* --- Shared match furniture --- */
+
+.sv-dr-time {
+  display: grid;
+  place-items: center;
+  min-width: 78px;
+  min-height: 32px;
+  padding: 0 var(--space-2);
+  background: var(--dr-head);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.sv-dr-match-no {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 32px;
+  padding: 0 var(--space-2);
+  background: var(--dr-head);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: var(--gold-700);
+}
+.sv-dr-name { flex: 1; min-width: 0; font-size: 16px; line-height: 22px; font-weight: 500; color: var(--ink); }
+.sv-dr-name.is-tbc { min-height: 24px; border-radius: 4px; background: var(--dr-slot); }
+.sv-dr-score { display: flex; align-items: center; gap: 6px; }
+.sv-dr-score-box {
+  flex: none;
+  display: grid;
+  place-items: center;
+  min-width: 42px;
+  height: 28px;
+  padding: 0 7px;
+  background: var(--paper);
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--ink);
+}
+.sv-dr-score-box:empty { background: var(--paper); }
+.sv-dr-score-raw {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: var(--gold-700);
+}
+.sv-dr-court {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ink-muted);
+}
+
+/* Match state, as the desk set it. Three looks that read from across a hall: a live
+   match is a warm row with a gold edge and a pulsing LIVE pill; a finished one has a
+   green DONE pill and its score set white on navy; an upcoming one is plain. */
+.sv-dr-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.sv-dr-status:empty { padding: 0; min-height: 0; }
+.sv-dr-status.is-live { background: var(--dr-live); color: var(--ink); }
+.sv-dr-status.is-live::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ink);
+  animation: sv-dr-pulse 1.1s ease-in-out infinite;
+}
+.sv-dr-status.is-done { background: var(--dr-done); color: #fff; }
+.sv-dr-status.is-done::before { content: '✓'; font-size: 12px; }
+.sv-dr-status.is-compact { width: 26px; padding: 0; justify-content: center; }
+.sv-dr-status.is-compact::before { font-size: 14px; }
+.sv-dr-status.is-upcoming { background: var(--paper); color: var(--ink-muted); box-shadow: inset 0 0 0 1px #d6d6d6; }
+
+.is-live .sv-dr-score-box { background: var(--gold-100); border-color: var(--dr-live); }
+.is-done .sv-dr-score-box { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.is-done .sv-dr-score-box:empty { background: var(--dr-head); border-color: var(--dr-head); }
+
+@keyframes sv-dr-pulse { 50% { opacity: .2; } }
+@media (prefers-reduced-motion: reduce) { .sv-dr-status.is-live::before { animation: none; } }
+
+/* The status bar under the title: note, "last updated" stamp (kept current by the
+   match-day script), the pill legend and the TV mode button. */
+.sv-dr-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-5);
+  margin: var(--space-4) 0 0;
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+.sv-dr-toolbar-note { margin: 0; flex-basis: 100%; }
+.sv-dr-stamp { margin: 0; font-weight: 600; }
+.sv-dr-stamp[hidden] { display: none; }
+.sv-dr-legend { display: flex; gap: var(--space-2); list-style: none; margin: 0; padding: 0; }
+.sv-dr-tv {
+  margin-left: auto;
+  padding: 6px 14px;
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ink);
+  cursor: pointer;
+}
+.sv-dr-tv:hover, .sv-dr-tv[aria-pressed='true'] { background: var(--ink); color: var(--paper); }
+.sv-dr-tv:focus-visible { outline: 2px solid var(--gold-700); outline-offset: 3px; }
+
+/* --- Round-robin groups --- */
+
+.sv-dr-groups { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-5); }
+.sv-dr-group {
+  padding: var(--space-4);
+  background: var(--paper);
+  border: 1px solid #e6e6e6;
+  border-radius: var(--radius-md);
+}
+.sv-dr-group-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--dr-head);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.sv-dr-fixtures { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.sv-dr-fixture {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+}
+.sv-dr-fixture.is-live { background: var(--dr-live-bg); box-shadow: inset 4px 0 0 var(--dr-live); }
+.sv-dr-fixture.is-done { background: var(--dr-done-bg); }
+.sv-dr-vs { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: var(--space-2); }
+.sv-dr-vs-label { font-family: var(--font-display); font-size: 13px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-muted); }
+
+/* --- Knockout bracket ---
  * One grid shared by every round: `--dr-rows` match rows plus a header row. A match
  * spans `--span` rows and centres in them, which lands it level with the midpoint of
  * the two matches feeding it.
  */
 .sv-dr-bracket {
   display: grid;
-  grid-template-columns: repeat(4, minmax(190px, 1fr));
-  grid-template-rows: auto repeat(var(--dr-rows), minmax(56px, 1fr));
+  grid-template-columns: repeat(var(--dr-cols), minmax(260px, 1fr));
+  grid-template-rows: auto repeat(var(--dr-rows), minmax(84px, 1fr));
   column-gap: var(--dr-gap);
   row-gap: var(--space-3);
   align-items: stretch;
@@ -546,24 +744,21 @@
 }
 .sv-dr-match {
   display: grid;
-  gap: 4px;
-  padding: 6px;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 8px;
   background: var(--paper);
   border: 1px solid #e6e6e6;
   border-radius: var(--radius-sm);
 }
-.sv-dr-slot { display: flex; align-items: center; gap: var(--space-2); min-height: 26px; }
-.sv-dr-seed {
-  flex: none;
-  width: 22px;
-  font-family: var(--font-display);
-  font-size: 13px;
-  font-weight: 700;
-  text-align: center;
-  color: var(--ink);
-}
-.sv-dr-name { flex: 1; font-size: 14px; line-height: 20px; color: var(--ink); }
-.sv-dr-name.is-tbc { min-height: 20px; border-radius: 4px; background: var(--dr-slot); }
+.sv-dr-match .sv-dr-time { min-width: 44px; min-height: 44px; padding: 0; }
+.sv-dr-match .sv-dr-match-no { background: none; padding: 0; min-width: 0; }
+.sv-dr-sides { display: grid; gap: 4px; min-width: 0; }
+.sv-dr-slot { display: flex; align-items: center; gap: var(--space-2); min-height: 28px; }
+.sv-dr-match-foot { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; gap: var(--space-2); }
+.sv-dr-match.is-live { background: var(--dr-live-bg); border-color: var(--dr-live); box-shadow: inset 4px 0 0 var(--dr-live); }
+.sv-dr-match.is-done { background: var(--dr-done-bg); }
 
 /* Connectors. Each cell sends a stub right to the middle of the column gap; each cell
    from round two on draws the vertical join back to its two feeders, plus the short
@@ -588,29 +783,126 @@
   background: linear-gradient(var(--dr-line), var(--dr-line)) left 50% / 100% 2px no-repeat;
 }
 
-/* --- Group tables --- */
+/* ---------- Live board ----------
+ * Three columns per category — on court now, up next, latest results — built from the
+ * same match cards as the bracket. */
 
-.sv-dr-groups { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-5); }
-.sv-dr-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-.sv-dr-table caption {
-  margin-bottom: var(--space-3);
-  padding: var(--space-3);
+.sv-lv-event { margin-top: var(--space-7); }
+.sv-lv-event-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-4);
+  margin: 0 0 var(--space-4);
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.sv-lv-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-5); }
+.sv-lv-col-title {
+  margin: 0 0 var(--space-3);
+  padding: var(--space-3) var(--space-4);
   background: var(--dr-head);
   border-radius: var(--radius-sm);
   font-family: var(--font-display);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: .04em;
   text-transform: uppercase;
   color: var(--ink);
 }
-.sv-dr-table th, .sv-dr-table td { padding: var(--space-3); border-bottom: 1px solid #ececec; text-align: left; }
-.sv-dr-table thead th { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-muted); }
-.sv-dr-th-seed { width: 34px; }
-.sv-dr-th-num, .sv-dr-num { width: 44px; text-align: center; }
-.sv-dr-num { color: var(--ink-muted); }
-.sv-dr-seed-cell { font-family: var(--font-display); font-weight: 700; color: var(--ink); }
-.sv-dr-table .sv-dr-name.is-tbc { display: block; max-width: 220px; }
+.sv-lv-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-3); }
+.sv-lv-card {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--paper);
+  border: 1px solid #e6e6e6;
+  border-radius: var(--radius-sm);
+}
+.sv-lv-card.is-live { background: var(--dr-live-bg); border-color: var(--dr-live); box-shadow: inset 4px 0 0 var(--dr-live); }
+.sv-lv-card.is-done { background: var(--dr-done-bg); }
+.sv-lv-card-head .sv-dr-status { margin-left: auto; }
+.sv-lv-card-head .sv-lv-time { margin-left: 0; }
+.sv-lv-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  font-size: 12px;
+}
+.sv-lv-card-head .sv-dr-match-no { min-height: 24px; }
+.sv-lv-stage { font-weight: 600; color: var(--ink); }
+.sv-lv-time { margin-left: auto; font-weight: 600; color: var(--ink-muted); }
+.sv-lv-empty { margin: 0; padding: var(--space-3) 0; font-size: 13px; color: var(--ink-muted); }
+.sv-lv-more { margin: var(--space-4) 0 0; font-size: 14px; }
+.sv-lv-more a { color: var(--gold-700); font-weight: 600; }
+
+/* ---------- TV mode ----------
+ * The hall TV. Chrome goes and the page becomes one slim header row — title, draw tabs,
+ * legend, stamp, exit — over the board. `zoom: 1.3` scales it for a 1920×1080 screen,
+ * which then lays out as 1477×831: two group columns, the full bracket, and every
+ * breakpoint still holds. The spacing below is tuned so all four groups of a draw sit
+ * on that screen with nothing to scroll. Entered with the button or `?tv`, left with
+ * the button or Esc — see src/scripts/tv-mode.ts. */
+
+html[data-tv] .sv-tr-page .sv-header,
+html[data-tv] .sv-tr-footer,
+html[data-tv] .sv-dr-note,
+html[data-tv] .sv-dr-toolbar-note,
+html[data-tv] .sv-dr-tab-icon,
+html[data-tv] .sv-dr-tab-meta,
+html[data-tv] .sv-lv-more { display: none; }
+
+html[data-tv] .sv-dr { zoom: 1.3; padding-block: var(--space-3) var(--space-4); }
+html[data-tv] .sv-dr-title { font-size: 28px; }
+html[data-tv] .sv-dr-title::after { display: none; }
+html[data-tv] .sv-dr-toolbar { margin: 0; }
+
+/* Draws: title, draw tabs and toolbar share one row; the open panel is the board. */
+html[data-tv] .sv-dr:not(.sv-lv) .sv-container {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas: 'title tabs toolbar' 'board board board';
+  align-items: center;
+  column-gap: var(--space-5);
+  row-gap: var(--space-3);
+}
+html[data-tv] .sv-dr:not(.sv-lv) .sv-dr-title { grid-area: title; }
+html[data-tv] .sv-dr-tabs { grid-area: tabs; display: flex; margin: 0; gap: var(--space-2); }
+html[data-tv] .sv-dr-tab { min-height: 36px; padding: 0 var(--space-4); }
+html[data-tv] .sv-dr-tab-label { white-space: nowrap; }
+html[data-tv] .sv-dr:not(.sv-lv) .sv-dr-toolbar { grid-area: toolbar; }
+html[data-tv] .sv-dr-panel { grid-area: board; margin: 0; }
+
+/* Live: title and toolbar on one row, the boards below. */
+html[data-tv] .sv-lv .sv-container { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-5); }
+html[data-tv] .sv-lv .sv-dr-toolbar { flex: 1; }
+html[data-tv] .sv-lv-event { flex-basis: 100%; margin-top: var(--space-2); }
+
+html[data-tv] .sv-dr-stages { margin-bottom: var(--space-3); }
+html[data-tv] .sv-dr-stage-tab { min-width: 160px; padding: var(--space-2) var(--space-4); }
+
+html[data-tv] .sv-dr-groups { gap: var(--space-3); }
+html[data-tv] .sv-dr-group { padding: var(--space-3); }
+html[data-tv] .sv-dr-group-title { margin-bottom: var(--space-2); padding: var(--space-2) var(--space-3); }
+html[data-tv] .sv-dr-fixtures { gap: 4px; }
+html[data-tv] .sv-dr-fixture { padding: 2px 8px; }
+html[data-tv] .sv-dr-time,
+html[data-tv] .sv-dr-match-no { min-height: 30px; }
+/* One line per match, so six rows stay six rows. The two names share the space by
+   length rather than half each, and only a very long one is clipped. */
+html[data-tv] .sv-dr-fixture .sv-dr-vs { display: flex; }
+html[data-tv] .sv-dr-fixture .sv-dr-name { flex: 1 1 auto; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+html[data-tv] .sv-dr-fixture .sv-dr-time { flex: none; min-width: 70px; font-size: 13px; white-space: nowrap; }
+html[data-tv] .sv-dr-fixture .sv-dr-match-no { white-space: nowrap; }
+html[data-tv] .sv-dr-name { font-size: 17px; }
+
+html[data-tv] .sv-dr-bracket { grid-template-rows: auto repeat(var(--dr-rows), minmax(72px, 1fr)); }
+html[data-tv] .sv-dr-round-title { margin-bottom: 0; padding: var(--space-2); }
 
 /* ---------- Responsive ---------- */
 
@@ -627,14 +919,15 @@
   .sv-dr-round-title { margin-bottom: var(--space-4); }
   .sv-dr-cell { display: block; margin-bottom: var(--space-3); }
   .sv-dr-cell::before, .sv-dr-cell::after { display: none; }
+  .sv-dr-match { max-width: 520px; }
   .sv-dr-groups { grid-template-columns: 1fr; }
+  .sv-lv-cols { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 900px) {
   .sv-tr-category-grid,
   .sv-tr-prize-grid,
   .sv-tr-details-inner { grid-template-columns: 1fr; }
-  .sv-tr-guest-grid { grid-template-columns: repeat(2, 1fr); }
   /* The shuttle stops being a backdrop and gets out of the copy's way. */
   .sv-tr-about-img {
     position: static;
@@ -661,12 +954,14 @@
     mask-image: linear-gradient(180deg, transparent 0, #000 18%);
   }
   .sv-tr-lockup img { height: 76px; }
-  .sv-dr-tabs { grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
+  .sv-dr-tabs { gap: var(--space-3); }
+  .sv-dr-tab { flex-direction: column; gap: var(--space-2); text-align: center; }
+  .sv-dr-tab-text { justify-items: center; }
 }
 
 @media (max-width: 720px) {
   .sv-tr-about, .sv-tr-categories, .sv-tr-prizes, .sv-tr-details,
-  .sv-tr-live, .sv-tr-sponsors, .sv-tr-guests { padding-block: var(--space-7); }
+  .sv-tr-sponsors, .sv-tr-guests { padding-block: var(--space-7); }
   .sv-tr-sponsor-grid { grid-template-columns: repeat(2, 1fr); }
   .sv-tr-footer-cta { padding-block: var(--space-7); }
   .sv-tr-footer-base { justify-content: center; text-align: center; }
@@ -675,14 +970,20 @@
   .sv-tr-venue figcaption { position: static; max-width: none; border-radius: 0; }
   .sv-tr-page .sv-nav-logo { height: 30px; }
   .sv-dr { padding-block: var(--space-6) var(--space-7); }
-  .sv-dr-table th, .sv-dr-table td { padding: var(--space-2); }
+  .sv-dr-group { padding: var(--space-3); }
+  /* Time and match number on one line, the pairing and score on the next. */
+  .sv-dr-fixture { grid-template-columns: auto auto 1fr auto; row-gap: var(--space-2); }
+  .sv-dr-fixture .sv-dr-status { grid-row: 1; grid-column: 3; justify-self: start; }
+  .sv-dr-fixture .sv-dr-score { grid-row: 1; grid-column: 4; justify-self: end; }
+  .sv-dr-vs { grid-row: 2; grid-column: 1 / -1; }
+  .sv-dr-stage-tab { flex: 1; min-width: 0; }
 }
 
 @media (max-width: 520px) {
-  .sv-tr-guest-grid { grid-template-columns: 1fr; }
-  .sv-tr-live-actions .sv-btn { width: 100%; }
+  .sv-tr-guest-grid { grid-template-columns: minmax(0, 320px); }
   .sv-tr-tagline { gap: var(--space-2); letter-spacing: .1em; }
   .sv-tr-cta, .sv-tr-footer-cta .sv-btn { width: 100%; }
   .sv-dr-tabs { grid-template-columns: 1fr; }
-  .sv-dr-tab { grid-template-columns: auto; padding: var(--space-3); }
+  .sv-dr-tab { flex-direction: row; min-height: 0; padding: var(--space-3); text-align: left; }
+  .sv-dr-tab-text { justify-items: start; }
 }

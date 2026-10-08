@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>StarRise Court Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Poppins:wght@400;500;600&family=Roboto+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: a hall-floor scoreboard. Controls and verdict on top, live courts in the middle, the whole day as a court-by-court timeline below. Single dark world, Smash Vibes night + gold. */
+:root {
+  color-scheme: dark;
+  --bg: #0d0c0a;
+  --panel: #17161a;
+  --panel-2: #201f23;
+  --line: #2e2c2a;
+  --ink: #f5f0e6;
+  --muted: #a8a296;
+  --gold: #f2bc4f;
+  --court: #1d6a4a;
+  --court-line: rgba(255, 255, 255, .75);
+  --cat-s: #f2bc4f;
+  --cat-d: #7cc4f5;
+  --cat-a: #ff9478;
+  --ok: #5fd08a;
+  --warn: #ffb347;
+  --bad: #ff6b6b;
+  --font-display: Montserrat, "Arial Black", system-ui, sans-serif;
+  --font-body: Poppins, "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Roboto Mono", ui-monospace, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 14px/1.55 var(--font-body); }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 32px 20px 56px; display: grid; gap: 20px; }
+button, input { font: inherit; color: inherit; }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+header.top { display: grid; gap: 6px; }
+.eyebrow { font: 700 12px/16px var(--font-display); letter-spacing: .1em; text-transform: uppercase; color: var(--gold); }
+h1 { margin: 0; font: 800 clamp(30px, 5vw, 46px)/1.05 var(--font-display); letter-spacing: -.01em; text-wrap: balance; }
+.lede { margin: 0; color: var(--muted); max-width: 64ch; }
+
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+h2 { margin: 0 0 12px; font: 700 14px/20px var(--font-display); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+
+/* Controls row */
+.setup { display: grid; grid-template-columns: auto 1fr minmax(240px, 300px); gap: 24px; align-items: center; }
+.courts-ctl { display: grid; gap: 6px; justify-items: center; }
+.courts-ctl .lbl { font: 700 12px var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.stepper { display: flex; align-items: center; gap: 10px; }
+.stepper button { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line); background: var(--panel-2); font-size: 22px; line-height: 1; cursor: pointer; }
+.stepper button:hover { border-color: var(--gold); color: var(--gold); }
+.big-n { font: 800 56px/1 var(--font-display); color: var(--gold); min-width: 1.4ch; text-align: center; font-variant-numeric: tabular-nums; }
+.sliders { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 24px; }
+.slider { display: grid; gap: 2px; }
+.slider label { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--muted); }
+.slider output { font: 500 13px var(--font-mono); color: var(--ink); white-space: nowrap; }
+input[type=range] { width: 100%; accent-color: var(--gold); }
+
+.order { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.order-lbl { font-size: 13px; color: var(--muted); }
+.order .speeds button { font: 500 12.5px var(--font-body); }
+.order-note { font-size: 12.5px; color: var(--muted); }
+.verdict { border-radius: 12px; padding: 14px 16px; background: var(--panel-2); border: 1px solid var(--line); display: grid; gap: 4px; }
+.verdict .pill { justify-self: start; font: 700 12px var(--font-display); letter-spacing: .08em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; color: #10100e; }
+.verdict[data-v=ok] .pill { background: var(--ok); }
+.verdict[data-v=warn] .pill { background: var(--warn); }
+.verdict[data-v=bad] .pill { background: var(--bad); }
+.verdict strong { font: 700 20px/1.25 var(--font-display); }
+.verdict span.sub { color: var(--muted); font-size: 13px; }
+
+/* Compare strip */
+.compare { display: flex; flex-wrap: wrap; gap: 8px; }
+.cmp { display: grid; gap: 0; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel-2); cursor: pointer; text-align: left; min-width: 96px; }
+.cmp b { font: 700 13px var(--font-display); }
+.cmp span { font: 500 12px var(--font-mono); }
+.cmp[data-v=ok] span { color: var(--ok); }
+.cmp[data-v=warn] span { color: var(--warn); }
+.cmp[data-v=bad] span { color: var(--bad); }
+.cmp[aria-pressed=true] { border-color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold); }
+
+/* Playback */
+.playback { display: grid; grid-template-columns: auto auto 1fr auto; gap: 16px; align-items: center; }
+.btn { border: 1px solid var(--line); background: var(--panel-2); border-radius: 999px; padding: 8px 16px; cursor: pointer; font-weight: 600; }
+.btn.primary { background: var(--gold); color: #1a1406; border-color: var(--gold); min-width: 92px; }
+.speeds { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.speeds button { border: 0; background: transparent; padding: 7px 11px; cursor: pointer; font: 500 12px var(--font-mono); color: var(--muted); }
+.speeds button[aria-pressed=true] { background: var(--panel-2); color: var(--gold); }
+.clock { font: 700 34px/1 var(--font-mono); font-variant-numeric: tabular-nums; color: var(--ink); }
+.clock small { display: block; font: 500 11px var(--font-body); color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-top: 4px; }
+.scrub { display: grid; gap: 4px; }
+.scrub .ticks { display: flex; justify-content: space-between; font: 500 11px var(--font-mono); color: var(--muted); }
+
+/* Courts */
+.courts { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+.court { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px; display: grid; gap: 10px; align-content: start; transition: border-color .3s; }
+.court.live { border-color: color-mix(in srgb, var(--c) 55%, var(--line)); }
+.court header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.court .cn { font: 800 15px var(--font-display); }
+.court .state { font: 600 11px var(--font-body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.court.live .state { color: var(--c); }
+.floor { position: relative; aspect-ratio: 2.2 / 1; max-width: 100%; background: var(--court); border-radius: 4px; border: 2px solid var(--court-line); overflow: hidden; transition: filter .3s; }
+.court:not(.live) .floor { filter: saturate(.25) brightness(.55); }
+.floor::before { content: ""; position: absolute; inset: 9% 0; border-block: 1px solid var(--court-line); }
+.floor::after { content: ""; position: absolute; left: 34%; right: 34%; top: 0; bottom: 0; border-inline: 1px solid var(--court-line); }
+.net { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 3px; transform: translateX(-50%); background: repeating-linear-gradient(#fff 0 3px, transparent 3px 5px); }
+.mid { position: absolute; top: 50%; height: 1px; background: var(--court-line); }
+.mid.l { left: 0; right: 66%; } .mid.r { left: 66%; right: 0; }
+.p { position: absolute; width: 11px; height: 11px; border-radius: 50%; background: var(--c, #fff); border: 2px solid #0d0c0a; transform: translate(-50%, -50%); transition: opacity .3s; z-index: 2; }
+.court:not(.live) .p { opacity: 0; }
+.bird { position: absolute; width: 6px; height: 6px; border-radius: 50%; background: #fff; box-shadow: 0 0 6px #fff; z-index: 3; opacity: 0; left: 20%; top: 50%; }
+.court.live .bird { opacity: 1; animation: rally 1.3s ease-in-out infinite alternate; }
+.paused .court.live .bird, .paused .court.live .p { animation-play-state: paused; }
+@keyframes rally { 0% { left: 18%; top: 62%; } 50% { top: 18%; } 100% { left: 82%; top: 40%; } }
+.court.live .p { animation: shuffle 2.6s ease-in-out infinite alternate; }
+@keyframes shuffle { 0% { margin-top: -6px; } 100% { margin-top: 6px; } }
+.info { display: grid; gap: 2px; min-height: 92px; }
+.chip { justify-self: start; font: 700 10.5px var(--font-display); letter-spacing: .08em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; background: color-mix(in srgb, var(--c, var(--muted)) 18%, transparent); color: var(--c, var(--muted)); }
+.stage { margin: 4px 0 0; font-weight: 600; font-size: 13px; }
+.vs { margin: 0; font-size: 12.5px; color: var(--muted); }
+.vs i { font-style: normal; opacity: .7; padding: 0 3px; }
+.score { margin: 2px 0 0; font: 700 16px var(--font-mono); font-variant-numeric: tabular-nums; color: var(--ink); }
+.bar { height: 4px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--c, var(--muted)); }
+
+/* Category progress */
+.cats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.cat { display: grid; gap: 6px; }
+.cat .row { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; }
+.cat .row b { font: 700 13px var(--font-display); color: var(--c); }
+.cat .row span { font: 500 12px var(--font-mono); color: var(--muted); }
+.cat .bar { height: 8px; }
+.cat .note { font-size: 12px; color: var(--muted); }
+
+/* Timeline */
+.gantt-scroll { overflow-x: auto; }
+.gantt { min-width: 700px; position: relative; display: grid; gap: 6px; padding-top: 22px; }
+.g-row { display: grid; grid-template-columns: 70px 1fr; align-items: center; gap: 8px; }
+.g-row > span { font: 700 12px var(--font-display); color: var(--muted); }
+.g-track { position: relative; height: 26px; background: var(--panel-2); border-radius: 6px; }
+.blk { position: absolute; top: 3px; bottom: 3px; border-radius: 4px; background: var(--c); opacity: .35; transition: opacity .2s; overflow: hidden; font: 600 10px/20px var(--font-body); color: #121110; padding: 0 4px; white-space: nowrap; }
+.blk.done { opacity: .9; }
+.blk.now { opacity: 1; box-shadow: 0 0 0 2px var(--ink); }
+.g-axis { position: absolute; left: 78px; right: 0; top: 0; height: 18px; }
+.g-axis span { position: absolute; transform: translateX(-50%); font: 500 11px var(--font-mono); color: var(--muted); }
+.g-overlay { position: absolute; left: 78px; right: 0; top: 18px; bottom: 0; pointer-events: none; }
+.vline { position: absolute; top: 0; bottom: 0; width: 0; border-left: 1px dashed var(--muted); }
+.vline.prizes { border-color: var(--warn); }
+.vline.close { border-left-style: solid; border-color: var(--bad); }
+.vline em { position: absolute; top: -18px; left: 4px; font: 600 10px var(--font-body); font-style: normal; white-space: nowrap; color: inherit; }
+.vline.prizes em { color: var(--warn); } .vline.close em { color: var(--bad); }
+.playhead { position: absolute; top: -4px; bottom: 0; width: 2px; background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 12px; font-size: 12px; color: var(--muted); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: var(--c); margin-right: 6px; vertical-align: -1px; }
+
+.notes { color: var(--muted); font-size: 13px; margin: 0; padding-left: 18px; display: grid; gap: 4px; max-width: 80ch; }
+
+[data-cat=S] { --c: var(--cat-s); } [data-cat=D] { --c: var(--cat-d); } [data-cat=A] { --c: var(--cat-a); }
+
+@media (max-width: 900px) {
+  .setup { grid-template-columns: 1fr; }
+  .playback { grid-template-columns: auto auto 1fr; }
+  .playback .scrub { grid-column: 1 / -1; }
+  .cats { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .sliders { grid-template-columns: 1fr; }
+  .courts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .court { padding: 10px; }
+  .clock { font-size: 26px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .court.live .bird, .court.live .p { animation: none; }
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <header class="top">
+    <div class="eyebrow">StarRise Cup 2026 · Sat 14 Nov · SBH VIP Hall @ Sims</div>
+    <h1>Court Planner</h1>
+    <p class="lede">Pick how many courts you book and whether categories play one after another or mixed. The planner fits all 53 matches onto the courts, then plays the day forward so you can see whether the last final ends before prizes at 2:40 PM.</p>
+  </header>
+
+  <section class="panel setup" aria-label="Setup">
+    <div class="courts-ctl">
+      <span class="lbl">Courts</span>
+      <div class="stepper">
+        <button type="button" id="minus" aria-label="One court fewer">−</button>
+        <span class="big-n" id="nCourts" aria-live="polite">6</span>
+        <button type="button" id="plus" aria-label="One court more">+</button>
+      </div>
+    </div>
+    <div class="sliders">
+      <div class="slider"><label for="sShort">Early-round match (first to 30) <output id="oShort"></output></label><input type="range" id="sShort" min="10" max="30" step="1" value="15"></div>
+      <div class="slider"><label for="sLong">Semi-final / final <output id="oLong"></output></label><input type="range" id="sLong" min="10" max="60" step="1" value="15"></div>
+      <div class="slider"><label for="sRest">Player rest between matches <output id="oRest"></output></label><input type="range" id="sRest" min="0" max="20" step="1" value="10"></div>
+      <div class="slider"><label for="sChange">Court changeover <output id="oChange"></output></label><input type="range" id="sChange" min="0" max="10" step="1" value="3"></div>
+      <div class="order">
+        <span class="order-lbl" id="orderLbl">Order of play</span>
+        <div class="speeds" role="group" aria-labelledby="orderLbl" id="order">
+          <button type="button" data-seq="1" aria-pressed="true">One category at a time</button>
+          <button type="button" data-seq="0" aria-pressed="false">Mix categories</button>
+        </div>
+        <span class="order-note" id="orderNote"></span>
+      </div>
+    </div>
+    <div class="verdict" id="verdict" data-v="ok" aria-live="polite">
+      <span class="pill" id="vPill">Fits</span>
+      <strong id="vHead">Last final ends 2:20 PM</strong>
+      <span class="sub" id="vSub"></span>
+    </div>
+  </section>
+
+  <section class="panel" aria-label="Compare court counts">
+    <h2>Same settings, different court counts</h2>
+    <div class="compare" id="compare"></div>
+  </section>
+
+  <section class="panel playback" aria-label="Playback">
+    <button type="button" class="btn primary" id="play">Pause</button>
+    <div class="speeds" role="group" aria-label="Speed" id="speeds">
+      <button type="button" data-s="1" aria-pressed="false">1×</button>
+      <button type="button" data-s="2" aria-pressed="false">2×</button>
+      <button type="button" data-s="4" aria-pressed="true">4×</button>
+      <button type="button" data-s="8" aria-pressed="false">8×</button>
+    </div>
+    <div class="scrub">
+      <input type="range" id="scrub" min="600" max="910" step="0.5" value="630" aria-label="Time of day">
+      <div class="ticks" id="ticks"></div>
+    </div>
+    <div class="clock"><span id="clock">10:30 AM</span><small id="doneCount">0 / 53 played</small></div>
+  </section>
+
+  <section class="courts" id="courts" aria-label="Courts"></section>
+
+  <section class="panel" aria-label="Progress by category">
+    <div class="cats" id="cats"></div>
+  </section>
+
+  <section class="panel" aria-label="Day plan">
+    <h2>Day plan, court by court</h2>
+    <div class="gantt-scroll"><div class="gantt" id="gantt"></div></div>
+    <div class="legend">
+      <span data-cat="S"><i></i>U17 Singles (16, knockout)</span>
+      <span data-cat="D"><i></i>U17 Doubles (16 pairs, knockout)</span>
+      <span data-cat="A"><i></i>Adults Open (2 groups of 5, then semis)</span>
+    </div>
+    <p class="legend">Last 16 = first round, 16 players left · Quarter = 8 left · Semi = 4 left · Final = 2 left · Group A 1 = adult Group A, round 1</p>
+  </section>
+
+  <ul class="notes">
+    <li><b>One category at a time:</b> Kids singles plays first, then kids pairs, then adults. The next category starts as soon as the one before reaches its semi-finals, using the courts the semis and final leave free. The earlier category always gets a court first.</li>
+    <li><b>Mix categories:</b> matches go to the first free court. Longer chains (adult group rounds) are picked first so the finals aren't held up. Sometimes a court is held free for a few minutes so an adult group match can start on time.</li>
+    <li>A player can't start a match until their previous one ends plus the rest time.</li>
+    <li>Adult group matches are assumed to be first to 30 like the U17 early rounds. The website doesn't say, so change the slider if it's different.</li>
+    <li>Names are seed and group positions only. The real draw happens after entries close. The planner doesn't know if a U17 player entered both singles and doubles.</li>
+  </ul>
+</div>
+
+<script>
+(() => {
+  const START = 600, PRIZES = 880, CLOSE = 900;
+  const BLOCK_NAME = { R16: 'Last 16', QF: 'Quarter', SF: 'Semi', F: 'Final' };
+  const CAT_NAME = { S: 'U17 Singles', D: 'U17 Doubles', A: 'Adults Open' };
+  const $ = id => document.getElementById(id);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cfg = { courts: 6, short: 15, long: 15, rest: 10, change: 3, seq: true };
+  const PLAY_ORDER = ['S', 'D', 'A'];
+
+  const fmt = m => {
+    m = Math.round(m);
+    let h = Math.floor(m / 60), mm = m % 60;
+    const ap = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    return `${h}:${String(mm).padStart(2, '0')} ${ap}`;
+  };
+  const fmtShort = m => fmt(m).replace(':00', '').replace(' ', '').toLowerCase();
+
+  function rng(seed) {
+    return () => {
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  // Circle-method round robin; index n is the bye.
+  function roundRobin(n) {
+    const t = [...Array(n + 1).keys()], out = [];
+    for (let r = 0; r < n; r++) {
+      const pairs = [];
+      for (let i = 0; i < (n + 1) / 2; i++) pairs.push([t[i], t[n - i]]);
+      out.push(pairs.filter(([a, b]) => a < n && b < n));
+      t.splice(1, 0, t.pop());
+    }
+    return out;
+  }
+
+  function build(c) {
+    const M = [];
+    const add = o => { o.id = M.length; o.deps = o.deps || []; o.ents = o.ents || []; M.push(o); return o.id; };
+    for (const cat of ['S', 'D']) {
+      const u = cat === 'S' ? 'Seed' : 'Pair';
+      const draw = [[1, 16], [8, 9], [5, 12], [4, 13], [3, 14], [6, 11], [7, 10], [2, 15]];
+      const r16 = draw.map(([a, b], i) => add({ cat, stage: 'R16', label: `Last 16 · Game ${i + 1}`, a: `${u} ${a}`, b: `${u} ${b}`, dur: c.short }));
+      const qf = [0, 1, 2, 3].map(i => add({ cat, stage: 'QF', label: `Quarter-final ${i + 1}`, a: `Winner M${2 * i + 1}`, b: `Winner M${2 * i + 2}`, dur: c.short, deps: [r16[2 * i], r16[2 * i + 1]] }));
+      const sf = [0, 1].map(i => add({ cat, stage: 'SF', label: `Semi-final ${i + 1}`, a: `Winner QF${2 * i + 1}`, b: `Winner QF${2 * i + 2}`, dur: c.long, long: true, deps: [qf[2 * i], qf[2 * i + 1]] }));
+      add({ cat, stage: 'F', label: 'Final', a: 'Winner SF1', b: 'Winner SF2', dur: c.long, long: true, deps: sf });
+    }
+    const group = [];
+    roundRobin(5).forEach((pairs, r) => {
+      for (const g of ['A', 'B']) for (const [x, y] of pairs) {
+        group.push(add({ cat: 'A', stage: 'G', round: r, label: `Group ${g} · Round ${r + 1}`, a: `Pair ${g}${x + 1}`, b: `Pair ${g}${y + 1}`, ents: [g + (x + 1), g + (y + 1)], dur: c.short }));
+      }
+    });
+    const asf = [
+      add({ cat: 'A', stage: 'SF', label: 'Semi-final 1', a: 'Group A 1st', b: 'Group B 2nd', dur: c.long, long: true, deps: group }),
+      add({ cat: 'A', stage: 'SF', label: 'Semi-final 2', a: 'Group B 1st', b: 'Group A 2nd', dur: c.long, long: true, deps: group }),
+    ];
+    add({ cat: 'A', stage: 'F', label: 'Final', a: 'Winner SF1', b: 'Winner SF2', dur: c.long, long: true, deps: asf });
+
+    // One category at a time: a category starts once the one before it is down to its
+    // semi-finals, so the courts those semis and the final leave empty get used.
+    for (const m of M) {
+      const rank = PLAY_ORDER.indexOf(m.cat), prev = PLAY_ORDER[rank - 1];
+      m.gate = c.seq && prev ? M.filter(x => x.cat === prev && x.stage !== 'SF' && x.stage !== 'F').map(x => x.id) : [];
+      m.bonus = c.seq ? (PLAY_ORDER.length - rank) * 1000 : 0;
+    }
+
+    // Priority: how much of the day still hangs off this match.
+    const step = c.rest + c.change, after = 2 * (c.long + step);
+    for (const m of M) {
+      m.tail = m.stage === 'R16' ? m.dur + step + c.short + step + after
+        : m.stage === 'QF' ? m.dur + step + after
+        : m.stage === 'G' ? m.dur + step + (4 - m.round) * (c.short + step) + after
+        : m.stage === 'SF' ? m.dur + step + c.long
+        : m.dur;
+    }
+    return M;
+  }
+
+  // One pass of list scheduling. `wait` is how many priority points each minute of
+  // holding a court idle costs: huge = never hold, small = keep a court free for an
+  // urgent match that is about to become ready.
+  function schedulePass(c, wait) {
+    const M = build(c), free = Array(c.courts).fill(START), ent = {};
+    const readyAt = m => {
+      let t = START;
+      for (const d of m.deps) { if (M[d].end == null) return null; t = Math.max(t, M[d].end + c.rest); }
+      for (const g of m.gate) { if (M[g].end == null) return null; t = Math.max(t, M[g].end + c.change); }
+      for (const e of m.ents) t = Math.max(t, ent[e] ?? START);
+      return t;
+    };
+    for (let left = M.length; left; left--) {
+      let ci = 0;
+      for (let i = 1; i < free.length; i++) if (free[i] < free[ci]) ci = i;
+      const t = free[ci];
+      let best = null, bestScore = -Infinity, bestReady = 0;
+      for (const m of M) {
+        if (m.start != null) continue;
+        const r = readyAt(m);
+        if (r == null) continue;
+        // Earlier categories go first among matches that can start now; never hold a court for them.
+        const score = m.tail + (r <= t ? m.bonus : 0) - wait * Math.max(0, r - t);
+        if (score > bestScore) { bestScore = score; best = m; bestReady = r; }
+      }
+      best.start = Math.max(t, bestReady); best.end = best.start + best.dur; best.court = ci;
+      free[ci] = best.end + c.change;
+      for (const e of best.ents) ent[e] = best.end + c.rest;
+    }
+    return { M, finish: Math.max(...M.map(m => m.end)) };
+  }
+
+  function schedule(c) {
+    let best = null;
+    for (const wait of [1e9, 8, 5, 3]) {
+      const r = schedulePass(c, wait);
+      if (!best || r.finish < best.finish) best = r;
+    }
+    return best;
+  }
+
+  const verdictOf = f => f <= PRIZES ? 'ok' : f <= CLOSE ? 'warn' : 'bad';
+
+  // Deterministic make-believe scores so the boards look alive.
+  function scoreAt(m, p) {
+    if (!m._sc) {
+      const r = rng(m.id * 7919 + 13), aWins = r() < .5;
+      if (!m.long) {
+        const lose = 16 + Math.floor(r() * 13);
+        m._sc = { sets: [aWins ? [30, lose] : [lose, 30]] };
+      } else {
+        const n = r() < .4 ? 3 : 2, sets = [];
+        const upsetSet = n === 3 ? Math.floor(r() * 2) : -1;
+        for (let i = 0; i < n; i++) {
+          const lose = 9 + Math.floor(r() * 11);
+          const winnerIsA = i === upsetSet ? !aWins : aWins;
+          sets.push(winnerIsA ? [21, lose] : [lose, 21]);
+        }
+        m._sc = { sets };
+      }
+    }
+    const sets = m._sc.sets, n = sets.length;
+    if (p >= 1) return sets.map(s => s.join('–')).join('  ');
+    const idx = Math.min(Math.floor(p * n), n - 1), frac = p * n - idx;
+    const parts = sets.slice(0, idx).map(s => s.join('–'));
+    parts.push(sets[idx].map(v => Math.floor(v * frac)).join('–'));
+    return parts.join('  ');
+  }
+
+  // ---------- state ----------
+  let plan = schedule(cfg), t = 630, playing = !reduce, speed = 4, endT = 910, last = null;
+  const BASE_MPS = 4; // sim minutes per second at 1×
+
+  const setText = (el, s) => { if (el._t !== s) { el.textContent = s; el._t = s; } };
+  const setAttr = (el, k, v) => { if (el.getAttribute(k) !== v) el.setAttribute(k, v); };
+
+  // ---------- courts ----------
+  let tiles = [];
+  function buildCourts() {
+    const host = $('courts');
+    host.innerHTML = '';
+    tiles = [];
+    for (let i = 0; i < cfg.courts; i++) {
+      const el = document.createElement('article');
+      el.className = 'court';
+      el.innerHTML = `
+        <header><span class="cn">Court ${i + 1}</span><span class="state"></span></header>
+        <div class="floor"><div class="mid l"></div><div class="mid r"></div><div class="net"></div>
+          <span class="p p1"></span><span class="p p2"></span><span class="p p3"></span><span class="p p4"></span>
+          <span class="bird"></span></div>
+        <div class="info"><span class="chip"></span><p class="stage"></p><p class="vs"></p><p class="score"></p></div>
+        <div class="bar"><i></i></div>`;
+      host.appendChild(el);
+      const q = s => el.querySelector(s);
+      tiles.push({ el, state: q('.state'), chip: q('.chip'), stage: q('.stage'), vs: q('.vs'), score: q('.score'), bar: q('.bar i'), ps: [...el.querySelectorAll('.p')] });
+    }
+  }
+
+  const POS = { single: [[25, 50], [75, 50]], double: [[18, 30], [30, 70], [70, 30], [82, 70]] };
+  function placePlayers(tile, doubles) {
+    const pos = doubles ? POS.double : POS.single;
+    tile.ps.forEach((p, i) => {
+      const xy = pos[i];
+      p.hidden = !xy;
+      if (xy) { p.style.left = xy[0] + '%'; p.style.top = xy[1] + '%'; p.style.animationDelay = (-i * .7) + 's'; }
+    });
+  }
+
+  function drawCourts() {
+    const byCourt = Array.from({ length: cfg.courts }, () => []);
+    for (const m of plan.M) byCourt[m.court].push(m);
+    byCourt.forEach((list, i) => {
+      const tile = tiles[i];
+      if (!tile) return;
+      const live = list.find(m => m.start <= t && t < m.end);
+      if (live) {
+        const p = (t - live.start) / live.dur;
+        tile.el.classList.add('live');
+        setAttr(tile.el, 'data-cat', live.cat);
+        if (tile._m !== live.id) { placePlayers(tile, live.cat !== 'S'); tile._m = live.id; }
+        setText(tile.state, `Playing · ends ${fmt(live.end)}`);
+        setText(tile.chip, CAT_NAME[live.cat]);
+        setText(tile.stage, live.label);
+        tile.vs.innerHTML !== `${live.a} <i>vs</i> ${live.b}` && (tile.vs.innerHTML = `${live.a} <i>vs</i> ${live.b}`);
+        setText(tile.score, scoreAt(live, p));
+        tile.bar.style.width = (p * 100).toFixed(1) + '%';
+        return;
+      }
+      tile.el.classList.remove('live');
+      tile._m = null;
+      const prev = list.filter(m => m.end <= t).sort((a, b) => b.end - a.end)[0];
+      const next = list.filter(m => m.start > t).sort((a, b) => a.start - b.start)[0];
+      tile.bar.style.width = '0%';
+      if (next) {
+        setAttr(tile.el, 'data-cat', next.cat);
+        const changing = prev && t < prev.end + cfg.change;
+        setText(tile.state, changing ? 'Changeover' : 'Waiting');
+        setText(tile.chip, `Next · ${fmt(next.start)}`);
+        setText(tile.stage, next.label);
+        tile.vs.innerHTML = `${next.a} <i>vs</i> ${next.b}`;
+        setText(tile.score, '');
+      } else {
+        tile.el.removeAttribute('data-cat');
+        setText(tile.state, list.length ? 'Done' : 'Not used');
+        setText(tile.chip, list.length ? `Last match ended ${fmt(prev.end)}` : 'No matches here');
+        setText(tile.stage, prev ? `${list.length} matches played` : '');
+        tile.vs.innerHTML = '';
+        setText(tile.score, '');
+      }
+    });
+  }
+
+  // ---------- categories ----------
+  let catEls = {};
+  function buildCats() {
+    const host = $('cats');
+    host.innerHTML = '';
+    catEls = {};
+    for (const k of ['S', 'D', 'A']) {
+      const el = document.createElement('div');
+      el.className = 'cat'; el.dataset.cat = k;
+      el.innerHTML = `<div class="row"><b>${CAT_NAME[k]}</b><span></span></div><div class="bar"><i></i></div><div class="note"></div>`;
+      host.appendChild(el);
+      catEls[k] = { count: el.querySelector('.row span'), bar: el.querySelector('.bar i'), note: el.querySelector('.note') };
+    }
+  }
+  function drawCats() {
+    for (const k of ['S', 'D', 'A']) {
+      const list = plan.M.filter(m => m.cat === k);
+      const done = list.filter(m => m.end <= t).length;
+      const fin = list.find(m => m.stage === 'F');
+      const e = catEls[k];
+      setText(e.count, `${done} / ${list.length}`);
+      e.bar.style.width = (done / list.length * 100) + '%';
+      const liveNow = list.filter(m => m.start <= t && t < m.end);
+      const stage = liveNow.length ? liveNow[0].label.replace(/ · .*/, '').replace(/ \d$/, '') : null;
+      setText(e.note, done === list.length ? `Champion decided at ${fmt(fin.end)}`
+        : stage ? `Now: ${stage}${liveNow.length > 1 ? ` (${liveNow.length} courts)` : ''} · final ${fmt(fin.start)}`
+        : `Final scheduled ${fmt(fin.start)}–${fmt(fin.end)}`);
+    }
+  }
+
+  // ---------- timeline ----------
+  let blocks = [], playheadEl;
+  const pct = m => ((m - START) / (endT - START) * 100) + '%';
+  function buildGantt() {
+    const g = $('gantt');
+    g.innerHTML = '';
+    const axis = document.createElement('div');
+    axis.className = 'g-axis';
+    for (let m = START; m <= endT; m += 30) {
+      const s = document.createElement('span');
+      s.style.left = pct(m); s.textContent = fmtShort(m);
+      axis.appendChild(s);
+    }
+    g.appendChild(axis);
+    blocks = [];
+    for (let i = 0; i < cfg.courts; i++) {
+      const row = document.createElement('div');
+      row.className = 'g-row';
+      row.innerHTML = `<span>Court ${i + 1}</span><div class="g-track"></div>`;
+      const track = row.querySelector('.g-track');
+      for (const m of plan.M.filter(x => x.court === i)) {
+        const b = document.createElement('div');
+        b.className = 'blk'; b.dataset.cat = m.cat;
+        b.style.left = pct(m.start);
+        b.style.width = `calc(${pct(m.end)} - ${pct(m.start)})`;
+        b.title = `${CAT_NAME[m.cat]} · ${m.label}\n${m.a} vs ${m.b}\n${fmt(m.start)}–${fmt(m.end)}`;
+        b.textContent = BLOCK_NAME[m.stage] || m.label.replace(' · Round ', ' ');
+        track.appendChild(b);
+        blocks.push({ b, m });
+      }
+      g.appendChild(row);
+    }
+    const ov = document.createElement('div');
+    ov.className = 'g-overlay';
+    ov.innerHTML = `<div class="vline prizes" style="left:${pct(PRIZES)}"><em>Prizes 2:40</em></div>
+      <div class="vline close" style="left:${pct(CLOSE)}"><em>Hall closes 3:00</em></div>
+      <div class="playhead" id="playhead"></div>`;
+    g.appendChild(ov);
+    playheadEl = $('playhead');
+  }
+  function drawGantt() {
+    for (const { b, m } of blocks) {
+      b.classList.toggle('done', m.end <= t);
+      b.classList.toggle('now', m.start <= t && t < m.end);
+    }
+    playheadEl.style.left = pct(t);
+  }
+
+  // ---------- summary ----------
+  function drawSummary() {
+    const f = plan.finish, v = verdictOf(f);
+    $('verdict').dataset.v = v;
+    $('vPill').textContent = v === 'ok' ? 'Fits' : v === 'warn' ? 'Tight' : 'Does not fit';
+    $('vHead').textContent = `Last final ends ${fmt(f)}`;
+    const used = plan.M.reduce((s, m) => s + m.dur, 0);
+    const util = Math.round(used / (cfg.courts * (f - START)) * 100);
+    $('vSub').textContent = v === 'ok' ? `${PRIZES - f} min spare before prizes. Courts busy ${util}% of the day.`
+      : v === 'warn' ? `Prizes start ${f - PRIZES} min late, but you're out by 3:00 PM.`
+      : `${f - CLOSE} min past 3:00 PM. Add a court or shorten matches.`;
+
+    $('orderNote').textContent = PLAY_ORDER.map(k => {
+      const list = plan.M.filter(m => m.cat === k);
+      const a = Math.min(...list.map(m => m.start)), b = Math.max(...list.map(m => m.end));
+      return `${CAT_NAME[k]} ${fmt(a)}–${fmt(b)}`;
+    }).join('  →  ');
+
+    const host = $('compare');
+    host.innerHTML = '';
+    for (let n = 2; n <= 10; n++) {
+      const f2 = n === cfg.courts ? f : schedule({ ...cfg, courts: n }).finish;
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'cmp'; b.dataset.v = verdictOf(f2);
+      b.setAttribute('aria-pressed', String(n === cfg.courts));
+      b.innerHTML = `<b>${n} courts</b><span>ends ${fmt(f2)}</span>`;
+      b.addEventListener('click', () => setCourts(n));
+      host.appendChild(b);
+    }
+  }
+
+  function drawClock() {
+    setText($('clock'), fmt(t));
+    setText($('doneCount'), `${plan.M.filter(m => m.end <= t).length} / ${plan.M.length} played`);
+    const s = $('scrub');
+    if (document.activeElement !== s) s.value = t;
+  }
+
+  function rebuild() {
+    plan = schedule(cfg);
+    endT = Math.max(CLOSE, Math.ceil((plan.finish + 10) / 30) * 30);
+    const s = $('scrub');
+    s.max = endT;
+    t = Math.min(t, endT);
+    const ticks = $('ticks');
+    ticks.innerHTML = '';
+    for (let m = START; m <= endT; m += 60) { const sp = document.createElement('span'); sp.textContent = fmtShort(m); ticks.appendChild(sp); }
+    $('nCourts').textContent = cfg.courts;
+    for (const [id, k] of [['Short', 'short'], ['Long', 'long'], ['Rest', 'rest'], ['Change', 'change']]) $('o' + id).textContent = cfg[k] + ' min';
+    buildCourts(); buildCats(); buildGantt(); drawSummary(); draw();
+  }
+
+  function draw() { drawCourts(); drawCats(); drawGantt(); drawClock(); }
+
+  function setCourts(n) { cfg.courts = Math.max(2, Math.min(10, n)); rebuild(); }
+
+  function setPlaying(p) {
+    playing = p;
+    if (playing && t >= endT) t = START;
+    $('play').textContent = playing ? 'Pause' : 'Play';
+    $('app').classList.toggle('paused', !playing);
+  }
+
+  // ---------- wiring ----------
+  $('minus').addEventListener('click', () => setCourts(cfg.courts - 1));
+  $('plus').addEventListener('click', () => setCourts(cfg.courts + 1));
+  for (const [id, k] of [['sShort', 'short'], ['sLong', 'long'], ['sRest', 'rest'], ['sChange', 'change']]) {
+    $(id).addEventListener('input', e => { cfg[k] = +e.target.value; rebuild(); });
+  }
+  $('play').addEventListener('click', () => setPlaying(!playing));
+  $('speeds').addEventListener('click', e => {
+    const b = e.target.closest('button[data-s]');
+    if (!b) return;
+    speed = +b.dataset.s;
+    for (const x of $('speeds').children) x.setAttribute('aria-pressed', String(x === b));
+  });
+  $('order').addEventListener('click', e => {
+    const b = e.target.closest('button[data-seq]');
+    if (!b) return;
+    cfg.seq = b.dataset.seq === '1';
+    for (const x of $('order').children) x.setAttribute('aria-pressed', String(x === b));
+    rebuild();
+  });
+  $('scrub').addEventListener('input', e => { t = +e.target.value; draw(); });
+
+  function frame(ts) {
+    if (playing) {
+      if (last != null) {
+        t += (ts - last) / 1000 * BASE_MPS * speed;
+        if (t >= endT) { t = endT; setPlaying(false); }
+        draw();
+      }
+      last = ts;
+    } else last = null;
+    requestAnimationFrame(frame);
+  }
+
+  rebuild();
+  setPlaying(playing);
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
