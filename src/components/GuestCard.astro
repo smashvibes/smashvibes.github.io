@@ -13,10 +13,10 @@ const { name, role, photo } = Astro.props;
   <Image
     src={photo}
     alt={`${name}, ${role}`}
-    widths={[220, 340, 480]}
+    widths={[280, 420, 595]}
     sizes="(max-width: 520px) 100vw, (max-width: 900px) 45vw, 280px"
     format="webp"
-    quality={80}
+    quality={85}
     loading="lazy"
     decoding="async"
   />

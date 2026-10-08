@@ -380,7 +380,7 @@
   box-shadow: var(--shadow-card);
   font-family: var(--font-body);
 }
-.sv-guest img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.sv-guest img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; object-position: 50% 20%; }
 .sv-guest-body { padding: var(--space-4); text-align: center; }
 .sv-guest-name { margin: 0; font: var(--text-heading-sm); font-size: 16px; color: var(--ink); }
 .sv-guest-role { margin: var(--space-1) 0 0; font: var(--text-body-sm); color: var(--ink-muted); }
