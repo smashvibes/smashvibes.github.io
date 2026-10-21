@@ -75,6 +75,7 @@ Everything is driven from `src/data/site.ts`, so there is one place to edit.
 | Robots meta | `Base.astro` | `index, follow, max-image-preview:large` — opts the photography into full-size previews. |
 | `robots.txt` | `public/robots.txt` | Allows everything, points at the sitemap. |
 | XML sitemap | `@astrojs/sitemap` | Generates `/sitemap-index.xml` at build. **Submit that URL in Search Console.** |
+| `/sitemap.xml` alias | `src/pages/sitemap.xml.ts` | The integration cannot write a plain `sitemap.xml`, so this endpoint serves an identical index for anyone who guesses the conventional path. |
 | Open Graph / Twitter | `Base.astro` | Full card set incl. `og:image:width/height` and image alt. |
 | Structured data | `src/pages/index.astro` | One `@graph`: `WebSite`, `SportsActivityLocation`, `FAQPage`. |
 | Favicons | `public/` | `.ico` (16/32/48), 16/32 PNG, 180 apple-touch, 192/512 + manifest. |
@@ -281,8 +282,21 @@ dead.
 | Responses | <https://docs.google.com/spreadsheets/d/1RGpG_7xmVjjLCT11hziGWlupfc2OSGPb7lOhJcAe6tg/edit> |
 
 The script also carries `updateCategoryAvailability()`: Google Forms cannot cap
-responses, so this removes a category from the list once it hits its entry limit
-(16 / 16 / 5 / 5). Install it with `installCapTrigger()` if you want that automatic.
+responses, so this removes a category from the list once it hits its entry limit.
+Install it with `installSheetTriggers()` if you want that automatic. The caps are set
+to 160 / 160 / 160 since 15 Oct 2026: the organisers want the form to keep taking entries
+past 16 and will close it by hand, so in practice nothing is ever hidden or waitlisted.
+Set them back to 16 in `CATEGORIES` to restore the automatic FULL handling.
+
+**Sign-up emails.** The same submit trigger emails every address in `NOTIFY_EMAILS`
+(currently James, Danial and Russell) once per registration and once per respondent
+edit: category, Entered/Waitlist status, running count, every answer, and a link to the
+row. To set it up or change the list:
+
+1. Paste `scripts/create-registration-form.gs` over the Apps Script project.
+2. Run `installSheetTriggers()` once (safe to re-run; it replaces, never stacks).
+3. Run `sendTestNotification()` — approve the mail permission and check all three
+   inboxes get it. Mail goes out from whichever Google account ran step 2.
 
 **Confirm before running:** the under-17 cut-off is set to "under 17 on the event date"
 (born on or after 15 November 2009). Age-as-at-event-date versus age-as-at-1-January is

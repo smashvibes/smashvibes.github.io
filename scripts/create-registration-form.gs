@@ -8,7 +8,9 @@
  *   listRegistrationForms()    finds duplicate forms on the account
  *   ensureWaiverLast()         moves the waiver to the end, on its own
  *   installCloseTrigger()      run ONCE: stops responses after the closing date
- *   installSheetTriggers()     run ONCE: caps each category from the response sheet
+ *   installSheetTriggers()     run ONCE: caps each category AND emails the organisers
+ *                              (NOTIFY_EMAILS) on every sign-up
+ *   sendTestNotification()     emails the organisers the latest entry, to check delivery
  *
  * TWO ENTRY POINTS
  *
@@ -79,11 +81,33 @@ var PAYMENT = {
   paynow: '8088 6684',
   maskedName: 'MUHAMXXX DANXXX BIX MOHAXXX AIZXX',
   fullName: 'Muhammad Danial bin Mohamed Aizam',
+  // Where the entrant sends their payment screenshot. The PayNow number is a mobile,
+  // so it doubles as the WhatsApp. Change here if proofs should go somewhere else.
+  proofWhatsApp: '8088 6684',
 };
+
+/**
+ * Who hears about every sign-up. Each submission (and each respondent edit) sends ONE
+ * email to all of these, from the Google account that ran installSheetTriggers().
+ *
+ * Quota: a consumer Gmail account may send to 100 recipients a day through Apps Script,
+ * a Workspace account 1,500. Three recipients per entry and a 48-entry field is well
+ * inside either. Leave the list empty to switch notifications off.
+ */
+var NOTIFY_EMAILS = [
+  'Jamesong@globalbarrels.com.sg',
+  'Danialburgandy@gmail.com',
+  'russellsg888@gmail.com',
+];
 
 /**
  * Entry caps. Enforced against the response sheet's Status column — see "Category caps"
  * near the end of this file.
+ *
+ * Set to 160 on 15 Oct 26 at the organisers' request: they want the form to keep taking
+ * entries after a category passes 16, and to close it by hand instead. 160 is high enough
+ * that the cap never trips, so no category is hidden and nobody is waitlisted. Put the
+ * caps back to 16 to restore the automatic FULL handling.
  *
  * Men's and Mixed Doubles are ONE entry category: the tournament runs them combined as a
  * single Open Doubles draw of 16 pairs (four groups of four, then a knockout — organiser's
@@ -94,9 +118,9 @@ var PAYMENT = {
  * count to zero. `fee` is display text only.
  */
 var CATEGORIES = [
-  { key: 'U17_SINGLES', label: 'Under-17 Singles', cap: 16, unit: 'entries', fee: '$50 per player' },
-  { key: 'U17_DOUBLES', label: 'Under-17 Doubles', cap: 16, unit: 'pairs', fee: '$80 per pair' },
-  { key: 'ADULT_OPEN', label: "Adults Open — Men's / Mixed Doubles", cap: 16, unit: 'pairs', fee: '$80 per pair' },
+  { key: 'U17_SINGLES', label: 'Under-17 Singles', cap: 160, unit: 'entries', fee: '$50 per player' },
+  { key: 'U17_DOUBLES', label: 'Under-17 Doubles', cap: 160, unit: 'pairs', fee: '$80 per pair' },
+  { key: 'ADULT_OPEN', label: "Adults Open — Men's / Mixed Doubles", cap: 160, unit: 'pairs', fee: '$80 per pair' },
 ];
 
 var CATEGORY_QUESTION = 'Which category are you entering?';
@@ -324,7 +348,9 @@ function formDescription() {
     'REGISTRATION FEE\n' +
     feeLines() + '\n\n' +
     'PAYMENT: PayNow to ' + PAYMENT.paynow + '\n' +
-    PAYMENT.maskedName + ' (' + PAYMENT.fullName + ')\n\n' +
+    PAYMENT.maskedName + ' (' + PAYMENT.fullName + ')\n' +
+    'Once paid, please send a screenshot of the payment to WhatsApp ' +
+    PAYMENT.proofWhatsApp + '.\n\n' +
     'One submission per entry. Doubles pairs submit ONCE, with both players listed — the ' +
     'pair fee covers both.\n' +
     'Questions: ' + EVENT.contact
@@ -347,7 +373,9 @@ function categoryHelpText(fullLabels) {
 
 /** Entrants cannot see their sheet status, so the message covers the waitlist case. */
 var CONFIRMATION_MESSAGE =
-  'Thanks — your entry is in. We will confirm your slot by WhatsApp before the event. ' +
+  'Thanks — your entry is in. If you have not paid yet: PayNow ' + PAYMENT.paynow +
+  ', then send a screenshot of the payment to WhatsApp ' + PAYMENT.proofWhatsApp + '. ' +
+  'We will confirm your slot by WhatsApp before the event. ' +
   'If your category filled up while you were registering, you will be placed on the ' +
   'waitlist and we will tell you. If your plans change, tell us early so the slot can go ' +
   'to another player.';
@@ -1178,12 +1206,23 @@ function installSheetTriggers() {
 
 /** Spreadsheet form-submit trigger. Also fires when a respondent edits their entry. */
 function onEntrySubmitted(e) {
+  var sheet = e.range.getSheet();
+  var row = e.range.getRow();
+  var cols;
+  var isEdit;
   withLock(function () {
     var form = openLiveForm();
-    var sheet = e.range.getSheet();
-    allocateRow(sheet, statusColumns(sheet), e.range.getRow());
+    cols = statusColumns(sheet);
+    isEdit = !!sheet.getRange(row, cols.status).getValue();
+    allocateRow(sheet, cols, row);
     updateCategoryAvailability(form);
   });
+  // Outside the lock, and never allowed to break the cap bookkeeping above.
+  try {
+    notifyOrganisers(sheet, cols, row, isEdit);
+  } catch (err) {
+    Logger.log('Notification email failed: ' + err.message);
+  }
 }
 
 /** Spreadsheet edit trigger. Only a Status change can free or take a slot. */
@@ -1365,4 +1404,97 @@ function updateCategoryAvailability(form) {
   }
   for (var k = 0; k < report.length; k++) Logger.log('  ' + report[k]);
   Logger.log(choices.length + ' of ' + CATEGORIES.length + ' categories open.');
+}
+
+// ---------------------------------------------------------------------------
+// Sign-up notifications
+// ---------------------------------------------------------------------------
+
+/**
+ * Emails NOTIFY_EMAILS a readable copy of one response row, with the Status the caps
+ * logic just gave it and the running count for its category.
+ *
+ * Columns are read by header from the sheet, so the email keeps working after the form's
+ * questions change. Declaration tick-boxes come through as the full clause text joined
+ * by commas; anything that long is shown as a tick instead of pasted in.
+ */
+function notifyOrganisers(sheet, cols, row, isEdit) {
+  if (!NOTIFY_EMAILS.length) return;
+
+  var lastCol = sheet.getLastColumn();
+  var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+  var values = sheet.getRange(row, 1, 1, lastCol).getDisplayValues()[0];
+
+  var category = values[cols.category - 1] || '(no category)';
+  var status = values[cols.status - 1] || '';
+  var primaryName = '';
+  var primaryEmail = '';
+  var lines = [];
+  for (var c = 0; c < headers.length; c++) {
+    var header = String(headers[c] || '');
+    var value = String(values[c] || '').trim();
+    if (!header || !value || header === STATUS_CATEGORY_HEADER) continue;
+    if (!primaryName && /— full name$/.test(header)) primaryName = value;
+    if (!primaryEmail && /— email$/.test(header)) primaryEmail = value;
+    if (value.length > 150) value = '✓ ticked';
+    lines.push(header + ': ' + value);
+  }
+
+  // Running total for this category, counted the same way the caps are.
+  var all = sheet.getDataRange().getValues();
+  var entered = 0;
+  for (var r = 1; r < all.length; r++) {
+    if (all[r][cols.category - 1] === category &&
+        all[r][cols.status - 1] === STATUS.entered) entered += 1;
+  }
+  var cap = capFor(category);
+  var tally = cap === null ? entered + ' entered' : entered + ' of ' + cap + ' entered';
+
+  var subject = '[' + EVENT.name + '] ' + (isEdit ? 'Updated' : 'New') + ' registration — ' +
+    category + ' — ' + (primaryName || 'row ' + row) + (status ? ' (' + status + ')' : '');
+
+  var body = [
+    (isEdit ? 'A registration was edited by the respondent.' : 'A new registration has come in.'),
+    '',
+    'Category : ' + category,
+    'Status   : ' + (status || '—') + '   (' + tally + ')',
+    'Sheet    : ' + sheet.getParent().getUrl() + '#gid=' + sheet.getSheetId() + '&range=A' + row,
+    '',
+    lines.join('\n'),
+    '',
+    'Status is set by the script: Entered = has a place, Waitlist = category was full. ' +
+    'Change it in the Status column of the sheet; the form reopens or closes on its own.',
+  ].join('\n');
+
+  MailApp.sendEmail({
+    to: NOTIFY_EMAILS.join(','),
+    replyTo: primaryEmail || undefined,
+    subject: subject,
+    body: body,
+    name: EVENT.name + ' registrations',
+  });
+  Logger.log('Notified ' + NOTIFY_EMAILS.length + ' organisers about row ' + row + '.');
+}
+
+/**
+ * Run this once after pasting: it emails the organisers the most recent entry in the
+ * sheet (or a note that there are none yet) so you know delivery works before the first
+ * real sign-up. Also triggers the one-time mail permission prompt.
+ */
+function sendTestNotification() {
+  var sheet = responseSheet(openLiveForm());
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) {
+    MailApp.sendEmail({
+      to: NOTIFY_EMAILS.join(','),
+      subject: '[' + EVENT.name + '] Registration notifications are on',
+      body: 'You will get one email per sign-up to ' + EVENT.name + '. No entries yet.\n\n' +
+            'Sheet: ' + sheet.getParent().getUrl(),
+      name: EVENT.name + ' registrations',
+    });
+    Logger.log('Sent the "notifications are on" email to ' + NOTIFY_EMAILS.join(', '));
+    return;
+  }
+  notifyOrganisers(sheet, statusColumns(sheet), lastRow, false);
+  Logger.log('Sent row ' + lastRow + ' as a test to ' + NOTIFY_EMAILS.join(', '));
 }
