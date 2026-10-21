@@ -75,6 +75,7 @@ Everything is driven from `src/data/site.ts`, so there is one place to edit.
 | Robots meta | `Base.astro` | `index, follow, max-image-preview:large` — opts the photography into full-size previews. |
 | `robots.txt` | `public/robots.txt` | Allows everything, points at the sitemap. |
 | XML sitemap | `@astrojs/sitemap` | Generates `/sitemap-index.xml` at build. **Submit that URL in Search Console.** |
+| `/llms.txt` | `src/pages/llms.txt.ts` | Plain-text site summary for AI assistants (llmstxt.org). Generated from `site.ts` and `tournament.ts` at build, so it never drifts from the pages. |
 | `/sitemap.xml` alias | `src/pages/sitemap.xml.ts` | The integration cannot write a plain `sitemap.xml`, so this endpoint serves an identical index for anyone who guesses the conventional path. |
 | Open Graph / Twitter | `Base.astro` | Full card set incl. `og:image:width/height` and image alt. |
 | Structured data | `src/pages/index.astro` | One `@graph`: `WebSite`, `SportsActivityLocation`, `FAQPage`. |
