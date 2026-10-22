@@ -12,7 +12,7 @@ import CtaBanner from '../components/CtaBanner.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import {
   closing, contacts, faq, features, featuresIntro, highlights, JOIN_URL, nav, schedule,
-  site, venue,
+  site, socials, venue,
   WHATSAPP_CHAT, WHATSAPP_GROUP, WHATSAPP_NUMBER,
 } from '../data/site';
 
@@ -78,7 +78,7 @@ const jsonLd = {
         description: 'Per game, pay as you play. All levels welcome.',
         availability: 'https://schema.org/InStock',
       },
-      sameAs: [WHATSAPP_CHAT, ...contacts.telegram.map((t) => t.href)],
+      sameAs: [...socials.map((s) => s.href), WHATSAPP_CHAT, ...contacts.telegram.map((t) => t.href)],
     },
     {
       '@type': 'FAQPage',

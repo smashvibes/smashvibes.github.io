@@ -109,6 +109,12 @@ var NOTIFY_EMAILS = [
  * that the cap never trips, so no category is hidden and nobody is waitlisted. Put the
  * caps back to 16 to restore the automatic FULL handling.
  *
+ * A cap of 0 CLOSES a category: it disappears from the form's category question and is
+ * named as FULL in the help text, and any entry that still slips through (someone who had
+ * the form open) is stamped Waitlist in the sheet. Adults Open was closed this way on
+ * 21 Oct 26 at the organisers' request. Apply by pasting the file and running
+ * updateExistingForm(); to reopen, put the cap back and run it again.
+ *
  * Men's and Mixed Doubles are ONE entry category: the tournament runs them combined as a
  * single Open Doubles draw of 16 pairs (four groups of four, then a knockout — organiser's
  * draws of 6 Oct 26), so that is the cap. Which of the two a pair is playing follows from
@@ -120,7 +126,7 @@ var NOTIFY_EMAILS = [
 var CATEGORIES = [
   { key: 'U17_SINGLES', label: 'Under-17 Singles', cap: 160, unit: 'entries', fee: '$50 per player' },
   { key: 'U17_DOUBLES', label: 'Under-17 Doubles', cap: 160, unit: 'pairs', fee: '$80 per pair' },
-  { key: 'ADULT_OPEN', label: "Adults Open — Men's / Mixed Doubles", cap: 160, unit: 'pairs', fee: '$80 per pair' },
+  { key: 'ADULT_OPEN', label: "Adults Open — Men's / Mixed Doubles", cap: 0, unit: 'pairs', fee: '$80 per pair' }, // closed 21 Oct 26
 ];
 
 var CATEGORY_QUESTION = 'Which category are you entering?';
@@ -1066,8 +1072,11 @@ function verifyForm() {
     Logger.log('  ' + choices[c].getValue() + '  ->  ' + (page ? page.getTitle() : 'NO BRANCH'));
     if (!page) problems.push('"' + choices[c].getValue() + '" has no branch set');
   }
-  if (choices.length !== CATEGORIES.length) {
-    problems.push('expected ' + CATEGORIES.length + ' categories, found ' + choices.length);
+  // Categories closed by a cap of 0 are meant to be missing from the question.
+  var expected = 0;
+  for (var e = 0; e < CATEGORIES.length; e++) if (CATEGORIES[e].cap > 0) expected += 1;
+  if (choices.length > expected) {
+    problems.push('expected at most ' + expected + ' categories, found ' + choices.length);
   }
 
   // The waiver is worthless if its tick is optional or can be skipped.

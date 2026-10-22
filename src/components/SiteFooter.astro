@@ -5,7 +5,7 @@
  * still holds (the system forbids two dark *sections* meeting, not a CTA and its footer).
  */
 import Icon from './Icon.astro';
-import { footerNav, site, venue, schedule, WHATSAPP_GROUP } from '../data/site';
+import { footerNav, site, socials, venue, schedule, WHATSAPP_GROUP } from '../data/site';
 
 const year = new Date().getFullYear();
 ---
@@ -36,6 +36,15 @@ const year = new Date().getFullYear();
           <Icon name="whatsapp" size={20} />Join the WhatsApp group
         </a>
       </p>
+      <ul class="sv-footer-socials">
+        {socials.map((s) => (
+          <li>
+            <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}>
+              <Icon name={s.icon} size={20} />
+            </a>
+          </li>
+        ))}
+      </ul>
     </div>
   </div>
 

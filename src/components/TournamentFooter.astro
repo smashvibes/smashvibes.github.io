@@ -40,13 +40,9 @@ const year = new Date().getFullYear();
     <ul class="sv-tr-socials">
       {socials.map((s) => (
         <li>
-          {s.href
-            ? (
-              <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}>
-                <Icon name={s.icon} size={20} />
-              </a>
-            )
-            : <span class="sv-tr-social-pending"><Icon name={s.icon} size={20} label={s.label} /></span>}
+          <a href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label}>
+            <Icon name={s.icon} size={20} />
+          </a>
         </li>
       ))}
     </ul>

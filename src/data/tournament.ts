@@ -295,13 +295,5 @@ export const draws: {
   ],
 };
 
-/**
- * TODO: no social handles were supplied. Fill in `href` and each icon becomes a link;
- * until then they render as muted marks rather than links to nowhere.
- */
-export const socials: { icon: IconName; label: string; href: string | null }[] = [
-  { icon: 'instagram', label: 'Instagram', href: null },
-  { icon: 'tiktok', label: 'TikTok', href: null },
-  { icon: 'facebook', label: 'Facebook', href: null },
-  { icon: 'youtube', label: 'YouTube', href: null },
-];
+/** Same profiles as the main site; the tournament has no accounts of its own. */
+export { socials } from './site';

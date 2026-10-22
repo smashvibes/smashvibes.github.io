@@ -26,6 +26,13 @@ export const WHATSAPP_CHAT = `https://wa.me/65${WHATSAPP_NUMBER.replace(/\s/g, '
 /** The community group. Every "Join WhatsApp Group" button points here. */
 export const WHATSAPP_GROUP = 'https://chat.whatsapp.com/CDLawr1pluT96IpcaQL4Ur';
 
+/** Public social profiles. Rendered in both footers and listed as `sameAs` in the schema. */
+export const socials: { icon: IconName; label: string; href: string }[] = [
+  { icon: 'facebook', label: 'Facebook', href: 'https://www.facebook.com/smashvibes.sg' },
+  { icon: 'instagram', label: 'Instagram', href: 'https://www.instagram.com/smashvibes.sg/' },
+  { icon: 'youtube', label: 'YouTube', href: 'https://www.youtube.com/channel/UC4AiAmFe9hURmeslZe99jCA' },
+];
+
 /** Where "Join a Game" points. Swap for a form/booking URL when one exists. */
 export const JOIN_URL = WHATSAPP_CHAT;
 

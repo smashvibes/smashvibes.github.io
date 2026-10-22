@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { site, schedule, venue, features, faq, contacts, WHATSAPP_GROUP } from '../data/site';
+import { site, schedule, venue, features, faq, contacts, socials, WHATSAPP_GROUP } from '../data/site';
 import {
   tournament,
   hero as tournamentHero,
@@ -50,6 +50,7 @@ export const GET: APIRoute = ({ site: base }) => {
     ...contacts.whatsapp.map((c) => `- WhatsApp ${c.label}: ${c.href}`),
     ...contacts.telegram.map((c) => `- Telegram ${c.label}: ${c.href}`),
     `- Community WhatsApp group: ${WHATSAPP_GROUP}`,
+    ...socials.map((s) => `- ${s.label}: ${s.href}`),
     '',
     '## FAQ',
     '',

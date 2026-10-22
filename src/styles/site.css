@@ -371,6 +371,9 @@ img { max-width: 100%; height: auto; display: block; }
 .sv-footer a:hover { color: var(--gold-400); }
 .sv-footer a:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: var(--radius-sm); }
 .sv-footer-wa { display: inline-flex; align-items: center; gap: var(--space-2); }
+/* Out-specifies `.sv-footer ul` so the icons sit in a row rather than the nav's stacked grid. */
+.sv-footer .sv-footer-socials { display: flex; gap: var(--space-4); margin-top: var(--space-2); }
+.sv-footer-socials a { display: grid; place-items: center; }
 .sv-footer-base {
   padding-block: var(--space-5);
   border-top: 1px solid var(--night-600);
