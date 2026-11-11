@@ -160,13 +160,18 @@ Two things about that file are load-bearing. Astro emits it **before** `tokens.c
 second pair of tabs for its two stages, **Round Robin** and **Knockout Draw**. Every
 category runs the same shape — four groups of four, top two through to the quarter
 finals. Which draws exist is declared in `draws` in `src/data/tournament.ts`; what is in
-them comes from the organiser's Google Sheet.
+them comes from the organiser's Google Sheet. The group letters (A–L across the three
+categories), match numbers (1–72 across the day), courts, start times and knockout
+pairings follow the organiser's schedule of 5 Nov 2026; `seedOrganiserDraw()` in
+`scripts/draws-sheet.gs` writes that draw, names included, onto the sheet.
 
 #### The sheet is the admin panel
 
-There is no login to build. The match desk types names, courts, times, scores and the
-knockout line-up into a Google Sheet; whoever can edit the
-sheet is the admin, and nobody else can change anything. `scripts/draws-sheet.gs` creates that sheet and, deployed as a web app, serves
+There is no login to build. The match desk types who plays whom, courts, times, scores
+and the knockout line-up into a Google Sheet; whoever can edit the sheet is the admin,
+and nobody else can change anything. Player A and Player B are plain text on every row
+of an event tab: the site never pairs players up or orders matches itself, and the
+Entries tab in the sheet is a roster the desk keeps for its own reference only. `scripts/draws-sheet.gs` creates that sheet and, deployed as a web app, serves
 it as JSON. The site reads it in two ways:
 
 1. **At build time**, from `src/data/draws.json`. `npm run draws:pull` fetches the feed

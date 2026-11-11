@@ -1,9 +1,9 @@
 /**
  * Draws engine: turns the organiser's sheet (as JSON) into something renderable.
  *
- * Deliberately dumb. The referees work out results, who qualifies and who plays whom;
- * the website shows what they typed and nothing more. So this module only reshapes the
- * feed: it never computes a winner, a table or a seed.
+ * Deliberately dumb. The desk decides who plays whom, the referees work out results and
+ * who qualifies; the website shows what they typed and nothing more. So this module
+ * only reshapes the feed: it never computes a winner, a table, a seed or a pairing.
  *
  * Pure TypeScript with no imports, because it runs in two places: at build time, where
  * the pages render the committed snapshot in src/data/draws.json, and in the browser,
@@ -18,9 +18,13 @@ export interface GroupMatchData {
   no: number;
   court: string;
   time: string;
-  /** Seats in the group, 1-based. */
-  a: number;
-  b: number;
+  /**
+   * Names as typed on the sheet; "" until the desk fills the row. A feed from before
+   * 10 Nov 2026 sent 1-based seat numbers into `players` instead; still accepted so the
+   * site and the sheet can be redeployed in either order.
+   */
+  a: string | number;
+  b: string | number;
   /** As typed: "21-15" or "21-15, 18-21, 21-19". Anything else is shown as text. */
   score: string;
   /** "" (not started), "live" or "done" — exactly as the desk set it. */
@@ -29,8 +33,8 @@ export interface GroupMatchData {
 
 export interface GroupData {
   name: string;
-  /** Names by seat, as typed; "" until the draw is made. */
-  players: string[];
+  /** Only in pre-10 Nov 2026 feeds: names by seat, which `matches[].a/b` then index. */
+  players?: string[];
   matches: GroupMatchData[];
 }
 
@@ -168,7 +172,8 @@ function sidesOf(
 
 function groupView(group: GroupData): GroupView {
   const matches = group.matches.map((m): MatchView => {
-    const name = (seat: number) => cleanName(group.players[seat - 1]);
+    const name = (side: string | number) =>
+      typeof side === 'number' ? cleanName(group.players?.[side - 1]) : cleanName(side);
     return {
       label: `M${m.no}`,
       court: text(m.court),

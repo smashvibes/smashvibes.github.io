@@ -60,7 +60,7 @@ function fixtureScore(m: MatchView): string {
 function sides(m: MatchView): string {
   const raw = m.rawScore !== null;
   const rows = m.sides.map((s) => `<div class="sv-dr-slot">${name(s)}${raw ? '' : scoreBox(s)}</div>`).join('');
-  return `<div class="sv-dr-sides">${rows}${raw ? `<div class="sv-dr-score-raw">${esc(m.rawScore)}</div>` : ''}</div>`;
+  return `<div class="sv-dr-sides">${rows}${raw ? `<div class="sv-dr-score-raw">${esc(m.rawScore ?? '')}</div>` : ''}</div>`;
 }
 
 function courtNote(court: string): string {

@@ -9,7 +9,8 @@
  * diff, commit: the deploy then carries the latest names and times as static HTML.
  *
  * The template MUST agree with the seed in scripts/draws-sheet.gs — same events, groups,
- * fixture order, knockout slots and draft times. Apps Script cannot import this
+ * matches per group, knockout slots and draft times. Player names are always typed by
+ * the desk, so the template's group matches have empty sides. Apps Script cannot import this
  * file, so the structure lives in both places; change them together.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -20,89 +21,91 @@ const SNAPSHOT = resolve(ROOT, 'src/data/draws.json');
 const FEED = resolve(ROOT, 'src/data/draws-feed.json');
 
 // ---------------------------------------------------------------------------
-// Structure. Keep in step with EVENTS / FIXTURES / KNOCKOUT in draws-sheet.gs.
+// Structure. Keep in step with EVENTS / MATCHES_PER_GROUP / KNOCKOUT in draws-sheet.gs.
+// Follows the organiser's "Round Robin & KO Round & Overall Schedule (5 Nov 26) v5":
+// groups lettered A–L across the three events, matches numbered 1–72 across the day.
 // ---------------------------------------------------------------------------
 
-const GROUPS = ['A', 'B', 'C', 'D'];
-const SEATS = 4;
-
-/** Fixture order within a group of four: nobody plays twice in a row, and the last round decides. */
-const FIXTURES = [
-  [1, 2],
-  [3, 4],
-  [1, 3],
-  [2, 4],
-  [1, 4],
-  [2, 3],
-];
+/** Rows per group: a group of four plays six matches. The desk types who plays in each. */
+const MATCHES_PER_GROUP = 6;
 
 /**
- * Cross-group quarter finals, so two players from one group cannot meet before the
- * final. The sides are plain text the page shows until the desk types a name over them.
+ * The knockout as the organiser drew it. A side is [place, group index] ("W" winner,
+ * "R" runner-up, into the event's four groups) or plain text. The page shows the text
+ * until the desk types a name over it.
  */
 const KNOCKOUT = [
-  { id: 'QF1', a: '1st Group A', b: '2nd Group B' },
-  { id: 'QF2', a: '1st Group C', b: '2nd Group D' },
-  { id: 'QF3', a: '1st Group B', b: '2nd Group A' },
-  { id: 'QF4', a: '1st Group D', b: '2nd Group C' },
+  { id: 'QF1', a: ['W', 0], b: ['R', 3] },
+  { id: 'QF2', a: ['R', 1], b: ['W', 2] },
+  { id: 'QF3', a: ['W', 1], b: ['R', 0] },
+  { id: 'QF4', a: ['R', 2], b: ['W', 3] },
   { id: 'SF1', a: 'Winner QF 1', b: 'Winner QF 2' },
   { id: 'SF2', a: 'Winner QF 3', b: 'Winner QF 4' },
   { id: 'F', a: 'Winner SF 1', b: 'Winner SF 2' },
 ];
 
-
 /**
- * DRAFT timetable on four courts, 15-minute group slots. The U17 Singles group times are
- * the organiser's; everything after is a proposal for the desk to adjust in the sheet.
- * Group A plays on court 1, B on 2, C on 3, D on 4.
+ * Per event: its four groups (first group on court 1, second on court 2, …), the number
+ * of its first match, when its first round starts (later rounds "follow by", so their
+ * time is left blank), and the knockout's court and time.
  */
 const EVENTS = [
   {
     id: 'u17-singles',
-    groupTimes: ['10:30 AM', '10:45 AM', '11:00 AM', '11:15 AM', '11:30 AM', '11:45 AM'],
+    groups: ['A', 'B', 'C', 'D'],
+    firstMatch: 1,
+    groupStart: '10:15 AM',
     knockout: {
-      QF1: ['3:00 PM', '1'], QF2: ['3:00 PM', '2'], QF3: ['3:00 PM', '3'], QF4: ['3:00 PM', '4'],
-      SF1: ['3:45 PM', '1'], SF2: ['3:45 PM', '2'], F: ['4:15 PM', '3'],
+      QF1: ['2:15 PM', '1'], QF2: ['2:15 PM', '2'], QF3: ['2:15 PM', '3'], QF4: ['2:15 PM', '4'],
+      SF1: ['3:15 PM', '1'], SF2: ['3:15 PM', '2'], F: ['4:30 PM', '1'],
     },
   },
   {
     id: 'u17-doubles',
-    groupTimes: ['12:00 PM', '12:15 PM', '12:30 PM', '12:45 PM', '1:00 PM', '1:15 PM'],
+    groups: ['E', 'F', 'G', 'H'],
+    firstMatch: 25,
+    groupStart: '11:30 AM',
     knockout: {
-      QF1: ['3:15 PM', '1'], QF2: ['3:15 PM', '2'], QF3: ['3:15 PM', '3'], QF4: ['3:15 PM', '4'],
-      SF1: ['3:45 PM', '3'], SF2: ['3:45 PM', '4'], F: ['4:15 PM', '4'],
+      QF1: ['2:30 PM', '1'], QF2: ['2:30 PM', '2'], QF3: ['2:30 PM', '3'], QF4: ['2:30 PM', '4'],
+      SF1: ['3:15 PM', '3'], SF2: ['3:15 PM', '4'], F: ['4:30 PM', '2'],
     },
   },
   {
     id: 'open-doubles',
-    groupTimes: ['1:30 PM', '1:45 PM', '2:00 PM', '2:15 PM', '2:30 PM', '2:45 PM'],
+    groups: ['I', 'J', 'K', 'L'],
+    firstMatch: 49,
+    groupStart: '1:00 PM',
     knockout: {
-      QF1: ['3:30 PM', '1'], QF2: ['3:30 PM', '2'], QF3: ['3:30 PM', '3'], QF4: ['3:30 PM', '4'],
-      SF1: ['4:15 PM', '1'], SF2: ['4:15 PM', '2'], F: ['4:45 PM', '1'],
+      QF1: ['2:45 PM', '1'], QF2: ['2:45 PM', '2'], QF3: ['2:45 PM', '3'], QF4: ['2:45 PM', '4'],
+      SF1: ['3:45 PM', '1'], SF2: ['3:45 PM', '2'], F: ['4:30 PM', '3'],
     },
   },
 ];
+
+/** "Winner Gp A" / "Runner-up Gp D" for a seeded side, or the text as given. */
+function side(e, v) {
+  return typeof v === 'string' ? v : `${v[0] === 'W' ? 'Winner Gp ' : 'Runner-up Gp '}${e.groups[v[1]]}`;
+}
 
 function template() {
   const events = {};
   for (const e of EVENTS) {
     events[e.id] = {
-      groups: GROUPS.map((name, g) => ({
+      groups: e.groups.map((name, g) => ({
         name,
-        players: Array(SEATS).fill(''),
-        matches: FIXTURES.map(([a, b], i) => ({
-          no: i + 1,
+        matches: Array.from({ length: MATCHES_PER_GROUP }, (_, i) => ({
+          no: e.firstMatch + i * e.groups.length + g,
           court: String(g + 1),
-          time: e.groupTimes[i] ?? '',
-          a,
-          b,
+          time: i === 0 ? e.groupStart : '',
+          a: '',
+          b: '',
           score: '',
           status: '',
         })),
       })),
       knockout: KNOCKOUT.map((k) => {
         const [time = '', court = ''] = e.knockout[k.id] ?? [];
-        return { id: k.id, court, time, a: k.a, b: k.b, score: '', status: '' };
+        return { id: k.id, court, time, a: side(e, k.a), b: side(e, k.b), score: '', status: '' };
       }),
     };
   }

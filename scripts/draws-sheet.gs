@@ -2,25 +2,35 @@
  * StarRise Cup 2026 — the draws sheet.
  *
  * A Google Sheet is the match desk's admin panel, and the website shows exactly what is
- * typed in it. The website computes NOTHING: referees decide results and fill in the
- * knockout. Whoever can edit the sheet is the admin; nobody else
- * can change anything, and the website only ever reads.
+ * typed in it. The website computes NOTHING: the desk decides who plays whom, referees
+ * decide results and fill in the knockout. Whoever can edit the sheet is the admin;
+ * nobody else can change anything, and the website only ever reads.
  *
  * THE TABS
  *
  *   Read Me        how to use the sheet, for the desk
- *   Entries        one row per player or pair: event, group, seat, name
+ *   Entries        a roster for the desk's own reference (event, group, seat, name).
+ *                  The website does NOT read it; nothing typed here reaches the site.
  *   U17 Singles    one row per match of that event, in playing order: the 24 group
  *   U17 Doubles    matches (Group A M1–M6, Group B …), then QF 1–4, SF 1–2 and the
  *   Open Doubles   Final. Columns: Stage, Match, Court, Time, Player A, Player B,
- *                  Score, Status. Group rows take their players from Entries; knockout
- *                  rows say "1st Group A" until the desk types the name over it.
+ *                  Score, Status. Player A and Player B are plain text the desk types
+ *                  on every row: group rows start empty, knockout rows say "1st Group A"
+ *                  until the desk types the name over it.
  *
  * RUN THESE (the others are internal helpers):
  *
  *   createDrawsSheet()    once: builds a NEW spreadsheet with every tab pre-filled
- *   upgradeDrawsSheet()   rebuilds the match tabs of an existing sheet to this layout,
- *                         keeping the names on Entries, SHEET_ID and the web app URL
+ *   seedOrganiserDraw()   writes the organiser's draw of 5 Nov 2026 (DRAW below) onto
+ *                         the event tabs: group letters, match numbers, names, courts
+ *                         and start times. Keeps scores and statuses. Run once, before
+ *                         match day; after that the desk edits the tabs directly.
+ *   unlinkPlayers()       once, on a sheet built before 10 Nov 2026: turns the group
+ *                         rows' lookup formulas into the names they show, so the desk
+ *                         can type over them. Keeps every score, status and time.
+ *                         seedOrganiserDraw() does this too, so run one or the other.
+ *   upgradeDrawsSheet()   REBUILDS the match tabs from scratch (loses what was typed on
+ *                         them); only for a sheet whose tabs are in an older layout
  *   previewFeed()         logs the JSON the website receives — run it after editing
  *   resetScores()         clears scores and statuses; keeps names, courts and times
  *
@@ -45,7 +55,7 @@
  * deployments → pencil → Version: New → Deploy. The URL does not change. If the
  * change touched the tabs or columns, run upgradeDrawsSheet() as well.
  *
- * The structure below (EVENTS, GROUPS, FIXTURES, KNOCKOUT) MUST agree with
+ * The structure below (EVENTS, MATCHES_PER_GROUP, KNOCKOUT) MUST agree with
  * scripts/pull-draws.mjs in the website repo. Apps Script cannot import that file.
  */
 
@@ -66,71 +76,100 @@ var TAB = { readme: 'Read Me', entries: 'Entries' };
 var OLD_TABS = ['Group Matches', 'Knockout', 'Formats'];
 
 // ---------------------------------------------------------------------------
-// Structure. Keep in step with scripts/pull-draws.mjs.
+// Structure. Keep in step with scripts/pull-draws.mjs. Follows the organiser's
+// "Round Robin & KO Round & Overall Schedule (5 Nov 26) v5": groups are lettered A–L
+// across the three events, matches are numbered 1–72 across the day, and the knockout
+// pairs each group winner with another group's runner-up.
 // ---------------------------------------------------------------------------
 
-var GROUPS = ['A', 'B', 'C', 'D'];
 var SEATS = 4;
-
-/** Fixture order in a group of four: nobody plays twice in a row, and the last round decides. */
-var FIXTURES = [
-  [1, 2],
-  [3, 4],
-  [1, 3],
-  [2, 4],
-  [1, 4],
-  [2, 3],
-];
+/** Rows pre-made per group: a group of four plays six matches. The desk types who plays in each. */
+var MATCHES_PER_GROUP = 6;
 
 /**
- * Cross-group quarter finals, so two players from one group cannot meet before the
- * final. The sides are plain text: the website shows "1st Group A" until the desk types
- * the player's name over it.
+ * The knockout, as the organiser drew it. A side is [place, group index]: "W" is the
+ * group winner, "R" the runner-up, and the index points into the event's four groups.
+ * The website shows the resulting text ("Winner Gp A") until the desk types a name over it.
  */
 var KNOCKOUT = [
-  { id: 'QF1', label: 'QF 1', a: '1st Group A', b: '2nd Group B' },
-  { id: 'QF2', label: 'QF 2', a: '1st Group C', b: '2nd Group D' },
-  { id: 'QF3', label: 'QF 3', a: '1st Group B', b: '2nd Group A' },
-  { id: 'QF4', label: 'QF 4', a: '1st Group D', b: '2nd Group C' },
+  { id: 'QF1', label: 'QF 1', a: ['W', 0], b: ['R', 3] },
+  { id: 'QF2', label: 'QF 2', a: ['R', 1], b: ['W', 2] },
+  { id: 'QF3', label: 'QF 3', a: ['W', 1], b: ['R', 0] },
+  { id: 'QF4', label: 'QF 4', a: ['R', 2], b: ['W', 3] },
   { id: 'SF1', label: 'SF 1', a: 'Winner QF 1', b: 'Winner QF 2' },
   { id: 'SF2', label: 'SF 2', a: 'Winner QF 3', b: 'Winner QF 4' },
   { id: 'F', label: 'Final', a: 'Winner SF 1', b: 'Winner SF 2' },
 ];
 
 /**
- * DRAFT timetable on four courts, 15-minute group slots. The U17 Singles group times
- * are the organiser's; everything after is a proposal to adjust in the sheet. Group A
- * plays on court 1, B on 2, C on 3, D on 4.
+ * Per event: its four groups (first group on court 1, second on court 2, …), the number
+ * of its first match, when its first round starts (the organiser lists the rest as
+ * "follow by", so later rows are left for the desk), and the knockout's court and time.
  */
 var EVENTS = [
   {
     id: 'u17-singles',
     label: 'U17 Singles',
-    groupTimes: ['10:30 AM', '10:45 AM', '11:00 AM', '11:15 AM', '11:30 AM', '11:45 AM'],
+    groups: ['A', 'B', 'C', 'D'],
+    firstMatch: 1,
+    groupStart: '10:15 AM',
     knockout: {
-      QF1: ['3:00 PM', 1], QF2: ['3:00 PM', 2], QF3: ['3:00 PM', 3], QF4: ['3:00 PM', 4],
-      SF1: ['3:45 PM', 1], SF2: ['3:45 PM', 2], F: ['4:15 PM', 3],
+      QF1: ['2:15 PM', 1], QF2: ['2:15 PM', 2], QF3: ['2:15 PM', 3], QF4: ['2:15 PM', 4],
+      SF1: ['3:15 PM', 1], SF2: ['3:15 PM', 2], F: ['4:30 PM', 1],
     },
   },
   {
     id: 'u17-doubles',
     label: 'U17 Doubles',
-    groupTimes: ['12:00 PM', '12:15 PM', '12:30 PM', '12:45 PM', '1:00 PM', '1:15 PM'],
+    groups: ['E', 'F', 'G', 'H'],
+    firstMatch: 25,
+    groupStart: '11:30 AM',
     knockout: {
-      QF1: ['3:15 PM', 1], QF2: ['3:15 PM', 2], QF3: ['3:15 PM', 3], QF4: ['3:15 PM', 4],
-      SF1: ['3:45 PM', 3], SF2: ['3:45 PM', 4], F: ['4:15 PM', 4],
+      QF1: ['2:30 PM', 1], QF2: ['2:30 PM', 2], QF3: ['2:30 PM', 3], QF4: ['2:30 PM', 4],
+      SF1: ['3:15 PM', 3], SF2: ['3:15 PM', 4], F: ['4:30 PM', 2],
     },
   },
   {
     id: 'open-doubles',
     label: 'Open Doubles',
-    groupTimes: ['1:30 PM', '1:45 PM', '2:00 PM', '2:15 PM', '2:30 PM', '2:45 PM'],
+    groups: ['I', 'J', 'K', 'L'],
+    firstMatch: 49,
+    groupStart: '1:00 PM',
     knockout: {
-      QF1: ['3:30 PM', 1], QF2: ['3:30 PM', 2], QF3: ['3:30 PM', 3], QF4: ['3:30 PM', 4],
-      SF1: ['4:15 PM', 1], SF2: ['4:15 PM', 2], F: ['4:45 PM', 1],
+      QF1: ['2:45 PM', 1], QF2: ['2:45 PM', 2], QF3: ['2:45 PM', 3], QF4: ['2:45 PM', 4],
+      SF1: ['3:45 PM', 1], SF2: ['3:45 PM', 2], F: ['4:30 PM', 3],
     },
   },
 ];
+
+/**
+ * The organiser's draw of 5 Nov 2026, for seedOrganiserDraw(): each group's four names
+ * in the order the organiser's sheet lists them. Names are copied from the per-group
+ * "Fixtures & Results" pages, with two stray brackets removed ("Lai Yu Le ((EBC)",
+ * "Eli Navarette & Chan Kok Fung ((DBC)"). The desk can edit any of them on the tab.
+ */
+var DRAW = {
+  'u17-singles': {
+    A: ['Shawn Goh Shao Yu (GSS)', 'Jaden Mak Jian En (A-Forze)', 'Chen Ruoyun (CCH)', 'Clara Yap (Meow)'],
+    B: ['James Chooi (Meow)', 'Kecia Lui (RGS)', 'Kiran Fan Jingyun (A-Forze)', 'Joash Gomez (TTBC)'],
+    C: ['Liu Zhiyuan (OTC)', 'Jorel Tay Jiale (DSTS)', 'Sim Yen Theng (NGZY)', 'Joshua Lum Kai Ze (CSC)'],
+    D: ['Lai Yu Le (EBC)', 'Jarius Yeo Wen Jun (SES)', 'Ethan Tum Ze Mun (NGZY)', 'Bryan Chng Heng Rui (DSTS)'],
+  },
+  'u17-doubles': {
+    E: ['Vincy Ng & Elica Chen (DBC)', 'Annabel Chua & Gu Manling', 'Yong Bok Yu & Yau Wen Jie (DAS)', 'Lee Shin Hanc & Lucas Tan (AZE)'],
+    F: ['Eli Navarette & Chan Kok Fung (DBC)', 'Chew Ting Rui & Dylan Tan (A-Forze)', 'Thomas Teh & Kevin Lim (GDS)', 'Bai Weizhe & Lucas Chen (USA)'],
+    G: ['Xann Yap & Dionne Teo (AH)', 'Kate Neo & Angeline Lim', 'Adalia Teo & Sarah Chng (DSTS)', 'Chong Wei Jun & Ng Zhan Feng (ES)'],
+    H: ['Nathaniel Wong & Gabriel X Tan (AH)', 'Travis Voo & Nathan Tan (DSTS)', 'Kanghyun Kim & Tsai Hsin An (UWCD)', 'Lucas Wong & Gabriel Ho (DH)'],
+  },
+  'open-doubles': {
+    I: ['James Ong & Lim Boon Chai', 'Ann Lin & Seh Wei Ching', 'Chua Chye Khoon & Kok Dong Yuan', 'Lim Horng Huei & Hoong Jia Qi'],
+    J: ['Jordan Oh & Isabel Yeow', 'Dickson Mah & Justin Chew', 'Sebastian Eio & Marcus Chan', 'Teo Xue Pang & Goh Zi Feng'],
+    K: ['Ella Lo Rui Yi & Lionel Boey', 'Jaren Ong & Talia', 'Tan Shinn Tatt & Looi Yi An', 'Mark Wong Wizhe & Lim Wen Kai'],
+    L: ['Bon Joey DB & Renee Tang', 'Darion Teo & Gareth Soh', 'Sng Wai Chin & Sng Wai Choung', 'Perry Tan & Low Wei Chie'],
+  },
+};
+/** The order the organiser's sheet plays a group of four in, by roster position (1-based). */
+var DRAW_ORDER = [[1, 2], [3, 4], [1, 3], [2, 4], [1, 4], [2, 3]];
 
 var ENTRIES_HEADERS = ['Event', 'Group', 'Seat', 'Name'];
 /** Columns an older version of this file added to Entries; upgradeDrawsSheet() removes them. */
@@ -138,6 +177,7 @@ var OLD_ENTRIES_COLUMNS = ['Pos', 'Played', 'Won', 'Lost', '+/-', 'Qualified'];
 var MATCH_HEADERS = ['Stage', 'Match', 'Court', 'Time', 'Player A', 'Player B', 'Score', 'Status'];
 /** Column numbers on an event tab, 1-based. */
 var COL = { stage: 1, match: 2, court: 3, time: 4, a: 5, b: 6, score: 7, status: 8 };
+var PLAYER_NOTE = 'Type the player or pair names. Who plays whom, and in what order, is up to the desk; the website shows exactly what is typed here.';
 
 // ---------------------------------------------------------------------------
 // ENTRY POINT: build the sheet
@@ -158,10 +198,99 @@ function createDrawsSheet() {
 }
 
 /**
- * Safe to re-run. Rebuilds the match tabs in this file's layout, trims Entries back to
- * its four columns, drops tabs older versions made and refreshes Read Me. Names on the
- * Entries tab are kept; anything typed on the OLD match tabs (scores, statuses, changed
- * times) is NOT carried over.
+ * One-off for a sheet built before 10 Nov 2026, when group rows took their players from
+ * Entries by formula. Replaces each formula with the name it currently shows, lifts the
+ * grey "this is a formula" protection off Player A / Player B, and leaves everything
+ * else (scores, statuses, courts, times, knockout names) exactly as typed. Also refreshes
+ * Read Me. Safe to re-run: a second run finds no formulas and changes nothing.
+ */
+function unlinkPlayers() {
+  var ss = open_();
+  var changes = [];
+  EVENTS.forEach(function (e) {
+    var sh = ss.getSheetByName(e.label);
+    if (!sh) { changes.push(e.label + ': no tab, skipped'); return; }
+    changes.push(e.label + ': ' + unlinkTab_(sh) + ' formulas replaced with the names they showed');
+  });
+  refreshReadme_(ss);
+  changes.push('Read Me refreshed');
+  CacheService.getScriptCache().remove('feed');
+  Logger.log(changes.join('\n'));
+}
+
+/**
+ * Writes the organiser's draw (DRAW, EVENTS, KNOCKOUT) onto each event tab: Stage,
+ * Match, Court, Time, Player A and Player B on every row, in the organiser's order.
+ * Score and Status are left exactly as they are, so it is safe before match day and
+ * harmless on an already-seeded sheet. Rows beyond the 31 it writes are left alone and
+ * reported. Also unlinks any old lookup formulas and refreshes Read Me.
+ */
+function seedOrganiserDraw() {
+  var ss = open_();
+  var changes = [];
+  EVENTS.forEach(function (e) {
+    var sh = ss.getSheetByName(e.label);
+    if (!sh) { buildEventTab_(ss, e); sh = ss.getSheetByName(e.label); changes.push(e.label + ': tab created'); }
+    unlinkTab_(sh);
+    var rows = seedRows_(e);
+    var n = rows.length;
+    var have = sh.getLastRow() - 1;
+    sh.getRange(2, COL.stage, n, COL.b).setValues(rows);
+    sh.getRange(2, COL.time, n, 1).setNumberFormat('h:mm am/pm');
+    sh.getRange(2, COL.a, n, 2).setNumberFormat('@');
+    var firstKnockoutRow = e.groups.length * MATCHES_PER_GROUP + 2;
+    sh.getRange(firstKnockoutRow, 1, 1, MATCH_HEADERS.length).setBorder(true, null, null, null, null, null, '#b08a2e', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
+    changes.push(e.label + ': ' + n + ' rows written' + (have > n ? ' (' + (have - n) + ' extra rows below them left untouched)' : ''));
+  });
+  refreshReadme_(ss);
+  changes.push('Read Me refreshed');
+  CacheService.getScriptCache().remove('feed');
+  Logger.log(changes.join('\n'));
+}
+
+/** Stage, Match, Court, Time, Player A, Player B for every row of an event, from DRAW. */
+function seedRows_(e) {
+  var names = DRAW[e.id] || {};
+  var rows = [];
+  e.groups.forEach(function (g, gi) {
+    var roster = names[g] || ['', '', '', ''];
+    DRAW_ORDER.forEach(function (pair, i) {
+      rows.push(['Group ' + g, 'M' + matchNo_(e, gi, i), gi + 1, i === 0 ? e.groupStart : '', roster[pair[0] - 1] || '', roster[pair[1] - 1] || '']);
+    });
+  });
+  KNOCKOUT.forEach(function (k) {
+    var slot = e.knockout[k.id] || ['', ''];
+    var side = knockoutSides_(e, k);
+    rows.push([stageOf_(k.id), k.label, slot[1], slot[0], side[0], side[1]]);
+  });
+  return rows;
+}
+
+/** Replaces lookup formulas in Player A / Player B with their values and lifts the grey protection. */
+function unlinkTab_(sh) {
+  var n = sh.getLastRow() - 1;
+  if (n < 1) return 0;
+  var rng = sh.getRange(2, COL.a, n, 2);
+  var formulas = rng.getFormulas();
+  var names = rng.getDisplayValues();
+  var count = 0;
+  formulas.forEach(function (row) { row.forEach(function (f) { if (f) count++; }); });
+  if (count) rng.setNumberFormat('@').setValues(names);
+  rng.setBackground(null);
+  sh.getProtections(SpreadsheetApp.ProtectionType.RANGE).forEach(function (p) {
+    var r = p.getRange();
+    if (r.getColumn() === COL.a && r.getLastColumn() === COL.b) p.remove();
+  });
+  sh.getRange(1, COL.a, 1, 2).setNote(PLAYER_NOTE);
+  return count;
+}
+
+/**
+ * Safe to re-run, but DESTRUCTIVE for the match tabs: rebuilds them in this file's
+ * layout, trims Entries back to its four columns, drops tabs older versions made and
+ * refreshes Read Me. Names on the Entries tab are kept; anything typed on the OLD match
+ * tabs (names, scores, statuses, changed times) is NOT carried over. For a sheet that
+ * only needs the lookup formulas gone, run unlinkPlayers() instead.
  */
 function upgradeDrawsSheet() {
   var ss = open_();
@@ -186,23 +315,32 @@ function upgradeDrawsSheet() {
   });
   EVENTS.forEach(function (e) { buildEventTab_(ss, e); changes.push('Built tab ' + e.label); });
 
-  var readme = ss.getSheetByName(TAB.readme);
-  if (readme) ss.deleteSheet(readme);
-  buildReadme_(ss);
-  ss.setActiveSheet(ss.getSheetByName(TAB.readme));
-  ss.moveActiveSheet(1);
-  ss.setActiveSheet(ss.getSheetByName(TAB.entries));
-  ss.moveActiveSheet(2);
+  refreshReadme_(ss);
   changes.push('Read Me refreshed');
 
   CacheService.getScriptCache().remove('feed');
   Logger.log(changes.join('\n'));
 }
 
+/** Replaces Read Me with this file's text and keeps Read Me and Entries as the first two tabs. */
+function refreshReadme_(ss) {
+  var readme = ss.getSheetByName(TAB.readme);
+  if (readme) ss.deleteSheet(readme);
+  buildReadme_(ss);
+  ss.setActiveSheet(ss.getSheetByName(TAB.readme));
+  ss.moveActiveSheet(1);
+  var entries = ss.getSheetByName(TAB.entries);
+  if (entries) {
+    ss.setActiveSheet(entries);
+    ss.moveActiveSheet(2);
+  }
+}
+
+/** A roster the desk may fill for its own reference. The website never reads this tab. */
 function buildEntries_(ss) {
   var rows = [];
   EVENTS.forEach(function (e) {
-    GROUPS.forEach(function (g) {
+    e.groups.forEach(function (g) {
       for (var s = 1; s <= SEATS; s++) rows.push([e.label, g, s, '']);
     });
   });
@@ -212,42 +350,33 @@ function buildEntries_(ss) {
 }
 
 /**
- * One event's matches, top to bottom in playing order. Group rows look their players
- * up on Entries by event, group and seat, so a name typed there appears here at once.
+ * One event's matches, top to bottom in playing order. The desk types who plays whom:
+ * Player A and Player B are plain text on every row. Group rows start empty; knockout
+ * rows start as "1st Group A" and so on until a name is typed over them.
  */
 function buildEventTab_(ss, e) {
   var rows = [];
-  var lookups = [];
-  GROUPS.forEach(function (g, gi) {
-    FIXTURES.forEach(function (f, i) {
-      lookups.push({ row: rows.length + 2, group: g, a: f[0], b: f[1] });
-      rows.push(['Group ' + g, 'M' + (i + 1), gi + 1, e.groupTimes[i] || '', '', '', '', '']);
-    });
+  e.groups.forEach(function (g, gi) {
+    for (var i = 0; i < MATCHES_PER_GROUP; i++) {
+      rows.push(['Group ' + g, 'M' + matchNo_(e, gi, i), gi + 1, i === 0 ? e.groupStart : '', '', '', '', '']);
+    }
   });
   var firstKnockoutRow = rows.length + 2;
   KNOCKOUT.forEach(function (k) {
     var slot = e.knockout[k.id] || ['', ''];
-    rows.push([stageOf_(k.id), k.label, slot[1], slot[0], k.a, k.b, '', '']);
+    var side = knockoutSides_(e, k);
+    rows.push([stageOf_(k.id), k.label, slot[1], slot[0], side[0], side[1], '', '']);
   });
 
   var sh = newTab_(ss, e.label, MATCH_HEADERS, rows);
   var n = rows.length;
 
-  var lookup = function (l, seat) {
-    return '=IFERROR(FILTER(' + TAB.entries + '!$D$2:$D, ' +
-      TAB.entries + '!$A$2:$A="' + e.label + '", ' +
-      TAB.entries + '!$B$2:$B="' + l.group + '", ' +
-      TAB.entries + '!$C$2:$C=' + seat + '), "")';
-  };
-  lookups.forEach(function (l) {
-    sh.getRange(l.row, COL.a).setFormula(lookup(l, l.a));
-    sh.getRange(l.row, COL.b).setFormula(lookup(l, l.b));
-  });
-
   sh.getRange(2, COL.time, n, 1).setNumberFormat('h:mm am/pm');
   sh.setColumnWidths(COL.a, 2, 200);
+  // Plain text, so a name like "3-4" or a score like "11-8" never turns into a date.
+  sh.getRange(2, COL.a, n, 2).setNumberFormat('@');
+  sh.getRange(1, COL.a, 1, 2).setNote(PLAYER_NOTE);
   sh.setColumnWidth(COL.score, 170);
-  // Plain text, or Sheets turns "11-8" into the 8th of November.
   sh.getRange(2, COL.score, n, 1).setNumberFormat('@');
   sh.getRange(2, COL.score, n, 1).setNote('Type the score as "21-15" or, for best of three, "21-15, 18-21, 21-19". Walkovers etc. can be written as words.');
   sh.getRange(2, COL.status, n, 1).setDataValidation(
@@ -265,12 +394,25 @@ function buildEventTab_(ss, e) {
   sh.getRange(firstKnockoutRow, 1, 1, MATCH_HEADERS.length).setBorder(true, null, null, null, null, null, '#b08a2e', SpreadsheetApp.BorderStyle.SOLID_MEDIUM);
 
   lock_(sh, COL.stage, 2, 'Stage and match are fixed.');
-  lock_(sh, COL.a, 2, 'Group rows take their players from the Entries tab.', lookups.length);
   sh.getRange(firstKnockoutRow, COL.a, KNOCKOUT.length, 2).setNote('The website shows this text as it is. Once the group or match is decided, type the player\'s name over it.');
 }
 
 function stageOf_(id) {
   return id === 'F' ? 'Final' : id.indexOf('SF') === 0 ? 'Semi Final' : 'Quarter Final';
+}
+
+/** Match numbers run across the day: round 1 of every group first, then round 2, as on the organiser's schedule. */
+function matchNo_(e, groupIndex, round) {
+  return e.firstMatch + round * e.groups.length + groupIndex;
+}
+
+/** The two sides of a knockout row as text: "Winner Gp A", "Runner-up Gp D", "Winner QF 1". */
+function knockoutSides_(e, k) {
+  var side = function (v) {
+    if (typeof v === 'string') return v;
+    return (v[0] === 'W' ? 'Winner Gp ' : 'Runner-up Gp ') + e.groups[v[1]];
+  };
+  return [side(k.a), side(k.b)];
 }
 
 function buildReadme_(ss) {
@@ -281,17 +423,18 @@ function buildReadme_(ss) {
     ['The website works nothing out. Whatever is typed here is what visitors see, so the match desk keeps everything up to date.'],
     [''],
     ['Before the event'],
-    ['  1. Entries: type each player or pair name next to its group and seat. Seat order within a group does not matter.'],
-    ['  2. Each event tab (U17 Singles, U17 Doubles, Open Doubles): check courts and times. Everything after the U17 Singles groups is a draft — change it freely.'],
+    ['  1. Each event tab (U17 Singles, U17 Doubles, Open Doubles): type the two names, or pair names, in Player A and Player B for every group match. Who plays whom, and in what order, is yours to decide.'],
+    ['  2. On the same tabs, check courts and times. Only the first round of each event has a time; the rest follow on, so leave them blank or type a time once it is known.'],
+    ['  3. Entries is a roster for your own reference. The website does not read it, so a name typed there does not appear anywhere until it is typed on an event tab.'],
     [''],
     ['On match day, on the event tab'],
     ['  • Status: set it to Live when a match starts and Done when it ends. The Live page lists matches by this column, so do not skip it.'],
     ['  • Score: type it as 21-15, or 21-15, 18-21, 21-19 for best of three. Player A is the left-hand name. Words like W/O are fine too.'],
-    ['  • Knockout rows: once a group is decided, type the player\'s name over "1st Group A" and so on. Same for "Winner QF 1" after each match.'],
+    ['  • Knockout rows: once a group is decided, type the player\'s name over "Winner Gp A" and so on. Same for "Winner QF 1" after each match.'],
     [''],
     ['Rules'],
-    ['  • Do not rename tabs, add columns in the middle, or change the Stage / Match / Event / Group / Seat columns.'],
-    ['  • Grey cells are formulas or fixed values. Google will warn before you edit them.'],
+    ['  • Do not rename tabs, add columns in the middle, or change the Stage / Match columns.'],
+    ['  • Grey cells are fixed values. Google will warn before you edit them.'],
   ];
   var sh = newTab_(ss, TAB.readme, null, lines);
   sh.setColumnWidth(1, 900);
@@ -363,45 +506,34 @@ function buildFeed_() {
   EVENTS.forEach(function (e) {
     var groups = {};
     var event = { groups: [], knockout: [] };
-    GROUPS.forEach(function (g) {
-      groups[g] = { name: g, players: [], matches: [] };
-      for (var s = 0; s < SEATS; s++) groups[g].players.push('');
-      event.groups.push(groups[g]);
-    });
-
-    rows_(ss, TAB.entries).forEach(function (r) {
-      var g = groups[String(r['Group'])];
-      var seat = Number(r['Seat']);
-      if (r['Event'] !== e.label || !g || !(seat >= 1 && seat <= SEATS)) return;
-      g.players[seat - 1] = text_(r['Name']);
-    });
+    // Groups come from the Stage column, in the order they first appear on the tab.
+    var groupOf = function (name) {
+      if (!groups[name]) {
+        groups[name] = { name: name, matches: [] };
+        event.groups.push(groups[name]);
+      }
+      return groups[name];
+    };
 
     rows_(ss, e.label).forEach(function (r) {
       var stage = text_(r['Stage']);
       var match = text_(r['Match']);
-      var group = /^Group (\w)$/.exec(stage);
-      if (group && groups[group[1]]) {
-        var no = Number(match.replace(/^M/i, ''));
-        var seats = FIXTURES[no - 1] || [0, 0];
-        groups[group[1]].matches.push({
-          no: no,
-          court: text_(r['Court']),
-          time: time_(r['Time']),
-          a: seats[0],
-          b: seats[1],
-          score: text_(r['Score']),
-          status: text_(r['Status']).toLowerCase(),
-        });
+      var group = /^Group\s+(\S+)$/i.exec(stage);
+      var common = {
+        court: text_(r['Court']),
+        time: time_(r['Time']),
+        a: text_(r['Player A']),
+        b: text_(r['Player B']),
+        score: text_(r['Score']),
+        status: text_(r['Status']).toLowerCase(),
+      };
+      if (group) {
+        var g = groupOf(group[1].toUpperCase());
+        common.no = Number(match.replace(/^M/i, '')) || g.matches.length + 1;
+        g.matches.push(common);
       } else {
-        event.knockout.push({
-          id: match.replace(/\s+/g, '').replace(/^Final$/i, 'F').toUpperCase(),
-          court: text_(r['Court']),
-          time: time_(r['Time']),
-          a: text_(r['Player A']),
-          b: text_(r['Player B']),
-          score: text_(r['Score']),
-          status: text_(r['Status']).toLowerCase(),
-        });
+        common.id = match.replace(/\s+/g, '').replace(/^Final$/i, 'F').toUpperCase();
+        event.knockout.push(common);
       }
     });
 
