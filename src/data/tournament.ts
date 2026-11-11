@@ -11,6 +11,7 @@ import heroImage from '../assets/tournament/hero.jpg';
 import aboutImage from '../assets/tournament/about-shuttle.jpg';
 import venueImage from '../assets/tournament/venue.jpg';
 import guest4 from '../assets/tournament/guest-4.jpg';
+import guest5 from '../assets/tournament/guest-5.jpg';
 
 /**
  * Where every "Register Now" button points.
@@ -244,7 +245,10 @@ export const sponsors = {
 export const guests = {
   eyebrow: 'Special guests',
   title: 'Meet Our Featured Guests',
-  items: [{ name: 'Jin Yujia', role: 'Award Presenter', photo: guest4 }],
+  items: [
+    { name: 'Jin Yujia', role: 'Award Presenter', photo: guest4 },
+    { name: '花花 hhua', role: 'Special Guest · AQ MCN Talent', photo: guest5 },
+  ],
 };
 
 export const closing = {
