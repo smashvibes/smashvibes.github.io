@@ -193,12 +193,14 @@ finished one a green **DONE** tick with its score set white on navy, an upcoming
 plain. The legend sits in the toolbar under the title.
 
 **TV mode** (the toolbar button, or open the page with `?tv`) hides the site chrome,
-folds the title, draw tabs and toolbar into one header row, and scales the board up
-with `zoom: 1.3`, so a 1920×1080 screen lays out as 1477×831 and all four groups of a
-draw fit without scrolling. Fixture rows there keep names on one line, sharing the
-space by length. Esc leaves it. The
-mode and the selected draw and stage tabs are remembered per browser
-(`src/scripts/tv-mode.ts`), so a reload on the TV lands back where it was.
+folds the title, draw tabs, stage tabs and toolbar into one header row, lets the board
+use the full screen width, and scales it up with `zoom: 1.2`, so a 1920×1080 screen
+lays out as 1600×900 and all four groups of a draw fit with no scrolling in either
+direction. A fixture row there is two lines, one name each, clipped with an ellipsis
+only if a name is absurdly long; on a narrower laptop the header wraps and the page
+scrolls vertically, never sideways. Esc leaves it. The mode and the selected draw and
+stage tabs are remembered per browser (`src/scripts/tv-mode.ts`), so a reload on the
+TV lands back where it was.
 
 **The site computes nothing.** What the desk keys in is what the page shows: the
 referees decide results and who goes through. There is no standings table, by choice:

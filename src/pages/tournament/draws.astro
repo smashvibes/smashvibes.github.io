@@ -19,10 +19,12 @@ const description =
  * so the tabs need no JavaScript. The stage tabs sit next to their panels and are
  * handled by a generic selector in tournament.css; the draw tabs live in a fieldset
  * above all the panels, so the pairing of each radio to its panel has to name the ids.
- * Generated here from the same list the markup comes from, so they cannot drift.
+ * Generated here from the same list the markup comes from, so they cannot drift. The
+ * display value is a variable so TV mode can flatten the open panel (`display: contents`)
+ * and lift its stage tabs into the header row.
  */
 const panelCss = draws.items
-  .map((d) => `.sv-dr:has(#draw-${d.id}:checked) #panel-${d.id}{display:block}`)
+  .map((d) => `.sv-dr:has(#draw-${d.id}:checked) #panel-${d.id}{display:var(--dr-panel-display,block)}`)
   .join('');
 
 /**

@@ -31,10 +31,11 @@ function statusPill(m: MatchView, compact = false): string {
   return `<span class="sv-dr-status is-${m.status}">${label}</span>`;
 }
 
+/** Blank when the row has no time: the desk lists only when each event starts and the rest "follow by". */
 function timeBox(time: string): string {
   return time
     ? `<span class="sv-dr-time">${esc(time)}</span>`
-    : `<span class="sv-dr-time"><span class="sv-sr-only">Time to be confirmed</span></span>`;
+    : `<span class="sv-dr-time is-empty"><span class="sv-sr-only">Follows the previous match</span></span>`;
 }
 
 function matchNo(m: MatchView): string {
@@ -50,13 +51,7 @@ function scoreBox(side: SideView): string {
   return `<span class="sv-dr-score-box">${side.points.map(String).join(' ')}</span>`;
 }
 
-/** Two boxes, one per side — or the typed text when it was not a score, e.g. "W/O". */
-function fixtureScore(m: MatchView): string {
-  const [a, b] = m.sides;
-  if (m.rawScore !== null) return `<span class="sv-dr-score"><span class="sv-dr-score-raw">${esc(m.rawScore)}</span></span>`;
-  return `<span class="sv-dr-score" aria-label="Score">${scoreBox(a)}<span class="sv-dr-score-dash" aria-hidden="true">-</span>${scoreBox(b)}</span>`;
-}
-
+/** The two sides stacked, each with its score box — or the typed text when it was not a score, e.g. "W/O". */
 function sides(m: MatchView): string {
   const raw = m.rawScore !== null;
   const rows = m.sides.map((s) => `<div class="sv-dr-slot">${name(s)}${raw ? '' : scoreBox(s)}</div>`).join('');
@@ -71,13 +66,16 @@ function courtNote(court: string): string {
 // Round robin
 // ---------------------------------------------------------------------------
 
+/**
+ * A group match: time, number, then the two sides stacked with their scores, the same
+ * shape as a bracket card. Pair names are long ("Nathaniel Wong & Gabriel X Tan (AH)"),
+ * so one name per line is what keeps a row readable at every width and on the TV.
+ */
 function fixture(m: MatchView): string {
-  const [a, b] = m.sides;
   return `<li class="sv-dr-fixture is-${m.status}">
   ${timeBox(m.time)}
   ${matchNo(m)}
-  <span class="sv-dr-vs">${name(a)}<span class="sv-dr-vs-label">vs</span>${name(b)}</span>
-  ${fixtureScore(m)}
+  ${sides(m)}
   ${statusPill(m, true)}
 </li>`;
 }
