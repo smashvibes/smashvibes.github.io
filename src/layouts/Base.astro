@@ -13,12 +13,15 @@ import { site } from '../data/site';
 interface Props {
   title?: string;
   description?: string;
+  /** Link-preview image for this page; must be 1200×630. Defaults to the site card. */
+  image?: { src: string; alt: string };
 }
 
-const { title = site.title, description = site.description } = Astro.props;
+const { title = site.title, description = site.description, image } = Astro.props;
 const base = Astro.site ?? new URL(site.url);
 const canonical = new URL(Astro.url.pathname, base).href;
-const ogImage = new URL(site.ogImage, base).href;
+const ogImage = new URL(image?.src ?? site.ogImage, base).href;
+const ogImageAlt = image?.alt ?? site.ogImageAlt;
 ---
 <html lang="en-SG">
   <head>
@@ -55,14 +58,14 @@ const ogImage = new URL(site.ogImage, base).href;
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={site.ogImageAlt} />
+    <meta property="og:image:alt" content={ogImageAlt} />
     <meta property="og:locale" content={site.locale} />
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
-    <meta name="twitter:image:alt" content={site.ogImageAlt} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
 
     <slot name="head" />
   </head>

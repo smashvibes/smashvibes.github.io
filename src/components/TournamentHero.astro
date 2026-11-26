@@ -6,7 +6,7 @@
 import { Image } from 'astro:assets';
 import Button from './Button.astro';
 import Icon from './Icon.astro';
-import { hero, REGISTER_URL, tournament } from '../data/tournament';
+import { cta, hero, tournament } from '../data/tournament';
 ---
 <section class="sv-hero sv-tr-hero sv-root" id="top">
   <Image
@@ -54,8 +54,8 @@ import { hero, REGISTER_URL, tournament } from '../data/tournament';
       </li>
     </ul>
 
-    <Button variant="primary" size="lg" arrow href={REGISTER_URL} target="_blank" class="sv-tr-cta">
-      {tournament.registerLabel}
+    <Button variant="primary" size="lg" arrow href={cta.href} class="sv-tr-cta">
+      {cta.label}
     </Button>
   </div>
 </section>

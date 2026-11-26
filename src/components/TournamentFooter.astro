@@ -1,18 +1,18 @@
 ---
 /**
- * Closing band: the registration call, then the wordmark, navigation and socials.
+ * Closing band: the call to the photos, then the wordmark, navigation and socials.
  * Sits on the same gold bar as the navigation, bracketing the page.
  */
 import Button from './Button.astro';
 import Icon from './Icon.astro';
-import { backToMain, closing, REGISTER_URL, socials, tournament, tournamentFooterNav } from '../data/tournament';
+import { backToMain, closing, cta, socials, tournament, tournamentFooterNav } from '../data/tournament';
 
 const year = new Date().getFullYear();
 ---
 <footer class="sv-tr-footer sv-root" id="register">
   <div class="sv-container sv-tr-footer-cta">
     <p class="sv-tr-secure">{closing.title}</p>
-    <Button variant="primary" arrow href={REGISTER_URL} target="_blank">{tournament.registerLabel}</Button>
+    <Button variant="primary" arrow href={cta.href}>{cta.label}</Button>
   </div>
 
   <div class="sv-container sv-tr-footer-base">

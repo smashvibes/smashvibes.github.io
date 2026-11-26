@@ -12,6 +12,7 @@ import aboutImage from '../assets/tournament/about-shuttle.jpg';
 import venueImage from '../assets/tournament/venue.jpg';
 import guest4 from '../assets/tournament/guest-4.jpg';
 import guest5 from '../assets/tournament/guest-5.jpg';
+import galleryData from './gallery.json';
 
 /**
  * Where every "Register Now" button points.
@@ -45,12 +46,21 @@ export const tournament = {
 };
 
 /**
+ * The page's one call to action. Registration closed with the event on 14 Nov 2026, so
+ * every button that said "Register Now" — nav, hero and the closing band — now points at
+ * the photos. REGISTER_URL stays for the record and for llms.txt.
+ */
+export const GALLERY_HREF = '/tournament/gallery/';
+export const cta = { label: 'View Photos', href: GALLERY_HREF };
+
+/**
  * Absolute paths, not bare anchors: the same nav renders on /tournament/ and on
  * /tournament/draws/, and "#about" from the draws page would go nowhere.
  */
 export const tournamentNav: { label: string; href: string }[] = [
   { label: 'Home', href: '/tournament/' },
   { label: 'Draws', href: '/tournament/draws/' },
+  { label: 'Gallery', href: GALLERY_HREF },
   // Live is built but hidden for now: src/pages/tournament/_live.astro. Rename it back
   // to live.astro and add { label: 'Live', href: '/tournament/live/' } here and in the footer.
 ];
@@ -65,6 +75,8 @@ export const backToMain = { label: 'Smash Vibes', href: '/' };
 /** Footer links, covering the sections the short nav no longer lists. */
 export const tournamentFooterNav: { label: string; href: string; target?: string }[] = [
   { label: 'Home', href: '/tournament/' },
+  { label: 'Highlights', href: '/tournament/#highlights' },
+  { label: 'Gallery', href: GALLERY_HREF },
   { label: 'About', href: '/tournament/#about' },
   { label: 'Categories', href: '/tournament/#categories' },
   { label: 'Prizes', href: '/tournament/#prizes' },
@@ -252,8 +264,68 @@ export const guests = {
 };
 
 export const closing = {
-  title: 'Secure Your Spot Now',
+  title: 'See You at the Next StarRise Cup',
 };
+
+/**
+ * Highlight reel on the home page. The organiser's file is HEVC, which Chrome on Android
+ * and Windows will not reliably play, so this is a 720p H.264 re-encode with the moov
+ * atom up front (it starts before the whole file arrives). From the original:
+ *
+ *   ffmpeg -i "StarRise CUP.mp4" -vf "scale=720:-2,format=yuv420p" -c:v libx264 \
+ *     -profile:v high -preset slow -crf 27 -c:a aac -b:a 128k -movflags +faststart \
+ *     public/tournament/starrise-cup-highlights.mp4
+ *   ffmpeg -ss 25 -i "StarRise CUP.mp4" -frames:v 1 -vf scale=720:-2 -q:v 4 \
+ *     public/tournament/starrise-cup-highlights.jpg
+ */
+export const highlights = {
+  eyebrow: 'Highlights',
+  title: 'Relive StarRise Cup 2026',
+  body: 'Thank you to every player, coach, guest and sponsor who made 14 November one to remember. Catch the best moments in the highlight reel, then find yourself in the gallery.',
+  video: '/tournament/starrise-cup-highlights.mp4',
+  poster: '/tournament/starrise-cup-highlights.jpg',
+  width: 720,
+  height: 1280,
+  videoLabel: 'StarRise Cup 2026 highlight reel',
+};
+
+export interface GalleryPhoto {
+  id: string;
+  width: number;
+  height: number;
+}
+
+/**
+ * Photo albums. The frames and their sizes come from src/data/gallery.json, which
+ * `npm run gallery:import` writes from the photographer's export; this list decides the
+ * order, the titles and the copy. A slug missing from gallery.json is simply not shown.
+ */
+const albumCopy = [
+  { slug: 'highlights', title: 'Tournament Highlights', description: 'Rallies, smashes and the action on court.' },
+  { slug: 'winners', title: 'Winners & Runner-Ups', description: 'Champions, runners-up and their trophies.' },
+  { slug: 'guests', title: 'Guests', description: 'Our special guests on the day.' },
+  { slug: 'behind-the-scenes', title: 'Behind the Scenes', description: 'The organising team, officials and the opening briefing.' },
+];
+
+export const gallery = {
+  eyebrow: 'Gallery',
+  title: 'Tournament Photos',
+  note: 'Every album from StarRise Cup 2026. Tap a photo to see it full size and save it to your phone.',
+  backLabel: 'All albums',
+  downloadLabel: 'Download',
+  albums: albumCopy.flatMap((album) => {
+    const photos = galleryData.albums.find((a) => a.slug === album.slug)?.photos as GalleryPhoto[] | undefined;
+    return photos?.length ? [{ ...album, photos, cover: photos[0] }] : [];
+  }),
+};
+
+export type GalleryAlbum = (typeof gallery.albums)[number];
+
+/** The album pages and the image files share one path: /tournament/gallery/<slug>/. */
+export const albumHref = (slug: string) => `${GALLERY_HREF}${slug}/`;
+export const photoSrc = (slug: string, id: string) => `${GALLERY_HREF}${slug}/${id}.jpg`;
+export const thumbSrc = (slug: string, id: string) => `${GALLERY_HREF}${slug}/${id}-thumb.webp`;
+export const albumOgImage = (slug: string) => `${GALLERY_HREF}${slug}/og.jpg`;
 
 export interface Draw {
   id: string;
@@ -282,6 +354,11 @@ export const draws: {
   /** Full-screen mode for the hall TV: chrome hidden, everything scaled up. */
   tv: { enter: string; exit: string; hint: string };
   stages: { groups: string; knockout: string };
+  /**
+   * The round robin is over, so since 26 Nov 2026 each draw shows only its knockout
+   * bracket and the stage tabs are gone. Set back to true to bring the groups back.
+   */
+  showGroups: boolean;
   items: Draw[];
 } = {
   eyebrow: 'Tournament draws',
@@ -292,6 +369,7 @@ export const draws: {
   legend: { live: 'Live', done: 'Done', upcoming: 'Upcoming' },
   tv: { enter: 'TV mode', exit: 'Exit TV mode', hint: 'Press Esc to exit' },
   stages: { groups: 'Round Robin', knockout: 'Knockout Draw' },
+  showGroups: false,
   items: [
     { id: 'u17-singles', label: 'U17 Singles', meta: '16 entries', icon: 'user' },
     { id: 'u17-doubles', label: 'U17 Doubles', meta: '16 pairs', icon: 'users' },

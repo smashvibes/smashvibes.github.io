@@ -5,7 +5,7 @@ import NavBar from '../../components/NavBar.astro';
 import TournamentFooter from '../../components/TournamentFooter.astro';
 import Icon from '../../components/Icon.astro';
 import DrawToolbar from '../../components/DrawToolbar.astro';
-import { backToMain, draws, REGISTER_URL, tournament, tournamentNav } from '../../data/tournament';
+import { backToMain, cta, draws, tournament, tournamentNav } from '../../data/tournament';
 import { DRAWS_FEED_URL, drawsData, eventView } from '../../data/draws';
 import { formatUpdated } from '../../data/draws-engine';
 import { renderBracket, renderGroups } from '../../data/draws-render';
@@ -49,7 +49,7 @@ const updated = formatUpdated(drawsData.updatedAt);
         logoSrc={tournament.logo}
         homeHref="/tournament/"
         links={tournamentNav.map((l) => ({ ...l, active: l.label === 'Draws' }))}
-        cta={{ label: tournament.registerLabel, href: REGISTER_URL, target: '_blank' }}
+        cta={cta}
         ctaArrow
         back={backToMain}
       />
@@ -86,6 +86,7 @@ const updated = formatUpdated(drawsData.updatedAt);
 
         {panels.map((draw) => (
           <section class="sv-dr-panel" id={`panel-${draw.id}`} aria-label={`${draw.label} draw`}>
+            {draws.showGroups ? (
             <fieldset class="sv-dr-stages">
               <legend class="sv-sr-only">Choose a stage</legend>
               <input
@@ -106,9 +107,18 @@ const updated = formatUpdated(drawsData.updatedAt);
               />
               <label class="sv-dr-stage-tab" for={`stage-${draw.id}-knockout`}>{draws.stages.knockout}</label>
             </fieldset>
+            ) : null}
 
-            <div class="sv-dr-stage" data-stage="groups" data-dr-view="groups" data-dr-event={draw.id} set:html={draw.groups} />
-            <div class="sv-dr-stage" data-stage="knockout" data-dr-view="bracket" data-dr-event={draw.id} set:html={draw.bracket} />
+            {draws.showGroups && (
+              <div class="sv-dr-stage" data-stage="groups" data-dr-view="groups" data-dr-event={draw.id} set:html={draw.groups} />
+            )}
+            <div
+              class:list={['sv-dr-stage', !draws.showGroups && 'is-only']}
+              data-stage="knockout"
+              data-dr-view="bracket"
+              data-dr-event={draw.id}
+              set:html={draw.bracket}
+            />
           </section>
         ))}
       </div>

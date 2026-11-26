@@ -10,7 +10,8 @@
     "sync:ds": "node scripts/sync-design-system.mjs",
     "tokens": "node scripts/build-tokens.mjs",
     "draws:pull": "node scripts/pull-draws.mjs",
-    "draws:template": "node scripts/pull-draws.mjs --template"
+    "draws:template": "node scripts/pull-draws.mjs --template",
+    "gallery:import": "node scripts/import-gallery.mjs"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",

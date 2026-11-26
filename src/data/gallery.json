@@ -1,0 +1,829 @@
+{
+  "albums": [
+    {
+      "slug": "highlights",
+      "photos": [
+        {
+          "id": "img-9742",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9743",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9744",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9745",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9746",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9747",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-9752",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-9756",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-9758",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-9760",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-9763",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-9765",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-9767",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-9769",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-9771",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-9773",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9775",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9798",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9817",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9818",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9819",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9820",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9821",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9822",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9823",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9824",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9825",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9828",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9830",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9832",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9836",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9838",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9840",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9843",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9845",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9848",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9850",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9852",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9854",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9856",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9858",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9860",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9863",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9865",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9867",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9869",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9871",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9873",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9876",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9878",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9879",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9889",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9890",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9891",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9892",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9893",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9895",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9898",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9901",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9903",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9904",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9906",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9908",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9922",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9924",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9933",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9935",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9937",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9939",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-9948",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9949",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9950",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9954",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-9956",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-9959",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-9962",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-9963",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-9966",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-9972",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9984",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9986",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0001",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0003",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0006",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0010",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0011",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0014",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0019",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0021",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0022",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0023",
+          "width": 1365,
+          "height": 2048
+        }
+      ]
+    },
+    {
+      "slug": "winners",
+      "photos": [
+        {
+          "id": "img-9779",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9781",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0035",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0037",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0076",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0077",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0078",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0079",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0080",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0081",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0082",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0083",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0084",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0085",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0086",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0087",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0088",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0089",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0090",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0091",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0092",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0093",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0094",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0095",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0096",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0097",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0098",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0099",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0100",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0101",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0102",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0103",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0104",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0105",
+          "width": 2048,
+          "height": 1365
+        }
+      ]
+    },
+    {
+      "slug": "guests",
+      "photos": [
+        {
+          "id": "img-0044",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0047",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0048",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0054",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0061",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0064",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0065",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0067",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0070",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0071",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0072",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0073",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0074",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0112",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0113",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0114",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0115",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0116",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0117",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-0118",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0119",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0120",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0121",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0124",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0125",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-0126",
+          "width": 1365,
+          "height": 2048
+        }
+      ]
+    },
+    {
+      "slug": "behind-the-scenes",
+      "photos": [
+        {
+          "id": "img-9704",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9706",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-9710",
+          "width": 1365,
+          "height": 2048
+        },
+        {
+          "id": "img-9716",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9720",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9810",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9811",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9812",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9813",
+          "width": 2048,
+          "height": 1365
+        },
+        {
+          "id": "img-9882",
+          "width": 2048,
+          "height": 1365
+        }
+      ]
+    }
+  ]
+}

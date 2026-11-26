@@ -7,7 +7,10 @@ import {
   prizes,
   details,
   sponsors,
-  REGISTRATION_FORM_URL,
+  gallery,
+  highlights,
+  albumHref,
+  GALLERY_HREF,
 } from '../data/tournament';
 
 /**
@@ -35,7 +38,11 @@ export const GET: APIRoute = ({ site: base }) => {
     '',
     `- [Home](${abs('/')}): Weekly games, venue, what is included, FAQ and how to join.`,
     `- [${tournament.name}](${abs('/tournament/')}): ${tournament.description}`,
-    `- [${tournament.name} draws](${abs('/tournament/draws/')}): Round-robin groups, knockout bracket and scores, updated on match day.`,
+    `- [${tournament.name} draws](${abs('/tournament/draws/')}): Round-robin groups, knockout bracket and match scores.`,
+    `- [${tournament.name} photo gallery](${abs(GALLERY_HREF)}): ${gallery.note}`,
+    ...gallery.albums.map(
+      (a) => `  - [${a.title}](${abs(albumHref(a.slug))}): ${a.description} ${a.photos.length} photos.`,
+    ),
     '',
     '## Weekly games',
     '',
@@ -61,7 +68,8 @@ export const GET: APIRoute = ({ site: base }) => {
     `- Date: ${tournamentHero.facts.map((f) => [f.value, f.note].filter(Boolean).join(' ')).join(', ')}`,
     `- Venue: ${tournamentHero.venue.name}, ${tournamentHero.venue.lines.join(' ')}`,
     `- ${tournament.collaboration}`,
-    `- Registration: ${REGISTRATION_FORM_URL}`,
+    `- Status: held on 14 November 2026; registration is closed.`,
+    `- Highlight reel: ${abs(highlights.video)}`,
     ...details.rows.map((r) => `- ${r.label ? `${r.label} ` : ''}${r.text}`),
     '',
     '### Categories',

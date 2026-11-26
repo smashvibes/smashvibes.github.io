@@ -9,7 +9,7 @@ import Base from '../../layouts/Base.astro';
 import NavBar from '../../components/NavBar.astro';
 import TournamentFooter from '../../components/TournamentFooter.astro';
 import DrawToolbar from '../../components/DrawToolbar.astro';
-import { backToMain, draws, live, REGISTER_URL, tournament, tournamentNav } from '../../data/tournament';
+import { backToMain, draws, cta, live, tournament, tournamentNav } from '../../data/tournament';
 import { DRAWS_FEED_URL, drawsData, eventView } from '../../data/draws';
 import { formatUpdated } from '../../data/draws-engine';
 import { renderLive } from '../../data/draws-render';
@@ -34,7 +34,7 @@ const updated = formatUpdated(drawsData.updatedAt);
         logoSrc={tournament.logo}
         homeHref="/tournament/"
         links={tournamentNav.map((l) => ({ ...l, active: l.label === 'Live' }))}
-        cta={{ label: tournament.registerLabel, href: REGISTER_URL, target: '_blank' }}
+        cta={cta}
         ctaArrow
         back={backToMain}
       />

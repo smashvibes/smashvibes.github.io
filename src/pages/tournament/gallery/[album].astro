@@ -1,0 +1,69 @@
+---
+import '../../../styles/tournament.css';
+import Base from '../../../layouts/Base.astro';
+import NavBar from '../../../components/NavBar.astro';
+import TournamentFooter from '../../../components/TournamentFooter.astro';
+import GalleryGrid from '../../../components/GalleryGrid.astro';
+import Icon from '../../../components/Icon.astro';
+import {
+  albumHref, albumOgImage, backToMain, cta, gallery, GALLERY_HREF, tournament, tournamentNav,
+  type GalleryAlbum,
+} from '../../../data/tournament';
+
+export function getStaticPaths() {
+  return gallery.albums.map((album) => ({ params: { album: album.slug }, props: { album } }));
+}
+
+interface Props {
+  album: GalleryAlbum;
+}
+
+const { album } = Astro.props;
+const title = `${album.title} | ${tournament.name} 2026 Photos`;
+const description = `${album.title} from the StarRise Cup 2026 badminton tournament, Singapore. ${album.description} ${album.photos.length} photos to view and download.`;
+---
+<Base
+  title={title}
+  description={description}
+  image={{ src: albumOgImage(album.slug), alt: `${tournament.name} 2026 — ${album.title}` }}
+>
+  <div class="sv-tr-page">
+    <header class="sv-header sv-tr-header-solid">
+      <NavBar
+        logoSrc={tournament.logo}
+        homeHref="/tournament/"
+        links={tournamentNav.map((l) => ({ ...l, active: l.label === 'Gallery' }))}
+        cta={cta}
+        ctaArrow
+        back={backToMain}
+      />
+    </header>
+
+    <main id="main" class="sv-gl sv-root">
+      <div class="sv-container">
+        <a class="sv-gl-back" href={GALLERY_HREF}>
+          <Icon name="arrow-right" size={18} />
+          {gallery.backLabel}
+        </a>
+        <h1 class="sv-dr-title">{album.title}</h1>
+        <p class="sv-dr-note">{album.description}</p>
+
+        <nav class="sv-gl-tabs" aria-label="Albums">
+          {gallery.albums.map((a) => (
+            <a
+              class="sv-gl-tab"
+              href={albumHref(a.slug)}
+              aria-current={a.slug === album.slug ? 'page' : undefined}
+            >
+              {a.title} <span class="sv-gl-tab-count">{a.photos.length}</span>
+            </a>
+          ))}
+        </nav>
+
+        <GalleryGrid album={album} />
+      </div>
+    </main>
+
+    <TournamentFooter />
+  </div>
+</Base>

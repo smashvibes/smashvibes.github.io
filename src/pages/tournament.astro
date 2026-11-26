@@ -11,10 +11,11 @@ import PrizeCard from '../components/PrizeCard.astro';
 import GuestCard from '../components/GuestCard.astro';
 import SpecRow from '../components/SpecRow.astro';
 import Icon from '../components/Icon.astro';
+import Button from '../components/Button.astro';
 import { site } from '../data/site';
 import {
-  about, backToMain, categories, details, guests, prizes, REGISTER_URL, sponsors,
-  tournament, tournamentNav,
+  about, albumHref, backToMain, categories, cta, details, gallery, guests, highlights, prizes,
+  sponsors, tournament, tournamentNav,
 } from '../data/tournament';
 
 /**
@@ -62,7 +63,7 @@ const jsonLd = {
       logoSrc={tournament.logo}
       homeHref="#top"
       links={tournamentNav.map((l) => ({ ...l, active: l.label === 'Home' }))}
-      cta={{ label: tournament.registerLabel, href: REGISTER_URL, target: '_blank' }}
+      cta={cta}
       ctaArrow
       back={backToMain}
     />
@@ -70,6 +71,42 @@ const jsonLd = {
 
   <main id="main">
     <TournamentHero />
+
+    <section class="sv-tr-highlights sv-root" id="highlights">
+      <div class="sv-container sv-tr-highlights-inner">
+        <div class="sv-tr-highlights-copy">
+          <SectionHeading eyebrow={highlights.eyebrow} title={highlights.title} />
+          <p class="sv-tr-highlights-body">{highlights.body}</p>
+          <Button variant="primary" arrow href={cta.href}>{cta.label}</Button>
+          <ul class="sv-tr-highlights-albums">
+            {gallery.albums.map((album) => (
+              <li>
+                <a href={albumHref(album.slug)}>
+                  {album.title} <span>{album.photos.length}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Muted, so browsers allow it to play by itself; the script below starts it only
+            while it is on screen, and never for visitors who ask for reduced motion.
+            preload="none" keeps the 9 MB file off the wire until then. */}
+        <video
+          class="sv-tr-reel"
+          src={highlights.video}
+          poster={highlights.poster}
+          width={highlights.width}
+          height={highlights.height}
+          aria-label={highlights.videoLabel}
+          controls
+          muted
+          loop
+          playsinline
+          preload="none"
+        ></video>
+      </div>
+    </section>
 
     <section class="sv-tr-about sv-root" id="about">
       <div class="sv-container sv-tr-about-inner">
@@ -174,3 +211,28 @@ const jsonLd = {
   <TournamentFooter />
   </div>
 </Base>
+
+<script>
+  const reel = document.querySelector<HTMLVideoElement>('.sv-tr-reel');
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reel && !calm && 'IntersectionObserver' in window) {
+    // Once someone has paused it or turned the sound on, it is theirs: stop auto-playing.
+    // The pause event fires after pause() returns, so our own pauses are flagged first.
+    let touched = false;
+    let autoPause = false;
+    reel.addEventListener('volumechange', () => { if (!reel.muted) touched = true; });
+    reel.addEventListener('pause', () => {
+      if (autoPause) autoPause = false;
+      else if (!reel.ended) touched = true;
+    });
+    new IntersectionObserver(([entry]) => {
+      if (touched) return;
+      if (entry.isIntersecting) {
+        reel.play().catch(() => {});
+      } else if (!reel.paused) {
+        autoPause = true;
+        reel.pause();
+      }
+    }, { threshold: 0.5 }).observe(reel);
+  }
+</script>

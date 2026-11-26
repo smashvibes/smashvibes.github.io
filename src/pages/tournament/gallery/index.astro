@@ -1,0 +1,66 @@
+---
+import '../../../styles/tournament.css';
+import Base from '../../../layouts/Base.astro';
+import NavBar from '../../../components/NavBar.astro';
+import TournamentFooter from '../../../components/TournamentFooter.astro';
+import Icon from '../../../components/Icon.astro';
+import {
+  albumHref, albumOgImage, backToMain, cta, gallery, thumbSrc, tournament, tournamentNav,
+} from '../../../data/tournament';
+
+const title = `Photo Gallery | ${tournament.name} 2026`;
+const description =
+  'Photos from the StarRise Cup 2026 badminton tournament at SBH VIP Hall @ Sims, Singapore — match highlights, winners, guests and behind the scenes.';
+const [first] = gallery.albums;
+---
+<Base
+  title={title}
+  description={description}
+  image={first && { src: albumOgImage(first.slug), alt: `${tournament.name} 2026 — ${first.title}` }}
+>
+  <div class="sv-tr-page">
+    <header class="sv-header sv-tr-header-solid">
+      <NavBar
+        logoSrc={tournament.logo}
+        homeHref="/tournament/"
+        links={tournamentNav.map((l) => ({ ...l, active: l.label === 'Gallery' }))}
+        cta={cta}
+        ctaArrow
+        back={backToMain}
+      />
+    </header>
+
+    <main id="main" class="sv-gl sv-root">
+      <div class="sv-container">
+        <h1 class="sv-dr-title">{gallery.title}</h1>
+        <p class="sv-dr-note">{gallery.note}</p>
+
+        <ul class="sv-gl-albums">
+          {gallery.albums.map((album, i) => (
+            <li>
+              <a class="sv-gl-album" href={albumHref(album.slug)}>
+                <img
+                  src={thumbSrc(album.slug, album.cover.id)}
+                  alt=""
+                  width="640"
+                  height={Math.round((640 * album.cover.height) / album.cover.width)}
+                  loading={i < 2 ? 'eager' : 'lazy'}
+                  decoding="async"
+                />
+                <span class="sv-gl-album-body">
+                  <span class="sv-gl-album-title">{album.title}</span>
+                  <span class="sv-gl-album-desc">{album.description}</span>
+                  <span class="sv-gl-album-count">
+                    {album.photos.length} photos <Icon name="arrow-right" size={18} />
+                  </span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </main>
+
+    <TournamentFooter />
+  </div>
+</Base>
