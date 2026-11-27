@@ -23,7 +23,7 @@
  * (IMG_9999 → IMG_0001), so file names do not sort chronologically.
  *
  * Re-running is safe: frames already converted are skipped, and files whose source has
- * gone from the folder are removed.
+ * gone from the folder, or is listed in SKIP, are removed.
  */
 import { readdir, mkdir, rm, stat, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -37,6 +37,42 @@ const FOLDERS = {
   '2 Winners & Runner-Ups': 'winners',
   '3 Guests': 'guests',
   '4 Behind The Scenes': 'behind-the-scenes',
+};
+
+/**
+ * Burst frames left out of the site. The photographer delivered 2–6 near-identical shots
+ * of most posed photos; one per burst is kept (picked 27 Nov 2026 for smiles and eyes
+ * open, then sharpness) and the rest are listed here so a re-import does not bring them
+ * back. File names as in the export, without extension.
+ */
+const SKIP = {
+  highlights: [
+    'IMG_9742', 'IMG_9743', 'IMG_9745', 'IMG_9746', // kept 9744
+    'IMG_9817', 'IMG_9818', 'IMG_9819', // kept 9820
+    'IMG_9821', 'IMG_9822', 'IMG_9824', 'IMG_9825', // kept 9823
+    'IMG_9889', 'IMG_9890', 'IMG_9891', // kept 9892
+  ],
+  winners: [
+    'IMG_0076', 'IMG_0077', // kept 0078
+    'IMG_0080', 'IMG_0081', 'IMG_0082', // kept 0079
+    'IMG_0083', 'IMG_0084', 'IMG_0086', // kept 0085
+    'IMG_0087', 'IMG_0089', 'IMG_0090', 'IMG_0091', // kept 0088
+    'IMG_0092', 'IMG_0093', 'IMG_0095', 'IMG_0096', // kept 0094
+    'IMG_0098', 'IMG_0099', 'IMG_0100', 'IMG_0101', // kept 0097
+    'IMG_0103', // kept 0102
+    'IMG_0104', // kept 0105
+  ],
+  guests: [
+    'IMG_0071', // kept 0072
+    'IMG_0073', // kept 0074
+    'IMG_0112', 'IMG_0113', 'IMG_0114', 'IMG_0115', 'IMG_0117', // kept 0116
+    'IMG_0118', // kept 0119
+    'IMG_0120', // kept 0121
+  ],
+  'behind-the-scenes': [
+    'IMG_9811', // kept 9810
+    'IMG_9812', // kept 9813
+  ],
 };
 
 const THUMB_WIDTH = 640;
@@ -99,7 +135,8 @@ for (const [folder, slug] of Object.entries(FOLDERS)) {
   const outDir = path.join(outRoot, slug);
   await mkdir(outDir, { recursive: true });
 
-  const files = (await readdir(dir)).filter((f) => /\.je?pg$/i.test(f));
+  const skip = new Set(SKIP[slug] ?? []);
+  const files = (await readdir(dir)).filter((f) => /\.je?pg$/i.test(f) && !skip.has(path.parse(f).name));
   const photos = [];
 
   for (const file of files) {
